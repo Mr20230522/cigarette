@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobDistrictMapper">
+    
+    <resultMap type="TobDistrict" id="TobDistrictResult">
+        <result property="districtId"    column="district_id"    />
+        <result property="parentId"    column="parent_id"    />
+        <result property="ancestors"    column="ancestors"    />
+        <result property="districtName"    column="district_name"    />
+        <result property="orderNum"    column="order_num"    />
+        <result property="leader"    column="leader"    />
+        <result property="phone"    column="phone"    />
+        <result property="email"    column="email"    />
+        <result property="status"    column="status"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectTobDistrictVo">
+        select district_id, parent_id, ancestors, district_name, order_num, leader, phone, email, status, del_flag, create_time, update_time from tob_district
+    </sql>
+
+    <select id="selectTobDistrictList" parameterType="TobDistrict" resultMap="TobDistrictResult">
+        <include refid="selectTobDistrictVo"/>
+        <where>  
+            <if test="parentId != null "> and parent_id = #{parentId}</if>
+            <if test="ancestors != null  and ancestors != ''"> and ancestors = #{ancestors}</if>
+            <if test="districtName != null  and districtName != ''"> and district_name like concat('%', #{districtName}, '%')</if>
+            <if test="orderNum != null "> and order_num = #{orderNum}</if>
+            <if test="leader != null  and leader != ''"> and leader = #{leader}</if>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="email != null  and email != ''"> and email = #{email}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectTobDistrictByDistrictId" parameterType="Long" resultMap="TobDistrictResult">
+        <include refid="selectTobDistrictVo"/>
+        where district_id = #{districtId}
+    </select>
+
+    <insert id="insertTobDistrict" parameterType="TobDistrict" useGeneratedKeys="true" keyProperty="districtId">
+        insert into tob_district
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="parentId != null">parent_id,</if>
+            <if test="ancestors != null">ancestors,</if>
+            <if test="districtName != null">district_name,</if>
+            <if test="orderNum != null">order_num,</if>
+            <if test="leader != null">leader,</if>
+            <if test="phone != null">phone,</if>
+            <if test="email != null">email,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="parentId != null">#{parentId},</if>
+            <if test="ancestors != null">#{ancestors},</if>
+            <if test="districtName != null">#{districtName},</if>
+            <if test="orderNum != null">#{orderNum},</if>
+            <if test="leader != null">#{leader},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="email != null">#{email},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTobDistrict" parameterType="TobDistrict">
+        update tob_district
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="ancestors != null">ancestors = #{ancestors},</if>
+            <if test="districtName != null">district_name = #{districtName},</if>
+            <if test="orderNum != null">order_num = #{orderNum},</if>
+            <if test="leader != null">leader = #{leader},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where district_id = #{districtId}
+    </update>
+
+    <delete id="deleteTobDistrictByDistrictId" parameterType="Long">
+        delete from tob_district where district_id = #{districtId}
+    </delete>
+
+    <delete id="deleteTobDistrictByDistrictIds" parameterType="String">
+        delete from tob_district where district_id in 
+        <foreach item="districtId" collection="array" open="(" separator="," close=")">
+            #{districtId}
+        </foreach>
+    </delete>
+</mapper>
