@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobCaseInformationMapper">
+    
+    <resultMap type="TobCaseInformation" id="TobCaseInformationResult">
+        <result property="caseId"    column="case_id"    />
+        <result property="caseCode"    column="case_code"    />
+        <result property="caseName"    column="case_name"    />
+        <result property="caseStartDate"    column="case_start_date"    />
+        <result property="caseEndDate"    column="case_end_date"    />
+        <result property="caseValue"    column="case_value"    />
+        <result property="incidentLocation"    column="incident_location"    />
+        <result property="illegalId"    column="illegal_id"    />
+        <result property="behaviorId"    column="behavior_id"    />
+        <result property="caseSourceId"    column="case_source_id"    />
+        <result property="caseType"    column="case_type"    />
+        <result property="caseStatus"    column="case_status"    />
+        <result property="mainCharge"    column="main_charge"    />
+        <result property="secondaryCharge"    column="secondary_charge"    />
+        <result property="mainCaseDetails"    column="main_case_details"    />
+        <result property="entryDate"    column="entry_date"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="remark"    column="remark"    />
+        <result property="caseUserId"    column="case_user_id"    />
+    </resultMap>
+
+    <sql id="selectTobCaseInformationVo">
+        select case_id, case_code, case_name, case_start_date, case_end_date, case_value, incident_location, illegal_id, behavior_id, case_source_id, case_type, case_status, main_charge, secondary_charge, main_case_details, entry_date, del_flag, remark, case_user_id from tob_case_information
+    </sql>
+
+    <select id="selectTobCaseInformationList" parameterType="TobCaseInformation" resultMap="TobCaseInformationResult">
+        <include refid="selectTobCaseInformationVo"/>
+        <where>  
+            <if test="caseCode != null  and caseCode != ''"> and case_code = #{caseCode}</if>
+            <if test="caseName != null  and caseName != ''"> and case_name like concat('%', #{caseName}, '%')</if>
+            <if test="caseStartDate != null "> and case_start_date = #{caseStartDate}</if>
+            <if test="caseEndDate != null "> and case_end_date = #{caseEndDate}</if>
+            <if test="caseValue != null "> and case_value = #{caseValue}</if>
+            <if test="incidentLocation != null  and incidentLocation != ''"> and incident_location = #{incidentLocation}</if>
+            <if test="illegalId != null "> and illegal_id = #{illegalId}</if>
+            <if test="behaviorId != null "> and behavior_id = #{behaviorId}</if>
+            <if test="caseSourceId != null  and caseSourceId != ''"> and case_source_id = #{caseSourceId}</if>
+            <if test="caseType != null  and caseType != ''"> and case_type = #{caseType}</if>
+            <if test="caseStatus != null  and caseStatus != ''"> and case_status = #{caseStatus}</if>
+            <if test="mainCharge != null  and mainCharge != ''"> and main_charge = #{mainCharge}</if>
+            <if test="secondaryCharge != null  and secondaryCharge != ''"> and secondary_charge = #{secondaryCharge}</if>
+            <if test="mainCaseDetails != null  and mainCaseDetails != ''"> and main_case_details = #{mainCaseDetails}</if>
+            <if test="entryDate != null "> and entry_date = #{entryDate}</if>
+            <if test="caseUserId != null "> and case_user_id = #{caseUserId}</if>
+        </where>
+    </select>
+    
+    <select id="selectTobCaseInformationByCaseId" parameterType="Long" resultMap="TobCaseInformationResult">
+        <include refid="selectTobCaseInformationVo"/>
+        where case_id = #{caseId}
+    </select>
+
+    <insert id="insertTobCaseInformation" parameterType="TobCaseInformation" useGeneratedKeys="true" keyProperty="caseId">
+        insert into tob_case_information
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="caseCode != null and caseCode != ''">case_code,</if>
+            <if test="caseName != null and caseName != ''">case_name,</if>
+            <if test="caseStartDate != null">case_start_date,</if>
+            <if test="caseEndDate != null">case_end_date,</if>
+            <if test="caseValue != null">case_value,</if>
+            <if test="incidentLocation != null and incidentLocation != ''">incident_location,</if>
+            <if test="illegalId != null">illegal_id,</if>
+            <if test="behaviorId != null">behavior_id,</if>
+            <if test="caseSourceId != null and caseSourceId != ''">case_source_id,</if>
+            <if test="caseType != null and caseType != ''">case_type,</if>
+            <if test="caseStatus != null and caseStatus != ''">case_status,</if>
+            <if test="mainCharge != null and mainCharge != ''">main_charge,</if>
+            <if test="secondaryCharge != null and secondaryCharge != ''">secondary_charge,</if>
+            <if test="mainCaseDetails != null and mainCaseDetails != ''">main_case_details,</if>
+            <if test="entryDate != null">entry_date,</if>
+            del_flag,
+            <if test="remark != null">remark,</if>
+            <if test="caseUserId != null">case_user_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="caseCode != null and caseCode != ''">#{caseCode},</if>
+            <if test="caseName != null and caseName != ''">#{caseName},</if>
+            <if test="caseStartDate != null">#{caseStartDate},</if>
+            <if test="caseEndDate != null">#{caseEndDate},</if>
+            <if test="caseValue != null">#{caseValue},</if>
+            <if test="incidentLocation != null and incidentLocation != ''">#{incidentLocation},</if>
+            <if test="illegalId != null">#{illegalId},</if>
+            <if test="behaviorId != null">#{behaviorId},</if>
+            <if test="caseSourceId != null and caseSourceId != ''">#{caseSourceId},</if>
+            <if test="caseType != null and caseType != ''">#{caseType},</if>
+            <if test="caseStatus != null and caseStatus != ''">#{caseStatus},</if>
+            <if test="mainCharge != null and mainCharge != ''">#{mainCharge},</if>
+            <if test="secondaryCharge != null and secondaryCharge != ''">#{secondaryCharge},</if>
+            <if test="mainCaseDetails != null and mainCaseDetails != ''">#{mainCaseDetails},</if>
+            <if test="entryDate != null">#{entryDate},</if>
+            0,
+            <if test="remark != null">#{remark},</if>
+            <if test="caseUserId != null">#{caseUserId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTobCaseInformation" parameterType="TobCaseInformation">
+        update tob_case_information
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="caseCode != null and caseCode != ''">case_code = #{caseCode},</if>
+            <if test="caseName != null and caseName != ''">case_name = #{caseName},</if>
+            <if test="caseStartDate != null">case_start_date = #{caseStartDate},</if>
+            <if test="caseEndDate != null">case_end_date = #{caseEndDate},</if>
+            <if test="caseValue != null">case_value = #{caseValue},</if>
+            <if test="incidentLocation != null and incidentLocation != ''">incident_location = #{incidentLocation},</if>
+            <if test="illegalId != null">illegal_id = #{illegalId},</if>
+            <if test="behaviorId != null">behavior_id = #{behaviorId},</if>
+            <if test="caseSourceId != null and caseSourceId != ''">case_source_id = #{caseSourceId},</if>
+            <if test="caseType != null and caseType != ''">case_type = #{caseType},</if>
+            <if test="caseStatus != null and caseStatus != ''">case_status = #{caseStatus},</if>
+            <if test="mainCharge != null and mainCharge != ''">main_charge = #{mainCharge},</if>
+            <if test="secondaryCharge != null and secondaryCharge != ''">secondary_charge = #{secondaryCharge},</if>
+            <if test="mainCaseDetails != null and mainCaseDetails != ''">main_case_details = #{mainCaseDetails},</if>
+            <if test="entryDate != null">entry_date = #{entryDate},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="caseUserId != null">case_user_id = #{caseUserId},</if>
+        </trim>
+        where case_id = #{caseId}
+    </update>
+
+    <delete id="deleteTobCaseInformationByCaseId" parameterType="Long">
+        update tob_case_information set del_flag = '1' where case_id = #{caseId}
+    </delete>
+
+    <delete id="deleteTobCaseInformationByCaseIds" parameterType="String">
+        delete from tob_case_information where case_id in 
+        <foreach item="caseId" collection="array" open="(" separator="," close=")">
+            #{caseId}
+        </foreach>
+    </delete>
+</mapper>

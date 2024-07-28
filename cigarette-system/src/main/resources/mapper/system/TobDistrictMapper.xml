@@ -53,9 +53,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="phone != null">phone,</if>
             <if test="email != null">email,</if>
             <if test="status != null">status,</if>
-            <if test="delFlag != null">del_flag,</if>
-            <if test="createTime != null">create_time,</if>
-            <if test="updateTime != null">update_time,</if>
+            del_flag,
+            create_time,
+            update_time
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="parentId != null">#{parentId},</if>
@@ -66,9 +66,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="phone != null">#{phone},</if>
             <if test="email != null">#{email},</if>
             <if test="status != null">#{status},</if>
-            <if test="delFlag != null">#{delFlag},</if>
-            <if test="createTime != null">#{createTime},</if>
-            <if test="updateTime != null">#{updateTime},</if>
+            0,
+            sysdate(),
+            sysdate()
          </trim>
     </insert>
 
@@ -84,14 +84,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="email != null">email = #{email},</if>
             <if test="status != null">status = #{status},</if>
             <if test="delFlag != null">del_flag = #{delFlag},</if>
-            <if test="createTime != null">create_time = #{createTime},</if>
-            <if test="updateTime != null">update_time = #{updateTime},</if>
+            update_time = sysdate(),
         </trim>
         where district_id = #{districtId}
     </update>
 
     <delete id="deleteTobDistrictByDistrictId" parameterType="Long">
-        delete from tob_district where district_id = #{districtId}
+        update tob_district set del_flag = '1' where district_id = #{districtId}
     </delete>
 
     <delete id="deleteTobDistrictByDistrictIds" parameterType="String">
