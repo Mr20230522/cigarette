@@ -182,7 +182,7 @@
 </template>
 
 <script>
-import { listDistrict, getDistrict, delDistrict, addDistrict, updateDistrict } from "@/api/cigarette/district";
+import { listDistrict, getDistrict, delDistrict, addDistrict, updateDistrict } from "@/api/cigarette/detection/district";
 
 export default {
   name: "District",
