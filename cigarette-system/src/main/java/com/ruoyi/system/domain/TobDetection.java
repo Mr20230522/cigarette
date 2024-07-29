@@ -9,7 +9,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * 监测区域对象 tob_detection
  * 
  * @author ruoyi
- * @date 2024-07-11
+ * @date 2024-07-24
  */
 public class TobDetection extends BaseEntity
 {
@@ -19,7 +19,6 @@ public class TobDetection extends BaseEntity
     private Long detectionId;
 
     /** 地区id */
-    @Excel(name = "地区id")
     private Long districtId;
 
     /** 监测点顺序 */
@@ -35,11 +34,12 @@ public class TobDetection extends BaseEntity
     private String status;
 
     /** 删除标记 */
+    @Excel(name = "删除标记")
     private String delFlag;
 
-    /** 备注 */
-    @Excel(name = "备注")
-    private String reamke;
+    /** 负责人id */
+    @Excel(name = "负责人id")
+    private Long responsibleId;
 
     public void setDetectionId(Long detectionId) 
     {
@@ -95,14 +95,14 @@ public class TobDetection extends BaseEntity
     {
         return delFlag;
     }
-    public void setReamke(String reamke) 
+    public void setResponsibleId(Long responsibleId) 
     {
-        this.reamke = reamke;
+        this.responsibleId = responsibleId;
     }
 
-    public String getReamke() 
+    public Long getResponsibleId() 
     {
-        return reamke;
+        return responsibleId;
     }
 
     @Override
@@ -114,9 +114,10 @@ public class TobDetection extends BaseEntity
             .append("districtName", getDistrictName())
             .append("status", getStatus())
             .append("delFlag", getDelFlag())
-            .append("reamke", getReamke())
+            .append("remark", getRemark())
             .append("createTime", getCreateTime())
             .append("updateTime", getUpdateTime())
+            .append("responsibleId", getResponsibleId())
             .toString();
     }
 }

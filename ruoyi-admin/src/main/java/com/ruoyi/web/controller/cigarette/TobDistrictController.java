@@ -19,50 +19,48 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.system.domain.TobDistrict;
 import com.ruoyi.system.service.ITobDistrictService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
-import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
- * 地区Controller
- * 
+ * 地区管理Controller
+ *
  * @author ruoyi
- * @date 2024-07-11
+ * @date 2024-07-24
  */
 @RestController
-@RequestMapping("/system/district")
+@RequestMapping("/cigarette/district")
 public class TobDistrictController extends BaseController
 {
     @Autowired
     private ITobDistrictService tobDistrictService;
 
     /**
-     * 查询地区列表
+     * 查询地区管理列表
      */
-    @PreAuthorize("@ss.hasPermi('system:district:list')")
+    @PreAuthorize("@ss.hasPermi('cigarette:district:list')")
     @GetMapping("/list")
-    public TableDataInfo list(TobDistrict tobDistrict)
+    public AjaxResult list(TobDistrict tobDistrict)
     {
-        startPage();
         List<TobDistrict> list = tobDistrictService.selectTobDistrictList(tobDistrict);
-        return getDataTable(list);
+        return success(list);
     }
 
     /**
-     * 导出地区列表
+     * 导出地区管理列表
      */
-    @PreAuthorize("@ss.hasPermi('system:district:export')")
-    @Log(title = "地区", businessType = BusinessType.EXPORT)
+    @PreAuthorize("@ss.hasPermi('cigarette:district:export')")
+    @Log(title = "地区管理", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, TobDistrict tobDistrict)
     {
         List<TobDistrict> list = tobDistrictService.selectTobDistrictList(tobDistrict);
         ExcelUtil<TobDistrict> util = new ExcelUtil<TobDistrict>(TobDistrict.class);
-        util.exportExcel(response, list, "地区数据");
+        util.exportExcel(response, list, "地区管理数据");
     }
 
     /**
-     * 获取地区详细信息
+     * 获取地区管理详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:district:query')")
+    @PreAuthorize("@ss.hasPermi('cigarette:district:query')")
     @GetMapping(value = "/{districtId}")
     public AjaxResult getInfo(@PathVariable("districtId") Long districtId)
     {
@@ -70,10 +68,10 @@ public class TobDistrictController extends BaseController
     }
 
     /**
-     * 新增地区
+     * 新增地区管理
      */
-    @PreAuthorize("@ss.hasPermi('system:district:add')")
-    @Log(title = "地区", businessType = BusinessType.INSERT)
+    @PreAuthorize("@ss.hasPermi('cigarette:district:add')")
+    @Log(title = "地区管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody TobDistrict tobDistrict)
     {
@@ -81,10 +79,10 @@ public class TobDistrictController extends BaseController
     }
 
     /**
-     * 修改地区
+     * 修改地区管理
      */
-    @PreAuthorize("@ss.hasPermi('system:district:edit')")
-    @Log(title = "地区", businessType = BusinessType.UPDATE)
+    @PreAuthorize("@ss.hasPermi('cigarette:district:edit')")
+    @Log(title = "地区管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody TobDistrict tobDistrict)
     {
@@ -92,13 +90,23 @@ public class TobDistrictController extends BaseController
     }
 
     /**
-     * 删除地区
+     * 删除地区管理
      */
-    @PreAuthorize("@ss.hasPermi('system:district:remove')")
-    @Log(title = "地区", businessType = BusinessType.DELETE)
+    @PreAuthorize("@ss.hasPermi('cigarette:district:remove')")
+    @Log(title = "地区管理", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{districtIds}")
     public AjaxResult remove(@PathVariable Long[] districtIds)
     {
         return toAjax(tobDistrictService.deleteTobDistrictByDistrictIds(districtIds));
+    }
+
+    /**
+     * 获取地区树列表
+     */
+    @PreAuthorize("@ss.hasPermi('cigarette:district:list')")
+    @GetMapping("/districtTree")
+    public AjaxResult districtTree(TobDistrict district )
+    {
+        return success(tobDistrictService.selectTobDistrictTreeList(district));
     }
 }
