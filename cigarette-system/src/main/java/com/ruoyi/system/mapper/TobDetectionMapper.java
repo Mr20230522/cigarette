@@ -6,8 +6,8 @@ import com.ruoyi.system.domain.TobDetection;
 /**
  * 监测区域Mapper接口
  * 
- * @author cigarette
- * @date 2024-07-28
+ * @author ruoyi
+ * @date 2024-07-24
  */
 public interface TobDetectionMapper 
 {

@@ -8,8 +8,8 @@ import com.ruoyi.common.core.domain.BaseEntity;
 /**
  * 工作人员对象 tob_staff
  * 
- * @author cigarette
- * @date 2024-07-27
+ * @author ruoyi
+ * @date 2024-07-25
  */
 public class TobStaff extends BaseEntity
 {
@@ -31,6 +31,7 @@ public class TobStaff extends BaseEntity
     private String status;
 
     /** 删除标记 */
+    @Excel(name = "删除标记")
     private String delFlag;
 
     public void setStaffId(Long staffId) 
