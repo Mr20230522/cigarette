@@ -28,8 +28,8 @@
             <el-input v-model="queryParams.orderNum" placeholder="请输入监测点顺序" clearable
               @keyup.enter.native="handleQuery" />
           </el-form-item>
-          <el-form-item label="监测点名称" prop="districtName">
-            <el-input v-model="queryParams.districtName" placeholder="请输入监测点名称" clearable
+          <el-form-item label="监测点名称" prop="detectionName">
+            <el-input v-model="queryParams.detectionName" placeholder="请输入监测点名称" clearable
               @keyup.enter.native="handleQuery" />
           </el-form-item>
           <el-form-item label="状态" prop="status">
@@ -78,7 +78,7 @@
           <el-table-column type="selection" width="55" align="center" />
           <el-table-column label="监测区域id" align="center" prop="detectionId" />
           <el-table-column label="监测点顺序" align="center" prop="orderNum" />
-          <el-table-column label="监测点名称" align="center" prop="districtName" />
+          <el-table-column label="监测点名称" align="center" prop="detectionName" />
           <!-- 监测点所属地区 -->
           <el-table-column label="监测点所属地区" align="center" prop="districtId">
             <template slot-scope="scope">
@@ -122,8 +122,8 @@
         <el-form-item label="监测点顺序" prop="orderNum">
           <el-input v-model="form.orderNum" placeholder="请输入监测点顺序" />
         </el-form-item>
-        <el-form-item label="监测点名称" prop="districtName">
-          <el-input v-model="form.districtName" placeholder="请输入监测点名称" />
+        <el-form-item label="监测点名称" prop="detectionName">
+          <el-input v-model="form.detectionName" placeholder="请输入监测点名称" />
         </el-form-item>
         <!-- 添加下拉框以选择检测区域所属地区 -->
         <!-- <el-form-item label="所属地区" prop="districtId">
@@ -170,9 +170,9 @@
 </template>
 
 <script>
-import { listDetection, getDetection, delDetection, addDetection, updateDetection } from "@/api/cigarette/detection";
-import { listDistrict, districtTreeSelect } from "@/api/cigarette/district"; // 导入地区列表接口
-import { listStaff } from "@/api/cigarette/staff"; // 导入工作人员列表接口
+import { listDetection, getDetection, delDetection, addDetection, updateDetection } from "@/api/cigarette/detection/detection";
+import { listDistrict, districtTreeSelect } from "@/api/cigarette/detection/district"; // 导入地区列表接口
+import { listStaff } from "@/api/cigarette/personnel/staff"; // 导入工作人员列表接口
 import { listUser } from "@/api/system/user"; // 导入用户列表接口
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
@@ -213,7 +213,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         orderNum: null,
-        districtName: null,
+        detectionName: null,
         status: null,
         delFlag: null,
         responsibleId: null,
@@ -227,7 +227,7 @@ export default {
       },
       // 表单校验
       rules: {
-        districtName: [
+        detectionName: [
           { required: true, message: "监测点名称不能为空", trigger: "blur" }
         ],
         status: [

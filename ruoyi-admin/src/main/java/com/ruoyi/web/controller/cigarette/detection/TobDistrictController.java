@@ -1,4 +1,4 @@
-package com.ruoyi.web.controller.cigarette;
+package com.ruoyi.web.controller.cigarette.detection;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
@@ -27,7 +27,7 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
  * @date 2024-07-24
  */
 @RestController
-@RequestMapping("/cigarette/district")
+@RequestMapping("/cigarette/detection/district")
 public class TobDistrictController extends BaseController
 {
     @Autowired

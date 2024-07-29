@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 查询监测区域列表
 export function listDetection(query) {
   return request({
-    url: '/cigarette/detection/list',
+    url: '/cigarette/detection/detection/list',
     method: 'get',
     params: query
   })
@@ -12,7 +12,7 @@ export function listDetection(query) {
 // 查询监测区域详细
 export function getDetection(detectionId) {
   return request({
-    url: '/cigarette/detection/' + detectionId,
+    url: '/cigarette/detection/detection/' + detectionId,
     method: 'get'
   })
 }
@@ -20,7 +20,7 @@ export function getDetection(detectionId) {
 // 新增监测区域
 export function addDetection(data) {
   return request({
-    url: '/cigarette/detection',
+    url: '/cigarette/detection/detection',
     method: 'post',
     data: data
   })
@@ -29,7 +29,7 @@ export function addDetection(data) {
 // 修改监测区域
 export function updateDetection(data) {
   return request({
-    url: '/cigarette/detection',
+    url: '/cigarette/detection/detection',
     method: 'put',
     data: data
   })
@@ -38,7 +38,7 @@ export function updateDetection(data) {
 // 删除监测区域
 export function delDetection(detectionId) {
   return request({
-    url: '/cigarette/detection/' + detectionId,
+    url: '/cigarette/detection/detection/' + detectionId,
     method: 'delete'
   })
 }

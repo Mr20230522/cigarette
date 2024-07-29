@@ -182,7 +182,7 @@
 </template>
 
 <script>
-import { listDistrict, getDistrict, delDistrict, addDistrict, updateDistrict } from "@/api/cigarette/district";
+import { listDistrict, getDistrict, delDistrict, addDistrict, updateDistrict } from "@/api/cigarette/detection/district";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 

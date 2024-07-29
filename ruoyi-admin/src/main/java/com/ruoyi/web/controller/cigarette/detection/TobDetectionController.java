@@ -1,4 +1,4 @@
-package com.ruoyi.web.controller.cigarette;
+package com.ruoyi.web.controller.cigarette.detection;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
@@ -28,7 +28,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
  * @date 2024-07-24
  */
 @RestController
-@RequestMapping("/cigarette/detection")
+@RequestMapping("/cigarette/detection/detection")
 public class TobDetectionController extends BaseController
 {
     @Autowired
