@@ -40,7 +40,12 @@
     <el-table v-loading="loading" :data="inspectorList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="检测人员id" align="center" prop="inspectorId" />
-      <el-table-column label="检测点id" align="center" prop="detectionId" />
+      <el-table-column label="检测点" align="center" prop="detectionId" >
+        <template slot-scope="scope">
+          {{ getDetectionName(scope.row.detectionId) }}
+        </template>
+      </el-table-column>
+  
       <el-table-column label="值班表id" align="center" prop="dutyId" />
       <el-table-column label="状态" align="center" prop="status" />
       <el-table-column label="备注" align="center" prop="remark" />
@@ -88,6 +93,15 @@
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-radio-group v-model="form.status">
+            <el-radio
+              v-for="dict in dict.type.tob_dd_status"
+              :key="dict.value"
+              :label="dict.value"
+            >{{dict.label}}</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <!-- 
          <el-form-item label="工作人员id" prop="staffId">
           <el-input v-model="form.staffId" placeholder="请输入工作人员id" />
@@ -116,7 +130,7 @@ import { listDetection } from "@/api/cigarette/detection/detection"; // 导入�
 
 export default {
   name: "Inspector",
-  dicts: ['tob_del_flag'],
+  dicts: ['tob_del_flag','tob_dd_status'],
   staffOptions: [], // 用于存储工作人员选项的数组
   userOptions: [], // 初始化用户选项    
   detectionOptions: [], // 初始化检测点选项
@@ -148,7 +162,6 @@ export default {
         dutyId: null,
         status: null,
         staffId: null,
-        staffId: null
       },
       // 表单参数
       form: {},

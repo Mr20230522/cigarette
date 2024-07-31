@@ -110,6 +110,12 @@
             @click="handleDelete(scope.row)"
             v-hasPermi="['system:notice:remove']"
           >删除</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-view"
+            @click="openDetailDialog(scope.row.noticeId)"
+          >查看</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -166,6 +172,44 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+
+    <!--通知公告详情 -->
+    <el-dialog :title="form.noticeTitle"
+               :visible.sync="openDetail"
+               width="800px" append-to-body
+               :fullscreen="dialogFull"
+               custom-class="adTextDetailDialogClass"
+    >
+      <div slot="title">
+        <div class="avue-crud__dialog__header">
+            <span class="el-dialog__title">
+            <span style="display:inline-block;background-color: #3478f5;
+            width:3px;height:20px;margin-right:5px;
+            float: left;margin-top:2px"></span>
+              {{ form.noticeTitle }}
+            </span>
+          <!--     全屏缩放按钮     -->
+          <div class="avue-crud__dialog__menu" @click="dialogFull? dialogFull=false: dialogFull=true">
+            <i class="el-icon-full-screen"></i>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:-20px;margin-bottom:10px;">
+        <el-tag size="mini" effect="dark" type="warning" v-if="form.noticeType==2">公告</el-tag>
+        <el-tag size="mini" effect="dark" v-else>信息</el-tag>
+        <span style="margin-left:20px;">{{form.createTime}}</span>
+      </div>
+      <div v-loading="loadingDetail" class="content">
+        <div v-html="form.noticeContent" style="margin-left:0px;margin-right:76px" class="ql-editor"></div>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="closeDetail"> 关 闭 </el-button>
+      </div>
+
+    </el-dialog>
+
   </div>
 </template>
 
@@ -175,8 +219,16 @@ import { listNotice, getNotice, delNotice, addNotice, updateNotice } from "@/api
 export default {
   name: "Notice",
   dicts: ['sys_notice_status', 'sys_notice_type'],
+
   data() {
     return {
+      // 全屏缩放按钮
+      dialogFull:false,
+      // 详情加载
+      loadingDetail: false,
+      // 打开详情
+      openDetail: false,
+
       // 遮罩层
       loading: true,
       // 选中数组
@@ -277,6 +329,23 @@ export default {
         this.title = "修改公告";
       });
     },
+    // 打开信息详情
+    openDetailDialog(id) {
+      this.dialogVisible2 = true;
+      this.openDetail = true;
+      this.loadingDetail = true;
+      getNotice(id).then(response => {
+        this.form = response.data;
+        this.openDetail = true;
+        this.loadingDetail = false;
+      });
+    },
+    // 取消按钮
+    closeDetail() {
+      this.titleDetail = "详情";
+      this.openDetail = false;
+      this.reset();
+    },
     /** 提交按钮 */
     submitForm: function() {
       this.$refs["form"].validate(valid => {
@@ -310,3 +379,71 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+/*  dialog*/
+::v-deep .el-dialog {
+  margin-top: 0vh !important;
+}
+::v-deep .el-dialog__header {
+  padding: 15px 20px 15px;
+}
+::v-deep .el-dialog__headerbtn{
+  top: 15px;
+}
+
+/*dialog header*/
+::v-deep .el-dialog__header{
+  background: #e3eaed;
+}
+::v-deep .avue-crud__dialog__header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+::v-deep .el-dialog__title {
+  color: rgba(0,0,0,.85);
+  font-weight: 500;
+  word-wrap: break-word;
+}
+/*全屏缩放图标样式*/
+::v-deep .avue-crud__dialog__menu {
+  padding-right: 20px;
+  float: left;
+}
+::v-deep .avue-crud__dialog__menu i {
+  color: #909399;
+  font-size: 15px;
+}
+::v-deep .el-icon-full-screen{
+  cursor: pointer;
+}
+::v-deep .el-icon-full-screen:before {
+  content: "\e719";
+}
+
+//头部固定
+::v-deep .adTextDetailDialogClass .el-dialog__body{
+  max-height: calc(100vh - 150px);
+  overflow: auto;
+  border-top:1px solid #dfdfdf;
+  border-bottom:1px solid #dfdfdf;
+}
+::v-deep .adTextDetailDialogClass .el-dialog{
+  position: fixed;
+  height:fit-content;
+  left:0 !important;
+  right:0 !important;
+  top:0 !important;
+  bottom:0 !important;
+  margin:auto !important;
+}
+
+</style>
+
