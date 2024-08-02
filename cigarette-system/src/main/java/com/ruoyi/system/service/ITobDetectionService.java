@@ -5,15 +5,15 @@ import com.ruoyi.system.domain.TobDetection;
 
 /**
  * 监测区域Service接口
- * 
+ *
  * @author ruoyi
  * @date 2024-07-24
  */
-public interface ITobDetectionService 
+public interface ITobDetectionService
 {
     /**
      * 查询监测区域
-     * 
+     *
      * @param detectionId 监测区域主键
      * @return 监测区域
      */
@@ -21,7 +21,7 @@ public interface ITobDetectionService
 
     /**
      * 查询监测区域列表
-     * 
+     *
      * @param tobDetection 监测区域
      * @return 监测区域集合
      */
@@ -29,7 +29,7 @@ public interface ITobDetectionService
 
     /**
      * 新增监测区域
-     * 
+     *
      * @param tobDetection 监测区域
      * @return 结果
      */
@@ -37,7 +37,7 @@ public interface ITobDetectionService
 
     /**
      * 修改监测区域
-     * 
+     *
      * @param tobDetection 监测区域
      * @return 结果
      */
@@ -45,7 +45,7 @@ public interface ITobDetectionService
 
     /**
      * 批量删除监测区域
-     * 
+     *
      * @param detectionIds 需要删除的监测区域主键集合
      * @return 结果
      */
@@ -53,9 +53,16 @@ public interface ITobDetectionService
 
     /**
      * 删除监测区域信息
-     * 
+     *
      * @param detectionId 监测区域主键
      * @return 结果
      */
     public int deleteTobDetectionByDetectionId(Long detectionId);
+
+    /**
+     * 根据地区数据查询监测区域列表
+     * @param tobDetection
+     * @return
+     */
+    List<TobDetection> selectTobDetectionListByDistrictId(TobDetection tobDetection);
 }

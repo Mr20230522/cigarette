@@ -47,8 +47,18 @@ public class TobDetectionController extends BaseController
     }
 
     /**
-     * 导出监测区域列表
+     * 根据地区数据查询监测区域列表
      */
+    @PreAuthorize("@ss.hasPermi('cigarette:detection:listByDistrictId')")
+    @GetMapping("/listByDistrictId")
+    public TableDataInfo listByDistrictId(TobDetection tobDetection)
+    {
+        startPage();
+        List<TobDetection> list = tobDetectionService.selectTobDetectionListByDistrictId(tobDetection);
+        return getDataTable(list);
+    }
+
+
     @PreAuthorize("@ss.hasPermi('cigarette:detection:export')")
     @Log(title = "监测区域", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
