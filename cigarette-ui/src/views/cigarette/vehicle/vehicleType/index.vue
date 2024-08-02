@@ -2,12 +2,15 @@
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="车型名称" prop="carTypeName">
-        <el-input
-          v-model="queryParams.carTypeName"
-          placeholder="请输入车型名称"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+        <el-select v-model="queryParams.carTypeId" placeholder="请选择车型" clearable clearable @keyup.enter.native="handleQuery">
+          <el-option
+            v-for="carType in carTypeList"
+            :key="carType.carTypeId"
+            :label="carType.carTypeName"
+            :value="carType.carTypeId"
+        
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
@@ -73,7 +76,7 @@
 
     <el-table v-loading="loading" :data="carTypeList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="表id" align="center" prop="carTypeId" />
+      <el-table-column label="序号" align="center" prop="carTypeId" />
       <el-table-column label="车型名称" align="center" prop="carTypeName" />
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">

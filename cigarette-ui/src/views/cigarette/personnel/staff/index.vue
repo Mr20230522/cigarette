@@ -9,14 +9,6 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="人脸特征编码" prop="faceFeature">
-        <el-input
-          v-model="queryParams.faceFeature"
-          placeholder="请输入人脸特征编码"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
           <el-option
@@ -81,9 +73,25 @@
 
     <el-table v-loading="loading" :data="staffList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="工作人员id" align="center" prop="staffId" />
+      <el-table-column label="工作人员编号" align="center" prop="staffId" />
       <el-table-column label="用户id" align="center" prop="userId" />
-      <el-table-column label="人脸特征编码" align="center" prop="faceFeature" />
+      <el-table-column label="人脸特征编码" align="center" prop="faceFeature" >
+         <template slot-scope="scope">
+                <!-- 使用作用域数据 scope.row 来访问行数据 -->
+                <el-button 
+                  v-if="scope.row.faceFeature === null"
+                  type="warning"
+                  @click="handleNotRecorded(scope.row)">
+                  尚未录入
+                </el-button>
+                <el-button 
+                  v-else
+                  type="success"
+                  @click="handleRecorded(scope.row)">
+                  已录入
+                </el-button>
+              </template>
+              </el-table-column>
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.status"/>
@@ -121,23 +129,40 @@
     <!-- 添加或修改工作人员对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="用户id" prop="userId">
-          <el-input v-model="form.userId" placeholder="请输入用户id" />
+
+        <el-form-item label="搜索"  >
+                 <el-input v-model="searchInput" @input="filterUsers" placeholder="请输入用户名称、ID 或电话号码" clearable suffix-icon="el-icon-search"></el-input>
+                 <el-scrollbar wrap-class="scrollbar-wrapper" style="max-height: 'auto';">
+                 <el-card class="user-list">
+                       <el-row v-for="(user, index) in filteredUsers" :key="index" class="user-info" :class="{ 'bg-color': index % 2 === 1,'selected': user === selectedUser }">
+                         <el-col :span="24">
+                             <span @click="selectUser(user)" class="label" style="cursor:pointer;">用户ID:{{ user.id }}&nbsp;&nbsp;用户名称:{{ user.username }}&nbsp;&nbsp;电话号码:{{ user.phonenumber }}  </span>
+                         </el-col>
+                       </el-row>
+                     </el-card>
+                 </el-scrollbar>
+        </el-form-item>
+        <el-form-item label="用户编号" prop="userId">
+          <el-input :disabled="true"  v-model="form.userId" placeholder="请在上方搜索人员" />
+        </el-form-item>
+        <el-form-item label="用户名称" prop="userId">
+          <el-input :disabled="true"  v-model="form.userName" placeholder="请在上方搜索人员" />
+        </el-form-item>
+        <el-form-item label="用户电话号码" prop="userId">
+          <el-input :disabled="true"  v-model="form.phoneNumber" placeholder="请在上方搜索人员" />
         </el-form-item>
         <el-form-item label="人脸特征编码" prop="faceFeature">
           <el-input v-model="form.faceFeature" placeholder="请输入人脸特征编码" />
         </el-form-item>
         <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio
-              v-for="dict in dict.type.sys_normal_disable"
-              :key="dict.value"
-              :label="dict.value"
-            >{{dict.label}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="删除标记" prop="delFlag">
-          <el-input v-model="form.delFlag" placeholder="请输入删除标记" />
+          <el-select v-model="form.status" placeholder="请选择状态" clearable>
+            <el-option
+            v-for="dict in dict.type.sys_normal_disable"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
@@ -153,6 +178,7 @@
 
 <script>
 import { listStaff, getStaff, delStaff, addStaff, updateStaff } from "@/api/cigarette/personnel/staff";
+import { listUser, getUser} from "@/api/system/user";
 
 export default {
   name: "Staff",
@@ -187,6 +213,15 @@ export default {
       },
       // 表单参数
       form: {},
+      // 搜索人
+      // 存储搜索信息
+      searchInput:'',
+      // 存储用户信息
+      userIdList: [],
+      // 存储根据搜索条件过滤后的用户列表数据
+      filteredUsers: [],
+      // 存储所选用户信息
+      selectedUser: null,
       // 表单校验
       rules: {
         userId: [
@@ -210,10 +245,25 @@ export default {
   created() {
     this.getList();
   },
+  mounted() {
+     this.filteredUsers = [];
+  },
   methods: {
     /** 查询工作人员列表 */
     getList() {
       this.loading = true;
+      listUser({ pageNum: null, pageSize: 100000 }).then(response => {
+        // 获取到用户信息后，保存原始用户列表数据
+        this.userIdList = response.rows.map(user => {
+          return {
+            id: user.userId,
+            username: user.nickName,
+            phonenumber: user.phonenumber
+          };
+        });
+      }).catch(error => {
+        console.error('Failed to fetch user list:', error);
+      });
       listStaff(this.queryParams).then(response => {
         this.staffList = response.rows;
         this.total = response.total;
@@ -306,7 +356,53 @@ export default {
       this.download('cigarette/personnel/staff/export', {
         ...this.queryParams
       }, `staff_${new Date().getTime()}.xlsx`)
-    }
+    },
+    // 选择数据化进行数据填充
+    filterUsers() {
+        const searchInput = this.searchInput.toLowerCase().trim();
+        if (!searchInput) {
+            // 如果搜索条件为空，不显示任何用户
+            this.filteredUsers = [];
+            return;
+        }
+        this.filteredUsers = this.userIdList.filter(user => {
+            // 在用户名、ID和电话号码中进行搜索匹配
+            return (
+                user.username.toLowerCase().includes(searchInput) ||
+                user.id.toString().includes(searchInput) ||
+                user.phonenumber.toString().includes(searchInput)
+            );
+        }) .slice(0, 10);
+    },
+    // 搜索用户并筛选数据
+    selectUser(user) {
+        // 将所选用户信息存储到 selectedUser 变量中
+        this.selectedUser = user;
+        // 更新表单数据
+        this.$set(this.form, "userId", user.id);
+        this.$set(this.form, "userName", user.username);
+        this.$set(this.form, "phoneNumber", user.phonenumber);
+    },
+              // 处理 "尚未录入" 按钮的点击事件
+     handleNotRecorded(row) {
+          // 可以在这里添加跳转逻辑
+          console.log('跳转到录入人脸特征的页面', row);
+        },
+                  // 处理 "已录入" 按钮的点击事件
+        handleRecorded(row) {
+          // 可以在这里添加查看人脸特征的逻辑
+          console.log('查看人脸特征', row);
+        },
+        // 其他方法...
   }
 };
 </script>
+
+<style>
+  .bg-color {
+    background-color: #f0f0f0;
+  }
+  .selected {
+    background-color: #d0e8f2; /* 天蓝色背景 */
+  }
+</style>

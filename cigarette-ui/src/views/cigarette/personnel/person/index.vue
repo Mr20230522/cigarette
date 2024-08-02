@@ -9,14 +9,6 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="人脸特征编码" prop="faceFeature">
-        <el-input
-          v-model="queryParams.faceFeature"
-          placeholder="请输入人脸特征编码"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="电话号码" prop="phone">
         <el-input
           v-model="queryParams.phone"
@@ -53,14 +45,6 @@
         <el-input
           v-model="queryParams.gender"
           placeholder="请输入性别"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="地址" prop="address">
-        <el-input
-          v-model="queryParams.address"
-          placeholder="请输入地址"
           clearable
           @keyup.enter.native="handleQuery"
         />
@@ -156,18 +140,34 @@
     <el-table v-loading="loading" :data="personList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="驾驶人ID" align="center" prop="suspectId" />
-      <el-table-column label="身份证ID" align="center" prop="identityCard" />
-      <el-table-column label="人脸特征编码" align="center" prop="faceFeature" />
-      <el-table-column label="电话号码" align="center" prop="phone" />
-      <el-table-column label="驾驶证号码" align="center" prop="suspectLicenseNumber" />
-      <el-table-column label="姓名" align="center" prop="name" />
+      <el-table-column label="身份证ID" align="center" prop="identityCard"  min-width="170px" />
+      <el-table-column label="人脸特征编码" align="center" prop="faceFeature" min-width="120px">
+        <template slot-scope="scope">
+               <!-- 使用作用域数据 scope.row 来访问行数据 -->
+               <el-button
+                 v-if="scope.row.faceFeature === null"
+                 type="warning"
+                 @click="handleNotRecorded(scope.row)">
+                 尚未录入
+               </el-button>
+               <el-button
+                 v-else
+                 type="success"
+                 @click="handleRecorded(scope.row)">
+                 已录入
+               </el-button>
+             </template>
+             </el-table-column>
+      <el-table-column label="电话号码" align="center" prop="phone"  min-width="120px" />
+      <el-table-column label="驾驶证号码" align="center" prop="suspectLicenseNumber"  min-width="170px" />
+      <el-table-column label="姓名" align="center" prop="name"  min-width="120px"/>
       <el-table-column label="年龄" align="center" prop="age" />
       <el-table-column label="性别" align="center" prop="gender">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.sys_user_sex" :value="scope.row.gender"/>
         </template>
       </el-table-column>
-      <el-table-column label="地址" align="center" prop="address" />
+      <el-table-column label="地址" align="center" prop="address"  min-width="140px"/>
       <el-table-column label="出现次数" align="center" prop="occurrenceNumber" />
       <el-table-column label="违法状态" align="center" prop="illegalStatus">
         <template slot-scope="scope">
@@ -181,7 +181,7 @@
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="涉案数" align="center" prop="casesInvolved" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width"  min-width="120px">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -231,7 +231,14 @@
           <el-input v-model="form.age" placeholder="请输入年龄" />
         </el-form-item>
         <el-form-item label="性别" prop="gender">
-          <el-input v-model="form.gender" placeholder="请输入性别" />
+          <el-select v-model="form.gender" placeholder="请选择状态" clearable>
+            <el-option
+            v-for="dict in dict.type.sys_user_sex"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="地址" prop="address">
           <el-input v-model="form.address" placeholder="请输入地址" />
@@ -240,25 +247,24 @@
           <el-input v-model="form.occurrenceNumber" placeholder="请输入出现次数" />
         </el-form-item>
         <el-form-item label="违法状态" prop="illegalStatus">
-          <el-radio-group v-model="form.illegalStatus">
-            <el-radio
-              v-for="dict in dict.type.tob_illegal_status"
-              :key="dict.value"
-              :label="dict.value"
-            >{{dict.label}}</el-radio>
-          </el-radio-group>
+          <el-select v-model="form.illegalStatus" placeholder="请选择违法状态" clearable>
+            <el-option
+            v-for="dict in dict.type.tob_illegal_status"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio
-              v-for="dict in dict.type.sys_show_hide"
-              :key="dict.value"
-              :label="dict.value"
-            >{{dict.label}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="删除标记" prop="delFlag">
-          <el-input v-model="form.delFlag" placeholder="请输入删除标记" />
+          <el-select v-model="form.status" placeholder="请选择状态" clearable>
+            <el-option
+            v-for="dict in dict.type.sys_normal_disable"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
@@ -280,7 +286,7 @@ import { listPerson, getPerson, delPerson, addPerson, updatePerson } from "@/api
 
 export default {
   name: "Person",
-  dicts: ['tob_illegal_status', 'sys_show_hide'],
+  dicts: ['tob_illegal_status', 'sys_show_hide','sys_normal_disable','sys_user_sex'],
   data() {
     return {
       // 遮罩层

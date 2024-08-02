@@ -10,17 +10,20 @@
         />
       </el-form-item>
       <el-form-item label="车型" prop="carTypeId">
-        <el-input
-          v-model="queryParams.carTypeId"
-          placeholder="请输入车型"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+        <el-select v-model="queryParams.carTypeId" placeholder="请选择车型" clearable clearable @keyup.enter.native="handleQuery">
+          <el-option
+            v-for="carType in carTypeList"
+            :key="carType.carTypeId"
+            :label="carType.carTypeName"
+            :value="carType.carTypeId"
+
+          />
+        </el-select>
       </el-form-item>
-      <el-form-item label="车的颜色" prop="carColor">
+      <el-form-item label="车身颜色" prop="carColor">
         <el-input
           v-model="queryParams.carColor"
-          placeholder="请输入车的颜色"
+          placeholder="请输入车身颜色"
           clearable
           @keyup.enter.native="handleQuery"
         />
@@ -71,14 +74,7 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="同伙id" prop="accompliceId">
-        <el-input
-          v-model="queryParams.accompliceId"
-          placeholder="请输入同伙id"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
+
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -133,12 +129,16 @@
 
     <el-table v-loading="loading" :data="vehicleBehaviorList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="车行为id" align="center" prop="behaviorId" />
-      <el-table-column label="车id" align="center" prop="carId" />
-      <el-table-column label="车型" align="center" prop="carTypeId" />
-      <el-table-column label="车的颜色" align="center" prop="carColor" />
+      <el-table-column label="车辆行为序号" align="center" prop="behaviorId" />
+      <el-table-column label="车辆序号" align="center" prop="carId" />
+      <el-table-column label="车牌编号" align="center" prop=" " />
+      <el-table-column label="车型" align="center" prop="carTypeId" :formatter="formatCarTypeName" min-width="120px">
+      </el-table-column>
+      <el-table-column label="车身颜色" align="center" prop="carColor" />
       <el-table-column label="嫌疑程度" align="center" prop="degreeSuspicion" />
-      <el-table-column label="驾驶人id" align="center" prop="driverId" />
+
+      <el-table-column label="驾驶人编号" align="center" prop="driverId" />
+      <el-table-column label="驾驶人姓名" align="center" prop=" " min-width="120px"/>
       <el-table-column label="行驶方向" align="center" prop="drivingDirection">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.tob_driving_irection" :value="scope.row.drivingDirection"/>
@@ -156,7 +156,8 @@
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="同伙id" align="center" prop="accompliceId" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="同伙姓名" align="center" prop="name" min-width="120px"/>
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="120px">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -175,7 +176,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -187,55 +188,104 @@
     <!-- 添加或修改车辆行为记录对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="车id" prop="carId">
-          <el-input v-model="form.carId" placeholder="请输入车id" />
-        </el-form-item>
+         <el-form-item label="搜索"  >
+                         <el-input v-model="searchInputCar" @input="filterCar" placeholder="请输入车辆编号或者车牌号" clearable suffix-icon="el-icon-search"></el-input>
+                         <el-scrollbar wrap-class="scrollbar-wrapper" style="max-height: 'auto';">
+                         <el-card class="user-list">
+                               <el-row v-for="(car, index) in filteredCar" :key="index" class="user-info" :class="{ 'bg-color': index % 2 === 1,'selected': car === selectedCar }">
+                                 <el-col :span="24">
+                                     <span @click="selectCar(car)" class="label" style="cursor:pointer;">车辆ID:{{ car.carId }}&nbsp;&nbsp;车牌编号:{{ car.licensePlate }}</span>
+                                 </el-col>
+                               </el-row>
+                             </el-card>
+                         </el-scrollbar>
+                </el-form-item>
+                <el-form-item label="车辆编号" prop="carId">
+                  <el-input :disabled="true" v-model="form.carId" placeholder="请输入车辆编号" />
+                </el-form-item>
+                <el-form-item label="车牌编号" prop="name">
+                  <el-input :disabled="true" v-model="form.licensePlate" placeholder="请输入车牌编号" />
+                </el-form-item>
         <el-form-item label="车型" prop="carTypeId">
-          <el-input v-model="form.carTypeId" placeholder="请输入车型" />
+          <el-select v-model="form.carTypeId" placeholder="请选择车型" clearable>
+            <el-option
+              v-for="carType in carTypeList"
+              :key="carType.carTypeId"
+              :label="carType.carTypeName"
+              :value="carType.carTypeId"
+            />
+          </el-select>
         </el-form-item>
-        <el-form-item label="车的颜色" prop="carColor">
-          <el-input v-model="form.carColor" placeholder="请输入车的颜色" />
+        <el-form-item label="车身颜色" prop="carColor">
+          <el-input v-model="form.carColor" placeholder="请输入车身颜色" />
         </el-form-item>
+
         <el-form-item label="嫌疑程度" prop="degreeSuspicion">
-          <el-input v-model="form.degreeSuspicion" placeholder="请输入嫌疑程度" />
+
+            <template>
+              <div class="block">
+                <el-slider
+                  v-model="form.degreeSuspicion"
+                  show-input>
+                </el-slider>
+              </div>
+            </template>
         </el-form-item>
-        <el-form-item label="驾驶人id" prop="driverId">
-          <el-input v-model="form.driverId" placeholder="请输入驾驶人id" />
+        <el-form-item label="搜索"  >
+                 <el-input v-model="searchInput" @input="filterUsers" placeholder="请输入驾驶员名称、ID 或电话号码" clearable suffix-icon="el-icon-search"></el-input>
+                 <el-scrollbar wrap-class="scrollbar-wrapper" style="max-height: 'auto';">
+                 <el-card class="user-list">
+                       <el-row v-for="(user, index) in filteredUsers" :key="index" class="user-info" :class="{ 'bg-color': index % 2 === 1,'selected': user === selectedUser }">
+                         <el-col :span="24">
+                             <span @click="selectUser(user)" class="label" style="cursor:pointer;">用户ID:{{ user.id }}&nbsp;&nbsp;用户名称:{{ user.username }}&nbsp;&nbsp;电话号码:{{ user.phonenumber }}  </span>
+                         </el-col>
+                       </el-row>
+                     </el-card>
+                 </el-scrollbar>
+        </el-form-item>
+        <el-form-item label="车主id" prop="carOwnerId">
+          <el-input :disabled="true" v-model="form.carOwnerId" placeholder="请输入车主id" />
+        </el-form-item>
+        <el-form-item label="车主姓名" prop="name">
+          <el-input :disabled="true" v-model="form.name" placeholder="请输入车主姓名" />
+        </el-form-item>
+        <el-form-item label="车主电话号码" prop="phone">
+          <el-input :disabled="true" v-model="form.phone" placeholder="请输入车主电话号码" />
         </el-form-item>
         <el-form-item label="行驶方向" prop="drivingDirection">
-          <el-radio-group v-model="form.drivingDirection">
-            <el-radio
-              v-for="dict in dict.type.tob_driving_irection"
-              :key="dict.value"
-              :label="dict.value"
-            >{{dict.label}}</el-radio>
-          </el-radio-group>
+          <el-select v-model="form.drivingDirection" placeholder="行驶方向" clearable>
+            <el-option
+            v-for="dict in dict.type.tob_driving_irection"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="违法状态" prop="illegalStatus">
-          <el-radio-group v-model="form.illegalStatus">
-            <el-radio
-              v-for="dict in dict.type.tob_illegal_status"
-              :key="dict.value"
-              :label="dict.value"
-            >{{dict.label}}</el-radio>
-          </el-radio-group>
+          <el-select v-model="form.illegalStatus" placeholder="请选择违法状态" clearable>
+            <el-option
+            v-for="dict in dict.type.tob_illegal_status"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio
-              v-for="dict in dict.type.sys_normal_disable"
-              :key="dict.value"
-              :label="dict.value"
-            >{{dict.label}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="删除标记" prop="delFlag">
-          <el-input v-model="form.delFlag" placeholder="请输入删除标记" />
+          <el-select v-model="form.status" placeholder="请选择状态" clearable>
+            <el-option
+            v-for="dict in dict.type.sys_normal_disable"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
-        <el-form-item label="同伙id" prop="accompliceId">
+        <el-form-item label="同伙人" prop="accompliceId">
           <el-input v-model="form.accompliceId" placeholder="请输入同伙id" />
         </el-form-item>
       </el-form>
@@ -249,6 +299,9 @@
 
 <script>
 import { listVehicleBehavior, getVehicleBehavior, delVehicleBehavior, addVehicleBehavior, updateVehicleBehavior } from "@/api/cigarette/vehicle/vehicleBehavior";
+import { listCarType } from "@/api/cigarette/vehicle/carType";
+import { listUser} from "@/api/system/user";
+import { listVehicle} from "@/api/cigarette/vehicle/vehicle";
 
 export default {
   name: "VehicleBehavior",
@@ -269,6 +322,7 @@ export default {
       total: 0,
       // 车辆行为记录表格数据
       vehicleBehaviorList: [],
+      carTypeList:[],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -287,8 +341,25 @@ export default {
         status: null,
         accompliceId: null
       },
+
       // 表单参数
       form: {},
+      // 存储搜索信息
+      searchInput:'',
+      // 存储用户信息
+      userIdList: [],
+      // 存储根据搜索条件过滤后的用户列表数据
+      filteredUsers: [],
+      // 存储所选用户信息
+      selectedUser: null,
+      // 存储车辆搜索信息
+      searchInputCar:'',
+      // 存储用户信息
+      carIdList: [],
+      // 存储根据搜索条件过滤后的用户列表数据
+      filteredCar: [],
+      // 存储所选用户信息
+      selectedCar: null,
       // 表单校验
       rules: {
         carId: [
@@ -331,6 +402,9 @@ export default {
       listVehicleBehavior(this.queryParams).then(response => {
         this.vehicleBehaviorList = response.rows;
         this.total = response.total;
+      });
+      listCarType(this.queryParams).then(response2 => {
+        this.carTypeList = response2.rows;
         this.loading = false;
       });
     },
@@ -378,6 +452,29 @@ export default {
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
+      listUser({ pageNum: null, pageSize: 100000 }).then(response => {
+        // 获取到用户信息后，保存原始用户列表数据
+        this.userIdList = response.rows.map(user => {
+          return {
+            id: user.userId,
+            username: user.nickName,
+            phonenumber: user.phonenumber
+          };
+        });
+      }).catch(error => {
+        console.error('Failed to fetch user list:', error);
+      });
+      listVehicle({ pageNum: null, pageSize: 100000 }).then(response => {
+        // 获取到用户信息后，保存原始用户列表数据
+        this.carIdList = response.rows.map(car => {
+          return {
+            carId: car.carId,
+            licensePlate: car.licensePlate,
+          };
+        });
+      }).catch(error => {
+        console.error('Failed to fetch user list:', error);
+      });
       this.open = true;
       this.title = "添加车辆行为记录";
     },
@@ -426,7 +523,79 @@ export default {
       this.download('cigarette/vehicle/vehicleBehavior/export', {
         ...this.queryParams
       }, `vehicleBehavior_${new Date().getTime()}.xlsx`)
-    }
+    },
+    // 将carTypeId转化显示为carTypeName
+    formatCarTypeName(row) {
+      // 根据 carTypeId 找到对应的 carTypeName
+      const carType = this.getCarTypeByCarTypeId(row.carTypeId);
+      return carType ? carType.carTypeName : '';
+    },
+    // 根据 carTypeId 获取 carType 对象
+    getCarTypeByCarTypeId(carTypeId) {
+      // 这里假设 carTypeList 是一个包含所有车型信息的数组
+      // 您需要确保 carTypeList 已经在 data 中定义，并且包含 carTypeId 和 carTypeName
+      return this.carTypeList.find(carType => carType.carTypeId === carTypeId);
+    },
+    // 选择数据化进行数据填充
+    filterUsers() {
+        const searchInput = this.searchInput.toLowerCase().trim();
+        if (!searchInput) {
+            // 如果搜索条件为空，不显示任何用户
+            this.filteredUsers = [];
+            return;
+        }
+        this.filteredUsers = this.userIdList.filter(user => {
+            // 在用户名、ID和电话号码中进行搜索匹配
+            return (
+                user.username.toLowerCase().includes(searchInput) ||
+                user.id.toString().includes(searchInput) ||
+                user.phonenumber.toString().includes(searchInput)
+            );
+        }) .slice(0, 10);
+    },
+    // 搜索用户并筛选数据
+    selectUser(user) {
+        // 将所选用户信息存储到 selectedUser 变量中
+        this.selectedUser = user;
+        // 更新表单数据
+        this.$set(this.form, "carOwnerId", user.id);
+        this.$set(this.form, "name", user.username);
+        this.$set(this.form, "phone", user.phonenumber);
+    },
+
+    // 选择数据化进行数据填充
+    filterCar() {
+        const searchInputCar = this.searchInputCar.toLowerCase().trim();
+        if (!searchInputCar) {
+            // 如果搜索条件为空，不显示任何用户
+            this.filteredCar = [];
+            return;
+        }
+        this.filteredCar = this.carIdList.filter(car => {
+            // 在用户名、ID和电话号码中进行搜索匹配
+            return (
+                car.licensePlate.toLowerCase().includes(searchInputCar) ||
+                car.carId.toString().includes(searchInputCar)
+            );
+        }) .slice(0, 10);
+    },
+    // 搜索用户并筛选数据
+    selectCar(car) {
+        // 将所选用户信息存储到 selectedCar 变量中
+        this.selectedCar = car;
+        // 更新表单数据
+        this.$set(this.form, "carId", car.carId);
+        this.$set(this.form, "licensePlate", car.licensePlate);
+    },
   }
 };
 </script>
+
+<style>
+  .bg-color {
+    background-color: #f0f0f0;
+  }
+  .selected {
+    background-color: #d0e8f2; /* 天蓝色背景 */
+  }
+</style>
