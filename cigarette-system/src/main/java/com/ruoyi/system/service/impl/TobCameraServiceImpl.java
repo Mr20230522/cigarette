@@ -10,19 +10,19 @@ import com.ruoyi.system.service.ITobCameraService;
 
 /**
  * 摄像头Service业务层处理
- * 
+ *
  * @author cigarette
  * @date 2024-07-28
  */
 @Service
-public class TobCameraServiceImpl implements ITobCameraService 
+public class TobCameraServiceImpl implements ITobCameraService
 {
     @Autowired
     private TobCameraMapper tobCameraMapper;
 
     /**
      * 查询摄像头
-     * 
+     *
      * @param cameraId 摄像头主键
      * @return 摄像头
      */
@@ -34,7 +34,7 @@ public class TobCameraServiceImpl implements ITobCameraService
 
     /**
      * 查询摄像头列表
-     * 
+     *
      * @param tobCamera 摄像头
      * @return 摄像头
      */
@@ -46,7 +46,7 @@ public class TobCameraServiceImpl implements ITobCameraService
 
     /**
      * 新增摄像头
-     * 
+     *
      * @param tobCamera 摄像头
      * @return 结果
      */
@@ -59,7 +59,7 @@ public class TobCameraServiceImpl implements ITobCameraService
 
     /**
      * 修改摄像头
-     * 
+     *
      * @param tobCamera 摄像头
      * @return 结果
      */
@@ -72,7 +72,7 @@ public class TobCameraServiceImpl implements ITobCameraService
 
     /**
      * 批量删除摄像头
-     * 
+     *
      * @param cameraIds 需要删除的摄像头主键
      * @return 结果
      */
@@ -84,7 +84,7 @@ public class TobCameraServiceImpl implements ITobCameraService
 
     /**
      * 删除摄像头信息
-     * 
+     *
      * @param cameraId 摄像头主键
      * @return 结果
      */
@@ -92,5 +92,15 @@ public class TobCameraServiceImpl implements ITobCameraService
     public int deleteTobCameraByCameraId(Long cameraId)
     {
         return tobCameraMapper.deleteTobCameraByCameraId(cameraId);
+    }
+
+    /**
+     * 根据地区数据查询摄像头列表
+     * @param tobCamera
+     * @return
+     */
+    @Override
+    public List<TobCamera> selectTobCameraListByDistrictId(TobCamera tobCamera) {
+        return tobCameraMapper.selectTobCameraListByDistrictId(tobCamera);
     }
 }

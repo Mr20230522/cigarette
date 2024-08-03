@@ -233,7 +233,7 @@ export default {
     };
   },
   watch: {
-    // 根据名称筛选部门树
+    // 根据名称筛选地区树
     districtName(val) {
       this.$refs.tree.filter(val);
     }
