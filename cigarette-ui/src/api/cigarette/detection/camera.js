@@ -8,7 +8,14 @@ export function listCamera(query) {
     params: query
   })
 }
-
+//根据摄像头数据查询监测区域列表
+export function listCameraByDistrictId(query) {
+  return request({
+    url: '/cigarette/detection/camera/listByDistrictId',
+    method: 'get',
+    params: query
+  })
+}
 // 查询摄像头详细
 export function getCamera(cameraId) {
   return request({

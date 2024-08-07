@@ -8,16 +8,9 @@
             style="margin-bottom: 20px" />
         </div>
         <div class="head-container">
-          <el-tree 
-          :data="districtTreeOptions" 
-          :props="defaultProps" 
-          :expand-on-click-node="false"
-          :filter-node-method="filterNode" 
-          ref="tree" 
-          node-key="id" 
-          default-expand-all 
-          highlight-current
-          @node-click="handleNodeClick" />
+          <el-tree :data="districtTreeOptions" :props="defaultProps" :expand-on-click-node="false"
+            :filter-node-method="filterNode" ref="tree" node-key="id" default-expand-all highlight-current
+            @node-click="handleNodeClickByDistrictId" />
         </div>
       </el-col>
       <!-- 监测点数据 -->
@@ -133,9 +126,9 @@
           </el-select>
         </el-form-item> -->
         <el-form-item label="所属地区" prop="districtId">
-        <treeselect v-model="form.districtId" :options="districtTreeOptions" placeholder="请选择所属地区" />
-      </el-form-item>
-     
+          <treeselect v-model="form.districtId" :options="districtTreeOptions" placeholder="请选择所属地区" />
+        </el-form-item>
+
 
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="form.status">
@@ -170,7 +163,7 @@
 </template>
 
 <script>
-import { listDetection, getDetection, delDetection, addDetection, updateDetection } from "@/api/cigarette/detection/detection";
+import { listDetection, getDetection, delDetection, addDetection, updateDetection, listDetectionByDistrictId } from "@/api/cigarette/detection/detection";
 import { listDistrict, districtTreeSelect } from "@/api/cigarette/detection/district"; // 导入地区列表接口
 import { listStaff } from "@/api/cigarette/personnel/staff"; // 导入工作人员列表接口
 import { listUser } from "@/api/system/user"; // 导入用户列表接口
@@ -240,7 +233,7 @@ export default {
     };
   },
   watch: {
-    // 根据名称筛选部门树
+    // 根据名称筛选地区树
     districtName(val) {
       this.$refs.tree.filter(val);
     }
@@ -319,7 +312,16 @@ export default {
 
       });
     },
-    /** 查询部门下拉树结构 */
+    /** 查询监测区域列表 */
+    getListByDistrictId() {
+      this.loading = true;
+      listDetectionByDistrictId(this.queryParams).then(response => {
+        this.detectionList = response.rows;
+        this.total = response.total;
+        this.loading = false;
+      });
+    },
+    /** 查询地区下拉树结构 */
     getDistrictTree() {
       districtTreeSelect().then(response => {
         this.districtTreeOptions = response.data;
@@ -335,10 +337,20 @@ export default {
       this.queryParams.districtId = data.id;
       this.handleQuery();
     },
+    // 节点单击事件
+    handleNodeClickByDistrictId(data) {
+      this.queryParams.districtId = data.id;
+      this.handleQueryByDistrictId();
+    },
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
       this.getList();
+    },
+    /** 搜索按钮操作 */
+    handleQueryByDistrictId() {
+      this.queryParams.pageNum = 1;
+      this.getListByDistrictId();
     },
     // 取消按钮
     cancel() {

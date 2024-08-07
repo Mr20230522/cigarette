@@ -2,94 +2,48 @@
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="地区名称" prop="districtName">
-        <el-input
-          v-model="queryParams.districtName"
-          placeholder="请输入地区名称"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.districtName" placeholder="请输入地区名称" clearable
+          @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item label="负责人" prop="leader">
-        <el-input
-          v-model="queryParams.leader"
-          placeholder="请输入负责人"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.leader" placeholder="请输入负责人" clearable @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item label="联系电话" prop="phone">
-        <el-input
-          v-model="queryParams.phone"
-          placeholder="请输入联系电话"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.phone" placeholder="请输入联系电话" clearable @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item label="邮箱" prop="email">
-        <el-input
-          v-model="queryParams.email"
-          placeholder="请输入邮箱"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.email" placeholder="请输入邮箱" clearable @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
-          <el-option
-            v-for="dict in dict.type.tob_dd_status"
-            :key="dict.value"
-            :label="dict.label"
-            :value="dict.value"
-          />
+          <el-option v-for="dict in dict.type.tob_dd_status" :key="dict.value" :label="dict.label"
+            :value="dict.value" />
         </el-select>
       </el-form-item>
       <el-form-item label="删除标记" prop="delFlag">
         <el-select v-model="queryParams.delFlag" placeholder="请选择删除标记" clearable>
-          <el-option
-            v-for="dict in dict.type.tob_del_flag"
-            :key="dict.value"
-            :label="dict.label"
-            :value="dict.value"
-          />
+          <el-option v-for="dict in dict.type.tob_del_flag" :key="dict.value" :label="dict.label" :value="dict.value" />
         </el-select>
       </el-form-item>
       <el-form-item>
-	    <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-          v-hasPermi="['cigarette:district:add']"
-        >新增</el-button>
+        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
+          v-hasPermi="['cigarette:district:add']">新增</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button
-          type="info"
-          plain
-          icon="el-icon-sort"
-          size="mini"
-          @click="toggleExpandAll"
-        >展开/折叠</el-button>
+        <el-button type="info" plain icon="el-icon-sort" size="mini" @click="toggleExpandAll">展开/折叠</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table
-      v-if="refreshTable"
-      v-loading="loading"
-      :data="districtList"
-      row-key="districtId"
-      :default-expand-all="isExpandAll"
-      :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
-    >
+    <el-table v-if="refreshTable" v-loading="loading" :data="districtList" row-key="districtId"
+      :default-expand-all="isExpandAll" :tree-props="{ children: 'children', hasChildren: 'hasChildren' }">
       <el-table-column label="地区名称" align="center" prop="districtName" />
       <el-table-column label="显示顺序" align="center" prop="orderNum" />
       <el-table-column label="负责人" align="center" prop="leader" />
@@ -97,38 +51,23 @@
       <el-table-column label="邮箱" align="center" prop="email" />
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
-          <dict-tag :options="dict.type.tob_dd_status" :value="scope.row.status"/>
+          <dict-tag :options="dict.type.tob_dd_status" :value="scope.row.status" />
         </template>
       </el-table-column>
       <el-table-column label="删除标记" align="center" prop="delFlag">
         <template slot-scope="scope">
-          <dict-tag :options="dict.type.tob_del_flag" :value="scope.row.delFlag"/>
+          <dict-tag :options="dict.type.tob_del_flag" :value="scope.row.delFlag" />
         </template>
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['cigarette:district:edit']"
-          >修改</el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-plus"
-            @click="handleAdd(scope.row)"
-            v-hasPermi="['cigarette:district:add']"
-          >新增</el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['cigarette:district:remove']"
-          >删除</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
+            v-hasPermi="['cigarette:district:edit']">修改</el-button>
+          <el-button size="mini" type="text" icon="el-icon-plus" @click="handleAdd(scope.row)"
+            v-hasPermi="['cigarette:district:add']">新增</el-button>
+          <el-button v-if="scope.row.parentId !== 0" size="mini" type="text" icon="el-icon-delete"
+            @click="handleDelete(scope.row)" v-hasPermi="['cigarette:district:remove']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -153,20 +92,14 @@
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="form.status">
-            <el-radio
-              v-for="dict in dict.type.tob_dd_status"
-              :key="dict.value"
-              :label="dict.value"
-            >{{dict.label}}</el-radio>
+            <el-radio v-for="dict in dict.type.tob_dd_status" :key="dict.value"
+              :label="dict.value">{{ dict.label }}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="删除标记" prop="delFlag">
           <el-radio-group v-model="form.delFlag">
-            <el-radio
-              v-for="dict in dict.type.tob_del_flag"
-              :key="dict.value"
-              :label="dict.value"
-            >{{dict.label}}</el-radio>
+            <el-radio v-for="dict in dict.type.tob_del_flag" :key="dict.value"
+              :label="dict.value">{{ dict.label }}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
@@ -267,7 +200,7 @@ export default {
         children: node.children
       };
     },
-	/** 查询地区管理下拉树结构 */
+    /** 查询地区管理下拉树结构 */
     getTreeselect() {
       listDistrict().then(response => {
         this.districtOptions = [];
@@ -364,12 +297,12 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      this.$modal.confirm('是否确认删除地区管理编号为"' + row.districtId + '"的数据项？').then(function() {
+      this.$modal.confirm('是否确认删除地区管理编号为"' + row.districtId + '"的数据项？').then(function () {
         return delDistrict(row.districtId);
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess("删除成功");
-      }).catch(() => {});
+      }).catch(() => { });
     }
   }
 };

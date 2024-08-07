@@ -5,37 +5,84 @@
 <mapper namespace="com.ruoyi.system.mapper.TobDetectionMapper">
 
     <resultMap type="TobDetection" id="TobDetectionResult">
-        <result property="detectionId"    column="detection_id"    />
-        <result property="districtId"    column="district_id"    />
-        <result property="orderNum"    column="order_num"    />
-        <result property="detectionName"    column="detection_name"    />
-        <result property="status"    column="status"    />
-        <result property="delFlag"    column="del_flag"    />
-        <result property="remark"    column="remark"    />
-        <result property="createTime"    column="create_time"    />
-        <result property="updateTime"    column="update_time"    />
-        <result property="responsibleId"    column="responsible_id"    />
+        <result property="detectionId" column="detection_id"/>
+        <result property="districtId" column="district_id"/>
+        <result property="orderNum" column="order_num"/>
+        <result property="detectionName" column="detection_name"/>
+        <result property="status" column="status"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="responsibleId" column="responsible_id"/>
     </resultMap>
 
     <sql id="selectTobDetectionVo">
-        select detection_id, district_id, order_num, detection_name, status, del_flag, remark, create_time, update_time, responsible_id from tob_detection
+        select detection_id,
+               district_id,
+               order_num,
+               detection_name,
+               status,
+               del_flag,
+               remark,
+               create_time,
+               update_time,
+               responsible_id
+        from tob_detection
     </sql>
 
     <select id="selectTobDetectionList" parameterType="TobDetection" resultMap="TobDetectionResult">
         <include refid="selectTobDetectionVo"/>
         <where>
-            <if test="districtId != null "> and district_id = #{districtId}</if>
-            <if test="orderNum != null  and orderNum != ''"> and order_num = #{orderNum}</if>
-            <if test="detectionName != null  and detectionName != ''"> and detection_name like concat('%', #{detectionName}, '%')</if>
-            <if test="status != null  and status != ''"> and status = #{status}</if>
-            <if test="delFlag != null  and delFlag != ''"> and del_flag = #{delFlag}</if>
-            <if test="responsibleId != null "> and responsible_id = #{responsibleId}</if>
+            <if test="districtId != null ">and district_id = #{districtId}</if>
+            <if test="orderNum != null  and orderNum != ''">and order_num = #{orderNum}</if>
+            <if test="detectionName != null  and detectionName != ''">and detection_name like concat('%',
+                #{detectionName}, '%')
+            </if>
+            <if test="status != null  and status != ''">and status = #{status}</if>
+            <if test="delFlag != null  and delFlag != ''">and del_flag = #{delFlag}</if>
+            <if test="responsibleId != null ">and responsible_id = #{responsibleId}</if>
         </where>
     </select>
 
     <select id="selectTobDetectionByDetectionId" parameterType="Long" resultMap="TobDetectionResult">
         <include refid="selectTobDetectionVo"/>
         where detection_id = #{detectionId}
+    </select>
+
+    <select id="selectTobDetectionListByDistrictId" parameterType="TobDetection" resultMap="TobDetectionResult" >
+        <include refid="selectTobDetectionVo"/>
+        <where>
+            <choose>
+                <when test="districtId != null and districtId != ''">
+                    district_id IN (
+                    SELECT DISTINCT district_id
+                    FROM tob_district
+                    WHERE CONCAT(ancestors, ',', district_id) LIKE CONCAT('%,', #{districtId}, ',%')
+                    OR district_id = #{districtId}  -- 包括自身地区ID
+                    )
+                </when>
+                <otherwise>
+                    <!-- 如果没有地区ID传入，则不添加任何地区限制条件 -->
+                </otherwise>
+            </choose>
+            <!-- 其他条件 -->
+            <if test="orderNum != null and orderNum != ''">
+                AND td.order_num = #{orderNum}
+            </if>
+            <if test="detectionName != null and detectionName != ''">
+                AND td.detection_name LIKE CONCAT('%', #{detectionName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND td.status = #{status}
+            </if>
+            <if test="delFlag != null and delFlag != ''">
+                AND td.del_flag = #{delFlag}
+            </if>
+            <if test="responsibleId != null">
+                AND td.responsible_id = #{responsibleId}
+            </if>
+        </where>
     </select>
 
     <insert id="insertTobDetection" parameterType="TobDetection" useGeneratedKeys="true" keyProperty="detectionId">
@@ -81,7 +128,9 @@
     </update>
 
     <delete id="deleteTobDetectionByDetectionId" parameterType="Long">
-        delete from tob_detection where detection_id = #{detectionId}
+        delete
+        from tob_detection
+        where detection_id = #{detectionId}
     </delete>
 
     <delete id="deleteTobDetectionByDetectionIds" parameterType="String">

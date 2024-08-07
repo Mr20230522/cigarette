@@ -2,52 +2,24 @@
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="原文件名" prop="fileName">
-        <el-input
-          v-model="queryParams.fileName"
-          placeholder="请输入原文件名"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.fileName" placeholder="请输入原文件名" clearable @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item label="上传后文件路径" prop="uploadPath">
-        <el-input
-          v-model="queryParams.uploadPath"
-          placeholder="请输入上传后文件路径"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.uploadPath" placeholder="请输入上传后文件路径" clearable
+          @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item label="上传后文件名" prop="uploadFileName">
-        <el-input
-          v-model="queryParams.uploadFileName"
-          placeholder="请输入上传后文件名"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.uploadFileName" placeholder="请输入上传后文件名" clearable
+          @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item label="转换pdf路径" prop="pdfPath">
-        <el-input
-          v-model="queryParams.pdfPath"
-          placeholder="请输入转换pdf路径"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.pdfPath" placeholder="请输入转换pdf路径" clearable @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item label="转换pdf文件名" prop="pdfName">
-        <el-input
-          v-model="queryParams.pdfName"
-          placeholder="请输入转换pdf文件名"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.pdfName" placeholder="请输入转换pdf文件名" clearable @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item label="预览URL" prop="previewUrl">
-        <el-input
-          v-model="queryParams.previewUrl"
-          placeholder="请输入预览URL"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.previewUrl" placeholder="请输入预览URL" clearable @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -57,46 +29,20 @@
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-          v-hasPermi="['document:add']"
-        >新增</el-button>
+        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
+          v-hasPermi="['document:add']">新增</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button
-          type="success"
-          plain
-          icon="el-icon-edit"
-          size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['document:edit']"
-        >修改</el-button>
+        <el-button type="success" plain icon="el-icon-edit" size="mini" :disabled="single" @click="handleUpdate"
+          v-hasPermi="['document:edit']">修改</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button
-          type="danger"
-          plain
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['document:remove']"
-        >删除</el-button>
+        <el-button type="danger" plain icon="el-icon-delete" size="mini" :disabled="multiple" @click="handleDelete"
+          v-hasPermi="['document:remove']">删除</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
-          v-hasPermi="['document:export']"
-        >导出</el-button>
+        <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport"
+          v-hasPermi="['document:export']">导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -115,35 +61,31 @@
       <el-table-column label="预览URL" align="center" prop="previewUrl" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['document:edit']"
-          >修改</el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['document:remove']"
-          >删除</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
+            v-hasPermi="['document:edit']">修改</el-button>
+          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
+            v-hasPermi="['document:remove']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="queryParams.pageNum"
-      :limit.sync="queryParams.pageSize"
-      @pagination="getList"
-    />
+    <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize"
+      @pagination="getList" />
 
     <!-- 添加或修改文档对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <!-- 上传文件功能 -->
+        <el-form-item label="上传文件">
+          <el-upload ref="upload" :limit="1" accept=".doc, .docx" :before-upload="beforeUpload" :action="upload.url" :headers="upload.headers"
+            :file-list="upload.fileList" :on-progress="handleFileUploadProgress" :on-success="handleFileSuccess"
+            :auto-upload="false">
+            <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+            <el-button style="margin-left: 10px;" size="small" type="success" :loading="upload.isUploading"
+              @click="submitUpload">上传到服务器</el-button>
+            <div slot="tip" class="el-upload__tip">只能上传doc/docx文件，且不超过10MB</div>
+          </el-upload>
+        </el-form-item>
         <el-form-item label="原文件名" prop="fileName">
           <el-input v-model="form.fileName" placeholder="请输入原文件名" />
         </el-form-item>
@@ -176,6 +118,7 @@
 
 <script>
 import { listDocument, getDocument, delDocument, addDocument, updateDocument } from "@/api/cigarette/document/document";
+import { getToken } from "@/utils/auth";
 
 export default {
   name: "Document",
@@ -214,6 +157,17 @@ export default {
       },
       // 表单参数
       form: {},
+      // 上传参数
+      upload: {
+        // 是否禁用上传
+        isUploading: false,
+        // 设置上传的请求头部
+        headers: { Authorization: "Bearer " + getToken() },
+        // 上传的地址
+        url: process.env.VUE_APP_BASE_API + "/common/upload",
+        // 上传的文件列表
+        fileList: []
+      },
       // 表单校验
       rules: {
         fileName: [
@@ -303,7 +257,7 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
-      this.single = selection.length!==1
+      this.single = selection.length !== 1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
@@ -345,19 +299,39 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$modal.confirm('是否确认删除文档编号为"' + ids + '"的数据项？').then(function() {
+      this.$modal.confirm('是否确认删除文档编号为"' + ids + '"的数据项？').then(function () {
         return delDocument(ids);
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess("删除成功");
-      }).catch(() => {});
+      }).catch(() => { });
     },
     /** 导出按钮操作 */
     handleExport() {
       this.download('cigarette/document/export', {
         ...this.queryParams
       }, `document_${new Date().getTime()}.xlsx`)
-    }
+    },
+    // 文件上传前处理
+    beforeUpload(file) {
+      this.form.fileName = file.name;
+      return false;
+    },
+    // 文件提交处理
+    submitUpload() {
+      this.$refs.upload.submit();
+    },
+    // 文件上传中处理
+    handleFileUploadProgress(event, file, fileList) {
+      this.upload.isUploading = true;
+    },
+    // 文件上传成功处理
+    handleFileSuccess(response, file, fileList) {
+      this.upload.isUploading = false;
+      this.form.filePath = response.url;
+      this.msgSuccess(response.msg);
+    },
+
   }
 };
 </script>

@@ -16,7 +16,6 @@
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
-
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
@@ -40,16 +39,28 @@
     <el-table v-loading="loading" :data="inspectorList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="检测人员id" align="center" prop="inspectorId" />
-      <el-table-column label="检测点id" align="center" prop="detectionId" />
+      <el-table-column label="检测点" align="center" prop="detectionId">
+        <template slot-scope="scope">
+          {{ getDetectionName(scope.row.detectionId) }}
+        </template>
+      </el-table-column>
       <el-table-column label="值班表id" align="center" prop="dutyId" />
-      <el-table-column label="状态" align="center" prop="status" />
+      <el-table-column label="删除标记" align="center" prop="delFlag">
+        <template slot-scope="scope">
+          <dict-tag :options="dict.type.tob_del_flag" :value="scope.row.delFlag" />
+        </template>
+      </el-table-column>
+      <el-table-column label="状态" align="center" prop="status">
+        <template slot-scope="scope">
+          <dict-tag :options="dict.type.tob_dd_status" :value="scope.row.status" />
+        </template>
+      </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="工作人员" align="center" prop="staffId">
         <template slot-scope="scope">
           {{ getStaffName(scope.row.staffId) }}
         </template>
       </el-table-column>
-
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
@@ -71,8 +82,8 @@
         </el-form-item> -->
         <el-form-item label="检测点" prop="detectionId">
           <el-select v-model="form.detectionId" placeholder="请选择所管理的监测点" filterable>
-            <el-option v-for="item in detectionOptions" :key="item.detectionId" :label="getDetectionName(item.detectionId)"
-              :value="item.detectionId"></el-option>
+            <el-option v-for="item in detectionOptions" :key="item.detectionId"
+              :label="getDetectionName(item.detectionId)" :value="item.detectionId"></el-option>
           </el-select>
         </el-form-item>
 
@@ -87,6 +98,12 @@
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+        </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-radio-group v-model="form.status">
+            <el-radio v-for="dict in dict.type.tob_dd_status" :key="dict.value" :label="dict.value">{{ dict.label
+              }}</el-radio>
+          </el-radio-group>
         </el-form-item>
         <!-- 
          <el-form-item label="工作人员id" prop="staffId">
@@ -116,12 +133,12 @@ import { listDetection } from "@/api/cigarette/detection/detection"; // 导入�
 
 export default {
   name: "Inspector",
-  dicts: ['tob_del_flag'],
-  staffOptions: [], // 用于存储工作人员选项的数组
-  userOptions: [], // 初始化用户选项    
-  detectionOptions: [], // 初始化检测点选项
+  dicts: ['tob_del_flag', 'tob_dd_status'],
   data() {
     return {
+      staffOptions: [], // 用于存储工作人员选项的数组
+      userOptions: [], // 初始化用户选项    
+      detectionOptions: [], // 初始化检测点选项
       // 遮罩层
       loading: true,
       // 选中数组
@@ -148,7 +165,6 @@ export default {
         dutyId: null,
         status: null,
         staffId: null,
-        staffId: null
       },
       // 表单参数
       form: {},
@@ -198,8 +214,8 @@ export default {
     },
     // 根据 detectionId 获取监测点名字
     getDetectionName(detectionId) {
-      const detection=this.detectionOptions.find(item => item.detectionId === detectionId)
-      return detection ? detection.detectionName : '未知用户';
+      const detection = this.detectionOptions.find(item => item.detectionId === detectionId)
+      return detection ? detection.detectionName : '未知监测点';
     },
     //加载用户选项
     loadUserOptions() {
@@ -223,7 +239,7 @@ export default {
         console.error("Failed to load staff options:", error);
       });
     },
-    
+
     getStaffInfo(staffId) {
       return this.staffOptions.find(item => item.staffId === staffId) || {};
     },
