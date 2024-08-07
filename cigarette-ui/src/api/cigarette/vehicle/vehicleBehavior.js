@@ -9,6 +9,14 @@ export function listVehicleBehavior(query) {
   })
 }
 
+// 查询车辆行为记录列表
+export function listVehicleBehaviorVo(query) {
+  return request({
+    url: '/cigarette/vehicle/vehicleBehavior/listVo',
+    method: 'get',
+    params: query
+  })
+}
 // 查询车辆行为记录详细
 export function getVehicleBehavior(behaviorId) {
   return request({

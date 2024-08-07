@@ -2,6 +2,8 @@ package com.ruoyi.web.controller.cigarette.vehicle;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.ruoyi.system.domain.vo.TobVehicleBehaviorVo;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,6 +61,20 @@ public class TobVehicleBehaviorController extends BaseController
         util.exportExcel(response, list, "车辆行为记录数据");
     }
 
+    /**
+     * 获取车辆行为记录列表
+     */
+    @PreAuthorize("@ss.hasPermi('vehicle:vehicleBehavior:list')")
+    @GetMapping("/listVo")
+    public TableDataInfo list(TobVehicleBehaviorVo tobVehicleBehaviorVo)
+    {
+        startPage();
+        List<TobVehicleBehaviorVo> list = tobVehicleBehaviorService.selectTobVehicleBehaviorVoList(tobVehicleBehaviorVo);
+//打印list
+        System.out.println(list);
+
+        return getDataTable(list);
+    }
     /**
      * 获取车辆行为记录详细信息
      */

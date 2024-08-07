@@ -9,6 +9,17 @@ export function listCaseInformation(query) {
   })
 }
 
+
+// 查询案件信息列表Vo
+export function listCaseInformationVo(query) {
+  return request({
+    url: '/cigarette/case/caseInformation/listVo',
+    method: 'get',
+    params: query
+  })
+}
+
+
 // 查询案件信息详细
 export function getCaseInformation(caseId) {
   return request({

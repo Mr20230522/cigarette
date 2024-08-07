@@ -12,9 +12,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="caseEndDate"    column="case_end_date"    />
         <result property="caseValue"    column="case_value"    />
         <result property="incidentLocation"    column="incident_location"    />
-        <result property="illegalId"    column="illegal_id"    />
         <result property="behaviorId"    column="behavior_id"    />
-        <result property="caseSourceId"    column="case_source_id"    />
+        <result property="caseSource"    column="case_source"    />
         <result property="caseType"    column="case_type"    />
         <result property="caseStatus"    column="case_status"    />
         <result property="mainCharge"    column="main_charge"    />
@@ -24,10 +23,39 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="delFlag"    column="del_flag"    />
         <result property="remark"    column="remark"    />
         <result property="caseUserId"    column="case_user_id"    />
+        <result property="inspectorId"    column="inspector_id"    />
+        <result property="degreeOfCase"    column="degree_of_case"    />
+    </resultMap>
+
+    <resultMap type="TobCaseInformationVo" id="TobCaseInformationVoResult">
+        <result property="caseId"    column="case_id"    />
+        <result property="caseCode"    column="case_code"    />
+        <result property="caseName"    column="case_name"    />
+        <result property="caseStartDate"    column="case_start_date"    />
+        <result property="caseEndDate"    column="case_end_date"    />
+        <result property="caseValue"    column="case_value"    />
+        <result property="incidentLocation"    column="incident_location"    />
+        <result property="behaviorId"    column="behavior_id"    />
+        <result property="caseSource"    column="case_source"    />
+        <result property="caseType"    column="case_type"    />
+        <result property="caseStatus"    column="case_status"    />
+        <result property="mainCharge"    column="main_charge"    />
+        <result property="secondaryCharge"    column="secondary_charge"    />
+        <result property="mainCaseDetails"    column="main_case_details"    />
+        <result property="entryDate"    column="entry_date"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="remark"    column="remark"    />
+        <result property="caseUserId"    column="case_user_id"    />
+        <result property="inspectorId"    column="inspector_id"    />
+        <result property="degreeOfCase"    column="degree_of_case"    />
+        <result property="driverName"    column="driver_name"    />
+        <result property="inspectorName"    column="inspector_name"    />
+        <result property="caseUserName"    column="case_user_name"    />
+        <result property="licensePlate"    column="license_plate"    />
     </resultMap>
 
     <sql id="selectTobCaseInformationVo">
-        select case_id, case_code, case_name, case_start_date, case_end_date, case_value, incident_location, illegal_id, behavior_id, case_source_id, case_type, case_status, main_charge, secondary_charge, main_case_details, entry_date, del_flag, remark, case_user_id from tob_case_information
+        select case_id, case_code, case_name, case_start_date, case_end_date, case_value, incident_location, behavior_id, case_source, case_type, case_status, main_charge, secondary_charge, main_case_details, entry_date, del_flag, remark, case_user_id, inspector_id, degree_of_case from tob_case_information
     </sql>
 
     <select id="selectTobCaseInformationList" parameterType="TobCaseInformation" resultMap="TobCaseInformationResult">
@@ -39,9 +67,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="caseEndDate != null "> and case_end_date = #{caseEndDate}</if>
             <if test="caseValue != null "> and case_value = #{caseValue}</if>
             <if test="incidentLocation != null  and incidentLocation != ''"> and incident_location = #{incidentLocation}</if>
-            <if test="illegalId != null "> and illegal_id = #{illegalId}</if>
             <if test="behaviorId != null "> and behavior_id = #{behaviorId}</if>
-            <if test="caseSourceId != null  and caseSourceId != ''"> and case_source_id = #{caseSourceId}</if>
+            <if test="caseSource != null  and caseSource != ''"> and case_source = #{caseSource}</if>
             <if test="caseType != null  and caseType != ''"> and case_type = #{caseType}</if>
             <if test="caseStatus != null  and caseStatus != ''"> and case_status = #{caseStatus}</if>
             <if test="mainCharge != null  and mainCharge != ''"> and main_charge = #{mainCharge}</if>
@@ -49,12 +76,59 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="mainCaseDetails != null  and mainCaseDetails != ''"> and main_case_details = #{mainCaseDetails}</if>
             <if test="entryDate != null "> and entry_date = #{entryDate}</if>
             <if test="caseUserId != null "> and case_user_id = #{caseUserId}</if>
+            <if test="inspectorId != null "> and inspector_id = #{inspectorId}</if>
+            <if test="degreeOfCase != null "> and degree_of_case = #{degreeOfCase}</if>
         </where>
     </select>
     
     <select id="selectTobCaseInformationByCaseId" parameterType="Long" resultMap="TobCaseInformationResult">
         <include refid="selectTobCaseInformationVo"/>
         where case_id = #{caseId}
+    </select>
+
+    <select id="selectTobCaseInformationVoList" parameterType="TobCaseInformationVo" resultMap="TobCaseInformationVoResult">
+        SELECT
+            a.*,
+            b.user_name AS case_user_name,
+            c.user_name AS inspector_name,
+            f.`name` AS driver_name,
+            g.license_plate
+        FROM
+            tob_case_information AS a
+                INNER JOIN
+            sys_user AS b
+            ON a.case_user_id = b.user_id
+                INNER JOIN
+            sys_user AS c
+            ON a.inspector_id = c.user_id
+                INNER JOIN
+            tob_vehicle_behavior AS d
+            ON a.behavior_id = d.behavior_id
+                INNER JOIN
+            tob_person AS f
+            ON d.driver_id = f.suspect_id
+                INNER JOIN
+            tob_vehicle AS g
+            ON d.car_id = g.car_id
+
+        <where>
+            <if test="caseCode != null  and caseCode != ''"> and a.case_code LIKE CONCAT('%', #{caseCode}, '%') </if>
+            <if test="caseName != null  and caseName != ''"> and a.case_name like concat('%', #{caseName}, '%')</if>
+            <if test="caseValue != null "> and a.case_value = #{caseValue}</if>
+            <if test="incidentLocation != null  and incidentLocation != ''"> and a.incident_location LIKE CONCAT('%', #{incidentLocation}, '%')</if>
+            <if test="caseSource != null  and caseSource != ''"> and a.case_source = #{caseSource}</if>
+            <if test="caseType != null  and caseType != ''"> and a.case_type = #{caseType}</if>
+            <if test="caseStatus != null  and caseStatus != ''"> and a.case_status = #{caseStatus}</if>
+            <if test="mainCharge != null  and mainCharge != ''"> and a.main_charge LIKE CONCAT('%', #{mainCharge}, '%') </if>
+            <if test="secondaryCharge != null  and secondaryCharge != ''"> and a.secondary_charge LIKE CONCAT('%', #{secondaryCharge}, '%') </if>
+            <if test="driverName != null "> and f.name LIKE CONCAT('%', #{driverName}, '%')</if>
+            <if test="inspectorName != null "> and c.user_name LIKE CONCAT('%', #{inspectorName}, '%') </if>
+            <if test="degreeOfCase != null "> and a.degree_of_case = #{degreeOfCase}</if>
+            <if test="caseUserName != null "> and b.user_name LIKE CONCAT('%', #{caseUserName}, '%') </if>
+            <if test="licensePlate != null "> and g.license_plate LIKE CONCAT('%', #{licensePlate}, '%')</if>
+        </where>
+
+
     </select>
 
     <insert id="insertTobCaseInformation" parameterType="TobCaseInformation" useGeneratedKeys="true" keyProperty="caseId">
@@ -66,9 +140,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="caseEndDate != null">case_end_date,</if>
             <if test="caseValue != null">case_value,</if>
             <if test="incidentLocation != null and incidentLocation != ''">incident_location,</if>
-            <if test="illegalId != null">illegal_id,</if>
             <if test="behaviorId != null">behavior_id,</if>
-            <if test="caseSourceId != null and caseSourceId != ''">case_source_id,</if>
+            <if test="caseSource != null and caseSource != ''">case_source,</if>
             <if test="caseType != null and caseType != ''">case_type,</if>
             <if test="caseStatus != null and caseStatus != ''">case_status,</if>
             <if test="mainCharge != null and mainCharge != ''">main_charge,</if>
@@ -78,6 +151,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             del_flag,
             <if test="remark != null">remark,</if>
             <if test="caseUserId != null">case_user_id,</if>
+            <if test="inspectorId != null">inspector_id,</if>
+            <if test="degreeOfCase != null">degree_of_case,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="caseCode != null and caseCode != ''">#{caseCode},</if>
@@ -86,9 +161,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="caseEndDate != null">#{caseEndDate},</if>
             <if test="caseValue != null">#{caseValue},</if>
             <if test="incidentLocation != null and incidentLocation != ''">#{incidentLocation},</if>
-            <if test="illegalId != null">#{illegalId},</if>
             <if test="behaviorId != null">#{behaviorId},</if>
-            <if test="caseSourceId != null and caseSourceId != ''">#{caseSourceId},</if>
+            <if test="caseSource != null and caseSource != ''">#{caseSource},</if>
             <if test="caseType != null and caseType != ''">#{caseType},</if>
             <if test="caseStatus != null and caseStatus != ''">#{caseStatus},</if>
             <if test="mainCharge != null and mainCharge != ''">#{mainCharge},</if>
@@ -98,6 +172,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             0,
             <if test="remark != null">#{remark},</if>
             <if test="caseUserId != null">#{caseUserId},</if>
+            <if test="inspectorId != null">#{inspectorId},</if>
+            <if test="degreeOfCase != null">#{degreeOfCase},</if>
          </trim>
     </insert>
 
@@ -110,9 +186,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="caseEndDate != null">case_end_date = #{caseEndDate},</if>
             <if test="caseValue != null">case_value = #{caseValue},</if>
             <if test="incidentLocation != null and incidentLocation != ''">incident_location = #{incidentLocation},</if>
-            <if test="illegalId != null">illegal_id = #{illegalId},</if>
             <if test="behaviorId != null">behavior_id = #{behaviorId},</if>
-            <if test="caseSourceId != null and caseSourceId != ''">case_source_id = #{caseSourceId},</if>
+            <if test="caseSource != null and caseSource != ''">case_source = #{caseSource},</if>
             <if test="caseType != null and caseType != ''">case_type = #{caseType},</if>
             <if test="caseStatus != null and caseStatus != ''">case_status = #{caseStatus},</if>
             <if test="mainCharge != null and mainCharge != ''">main_charge = #{mainCharge},</if>
@@ -122,6 +197,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="delFlag != null">del_flag = #{delFlag},</if>
             <if test="remark != null">remark = #{remark},</if>
             <if test="caseUserId != null">case_user_id = #{caseUserId},</if>
+            <if test="inspectorId != null">inspector_id = #{inspectorId},</if>
+            <if test="degreeOfCase != null">degree_of_case = #{degreeOfCase},</if>
         </trim>
         where case_id = #{caseId}
     </update>

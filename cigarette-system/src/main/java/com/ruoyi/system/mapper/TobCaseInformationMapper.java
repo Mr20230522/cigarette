@@ -2,6 +2,7 @@ package com.ruoyi.system.mapper;
 
 import java.util.List;
 import com.ruoyi.system.domain.TobCaseInformation;
+import com.ruoyi.system.domain.vo.TobCaseInformationVo;
 
 /**
  * 案件信息Mapper接口
@@ -26,6 +27,14 @@ public interface TobCaseInformationMapper
      * @return 案件信息集合
      */
     public List<TobCaseInformation> selectTobCaseInformationList(TobCaseInformation tobCaseInformation);
+
+    /**
+     * 查询案件信息列表
+     *
+     * @param tobCaseInformationVo 案件信息
+     * @return 案件信息集合
+     */
+    public List<TobCaseInformationVo> selectTobCaseInformationVoList(TobCaseInformationVo tobCaseInformationVo);
 
     /**
      * 新增案件信息
@@ -58,4 +67,6 @@ public interface TobCaseInformationMapper
      * @return 结果
      */
     public int deleteTobCaseInformationByCaseIds(Long[] caseIds);
+
+
 }

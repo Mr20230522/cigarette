@@ -57,12 +57,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="identityCard != null">identity_card,</if>
             <if test="faceFeature != null">face_feature,</if>
             <if test="phone != null">phone,</if>
-            <if test="suspectLicenseNumber != null">suspect_license_number,</if>
+            suspect_license_number,
             <if test="name != null and name != ''">name,</if>
             <if test="age != null">age,</if>
             <if test="gender != null">gender,</if>
             <if test="address != null">address,</if>
-            <if test="occurrenceNumber != null">occurrence_number,</if>
+            occurrence_number,
             <if test="illegalStatus != null">illegal_status,</if>
             <if test="status != null and status != ''">status,</if>
             del_flag,
@@ -75,12 +75,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="identityCard != null">#{identityCard},</if>
             <if test="faceFeature != null">#{faceFeature},</if>
             <if test="phone != null">#{phone},</if>
-            <if test="suspectLicenseNumber != null">#{suspectLicenseNumber},</if>
+            0,
             <if test="name != null and name != ''">#{name},</if>
             <if test="age != null">#{age},</if>
             <if test="gender != null">#{gender},</if>
             <if test="address != null">#{address},</if>
-            <if test="occurrenceNumber != null">#{occurrenceNumber},</if>
+            0,
             <if test="illegalStatus != null">#{illegalStatus},</if>
             <if test="status != null and status != ''">#{status},</if>
             0,

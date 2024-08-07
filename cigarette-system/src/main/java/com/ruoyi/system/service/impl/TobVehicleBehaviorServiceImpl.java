@@ -2,6 +2,7 @@ package com.ruoyi.system.service.impl;
 
 import java.util.List;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.system.domain.vo.TobVehicleBehaviorVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.system.mapper.TobVehicleBehaviorMapper;
@@ -42,6 +43,18 @@ public class TobVehicleBehaviorServiceImpl implements ITobVehicleBehaviorService
     public List<TobVehicleBehavior> selectTobVehicleBehaviorList(TobVehicleBehavior tobVehicleBehavior)
     {
         return tobVehicleBehaviorMapper.selectTobVehicleBehaviorList(tobVehicleBehavior);
+    }
+
+    /**
+     * 查询车辆行为列表
+     *
+     * @param tobVehicleBehaviorVo 查询条件对象，用于构建SQL查询语句的条件
+     * @return 返回一个List集合，包含查询到的车辆行为数据
+     */
+    @Override
+    public List<TobVehicleBehaviorVo> selectTobVehicleBehaviorVoList(TobVehicleBehaviorVo tobVehicleBehaviorVo) {
+
+        return tobVehicleBehaviorMapper.selectTobVehicleBehaviorVoList(tobVehicleBehaviorVo);
     }
 
     /**

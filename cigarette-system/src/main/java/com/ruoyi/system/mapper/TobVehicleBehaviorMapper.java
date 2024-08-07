@@ -2,6 +2,7 @@ package com.ruoyi.system.mapper;
 
 import java.util.List;
 import com.ruoyi.system.domain.TobVehicleBehavior;
+import com.ruoyi.system.domain.vo.TobVehicleBehaviorVo;
 
 /**
  * 车辆行为记录Mapper接口
@@ -26,6 +27,14 @@ public interface TobVehicleBehaviorMapper
      * @return 车辆行为记录集合
      */
     public List<TobVehicleBehavior> selectTobVehicleBehaviorList(TobVehicleBehavior tobVehicleBehavior);
+
+    /**
+     * 查询车辆行为记录列表
+     *
+     * @param tobVehicleBehaviorVo 车辆行为记录
+     * @return 车辆行为记录集合
+     */
+    public List<TobVehicleBehaviorVo> selectTobVehicleBehaviorVoList(TobVehicleBehaviorVo tobVehicleBehaviorVo);
 
     /**
      * 新增车辆行为记录

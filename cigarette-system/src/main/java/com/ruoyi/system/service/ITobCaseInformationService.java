@@ -2,6 +2,7 @@ package com.ruoyi.system.service;
 
 import java.util.List;
 import com.ruoyi.system.domain.TobCaseInformation;
+import com.ruoyi.system.domain.vo.TobCaseInformationVo;
 
 /**
  * 案件信息Service接口
@@ -26,6 +27,17 @@ public interface ITobCaseInformationService
      * @return 案件信息集合
      */
     public List<TobCaseInformation> selectTobCaseInformationList(TobCaseInformation tobCaseInformation);
+
+
+    /**
+     * 查询案件信息列表Vo
+     *
+     * @param tobCaseInformationVo 案件信息
+     * @return 案件信息集合
+     */
+    public List<TobCaseInformationVo> selectTobCaseInformationVoList(TobCaseInformationVo tobCaseInformationVo);
+
+
 
     /**
      * 新增案件信息

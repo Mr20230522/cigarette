@@ -1,6 +1,8 @@
 package com.ruoyi.system.service.impl;
 
 import java.util.List;
+
+import com.ruoyi.system.domain.vo.TobCaseInformationVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.system.mapper.TobCaseInformationMapper;
@@ -41,6 +43,17 @@ public class TobCaseInformationServiceImpl implements ITobCaseInformationService
     public List<TobCaseInformation> selectTobCaseInformationList(TobCaseInformation tobCaseInformation)
     {
         return tobCaseInformationMapper.selectTobCaseInformationList(tobCaseInformation);
+    }
+
+    /**
+     * 查询案件信息列表Vo
+     *
+     * @param tobCaseInformationVo 案件信息
+     * @return 案件信息
+     */
+    @Override
+    public List<TobCaseInformationVo> selectTobCaseInformationVoList(TobCaseInformationVo tobCaseInformationVo) {
+        return tobCaseInformationMapper.selectTobCaseInformationVoList(tobCaseInformationVo);
     }
 
     /**

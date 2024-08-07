@@ -2,6 +2,8 @@ package com.ruoyi.web.controller.cigarette.caseInformation;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.ruoyi.system.domain.vo.TobCaseInformationVo;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,6 +49,19 @@ public class TobCaseInformationController extends BaseController
     }
 
     /**
+     * 查询案件信息列表Vo
+     */
+    @PreAuthorize("@ss.hasPermi('case:caseInformation:list')")
+    @GetMapping("/listVo")
+    public TableDataInfo list(TobCaseInformationVo tobCaseInformationVo)
+    {
+        startPage();
+        List<TobCaseInformationVo> list = tobCaseInformationService.selectTobCaseInformationVoList(tobCaseInformationVo);
+        System.out.println(list);
+        return getDataTable(list);
+    }
+
+    /**
      * 导出案件信息列表
      */
     @PreAuthorize("@ss.hasPermi('case:caseInformation:export')")
@@ -77,6 +92,9 @@ public class TobCaseInformationController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody TobCaseInformation tobCaseInformation)
     {
+
+        System.out.printf("tobCaseInformation");
+        System.out.println(tobCaseInformation);
         return toAjax(tobCaseInformationService.insertTobCaseInformation(tobCaseInformation));
     }
 

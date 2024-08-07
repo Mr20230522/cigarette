@@ -47,17 +47,13 @@ public class TobCaseInformation extends BaseEntity
     @Excel(name = "案发地点")
     private String incidentLocation;
 
-    /** 违法人员id */
-    @Excel(name = "违法人员id")
-    private Long illegalId;
-
     /** 违法车辆id */
-    @Excel(name = "违法车辆id")
+    @Excel(name = "违法车辆行为id")
     private Long behaviorId;
 
     /** 案件来源ID */
     @Excel(name = "案件来源ID")
-    private String caseSourceId;
+    private String caseSource;
 
     /** 案件类型 */
     @Excel(name = "案件类型")
@@ -88,8 +84,16 @@ public class TobCaseInformation extends BaseEntity
     private String delFlag;
 
     /** 案件人id */
-    @Excel(name = "案件人id")
+    @Excel(name = "案件录入人id")
     private Long caseUserId;
+
+    /** 检查人员 */
+    @Excel(name = "检查人员")
+    private Long inspectorId;
+
+    /** 案件严重程度 */
+    @Excel(name = "案件严重程度")
+    private String degreeOfCase;
 
     public void setCaseId(Long caseId) 
     {
@@ -154,32 +158,19 @@ public class TobCaseInformation extends BaseEntity
     {
         return incidentLocation;
     }
-    public void setIllegalId(Long illegalId) 
-    {
-        this.illegalId = illegalId;
-    }
-
-    public Long getIllegalId() 
-    {
-        return illegalId;
-    }
-    public void setBehaviorId(Long behaviorId) 
-    {
-        this.behaviorId = behaviorId;
-    }
 
     public Long getBehaviorId() 
     {
         return behaviorId;
     }
-    public void setCaseSourceId(String caseSourceId) 
+    public void setCaseSource(String caseSource)
     {
-        this.caseSourceId = caseSourceId;
+        this.caseSource = caseSource;
     }
 
-    public String getCaseSourceId() 
+    public String getCaseSource()
     {
-        return caseSourceId;
+        return caseSource;
     }
     public void setCaseType(String caseType) 
     {
@@ -254,6 +245,22 @@ public class TobCaseInformation extends BaseEntity
         return caseUserId;
     }
 
+    public Long getInspectorId() {
+        return inspectorId;
+    }
+
+    public void setInspectorId(Long inspectorId) {
+        this.inspectorId = inspectorId;
+    }
+
+    public String getDegreeOfCase() {
+        return degreeOfCase;
+    }
+
+    public void setDegreeOfCase(String degreeOfCase) {
+        this.degreeOfCase = degreeOfCase;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -264,9 +271,8 @@ public class TobCaseInformation extends BaseEntity
             .append("caseEndDate", getCaseEndDate())
             .append("caseValue", getCaseValue())
             .append("incidentLocation", getIncidentLocation())
-            .append("illegalId", getIllegalId())
             .append("behaviorId", getBehaviorId())
-            .append("caseSourceId", getCaseSourceId())
+            .append("caseSource", getCaseSource())
             .append("caseType", getCaseType())
             .append("caseStatus", getCaseStatus())
             .append("mainCharge", getMainCharge())
@@ -276,6 +282,10 @@ public class TobCaseInformation extends BaseEntity
             .append("delFlag", getDelFlag())
             .append("remark", getRemark())
             .append("caseUserId", getCaseUserId())
+                .append("inspectorId", getInspectorId())
+                .append("degreeOfCase", getDegreeOfCase())
+
+
             .toString();
     }
 }
