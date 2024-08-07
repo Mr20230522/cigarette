@@ -118,16 +118,27 @@
           <el-table-column label="摄像头ip" align="center" prop="cameraIp" />
           <el-table-column label="摄像头型号" align="center" prop="cameraModel" />
           <el-table-column label="摄像头厂商" align="center" prop="cameraManufacturer" />
-          <el-table-column label="检测点" align="center" prop="detectionId">
+          <el-table-column label="监测点" align="center" prop="detectionId">
             <template slot-scope="scope">
               {{ getDetectionName(scope.row.detectionId) }}
             </template>
           </el-table-column>
-          <el-table-column label="分辨率" align="center" prop="resolutionRatio" />
-          <el-table-column label="帧率" align="center" prop="frameRate" />
-          <el-table-column label="夜视能力" align="center" prop="nightVision" />
+          <el-table-column label="分辨率" align="center" prop="resolutionRatio">
+            <template slot-scope="scope">
+              <dict-tag :options="dict.type.tob_resolution_ratio" :value="scope.row.resolutionRatio" />
+            </template>
+          </el-table-column>
+          <el-table-column label="帧率" align="center" prop="frameRate">
+            <template slot-scope="scope">
+              <dict-tag :options="dict.type.tob_frame_rate" :value="scope.row.frameRate" />
+            </template>
+          </el-table-column>
+          <el-table-column label="夜视能力" align="center" prop="nightVision">
+            <template slot-scope="scope">
+              <dict-tag :options="dict.type.tob_night_vision" :value="scope.row.nightVision" />
+            </template>
+          </el-table-column>
           <el-table-column label="连接方式" align="center" prop="connectionType" />
-
           <el-table-column label="安装日期" align="center" prop="installationDate" width="180">
             <template slot-scope="scope">
               <span>{{ parseTime(scope.row.installationDate, '{y}-{m}-{d}') }}</span>
@@ -156,8 +167,18 @@
               <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.status" />
             </template>
           </el-table-column>
+          <el-table-column label="删除标记" align="center" prop="delFlag">
+            <template slot-scope="scope">
+              <dict-tag :options="dict.type.tob_del_flag" :value="scope.row.delFlag" />
+            </template>
+          </el-table-column>
           <el-table-column label="备注" align="center" prop="remark" />
-          <el-table-column label="地区id" align="center" prop="districtId" />
+          <el-table-column label="所属地区" align="center" prop="districtId">
+            <template slot-scope="scope">
+              <!-- 使用一个方法来通过districtId找到对应的districtName -->
+              {{ getDistrictName(scope.row.districtId) }}
+            </template>
+          </el-table-column>
           <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
@@ -167,89 +188,162 @@
             </template>
           </el-table-column>
         </el-table>
-
         <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum"
           :limit.sync="queryParams.pageSize" @pagination="getList" />
       </el-col>
     </el-row>
-    <!-- 添加或修改摄像头对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <!-- 表单 -->
+    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="摄像头ip" prop="cameraIp">
-          <el-input v-model="form.cameraIp" placeholder="请输入摄像头ip" />
-        </el-form-item>
-        <el-form-item label="摄像头型号" prop="cameraModel">
-          <el-input v-model="form.cameraModel" placeholder="请输入摄像头型号" />
-        </el-form-item>
-        <el-form-item label="摄像头厂商" prop="cameraManufacturer">
-          <el-input v-model="form.cameraManufacturer" placeholder="请输入摄像头厂商" />
-        </el-form-item>
-        <el-form-item label="检测点" prop="detectionId">
-          <el-select v-model="form.detectionId" placeholder="请选择所管理的监测点" filterable @change="handleDetectionChange">
-            <el-option v-for="item in detectionOptions" :key="item.detectionId"
-              :label="getDetectionName(item.detectionId)" :value="item.detectionId"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="分辨率" prop="resolutionRatio">
-          <el-input v-model="form.resolutionRatio" placeholder="请输入分辨率" />
-        </el-form-item>
-        <el-form-item label="帧率" prop="frameRate">
-          <el-input v-model="form.frameRate" placeholder="请输入帧率" />
-        </el-form-item>
-        <el-form-item label="夜视能力" prop="nightVision">
-          <el-input v-model="form.nightVision" placeholder="请输入夜视能力" />
-        </el-form-item>
-        <!-- 连接方式 -->
-        <el-form-item label="连接方式" prop="connectionType">
-          <el-input v-model="form.connectionType" placeholder="请输入连接方式" />
-        </el-form-item>
-
-        <el-form-item label="安装日期" prop="installationDate">
-          <el-date-picker clearable v-model="form.installationDate" type="date" value-format="yyyy-MM-dd"
-            placeholder="请选择安装日期">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="质保截止日期" prop="guaranteePeriod">
-          <el-date-picker clearable v-model="form.guaranteePeriod" type="date" value-format="yyyy-MM-dd"
-            placeholder="请选择质保截止日期">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="经度" prop="longitude">
-          <el-input v-model="form.longitude" placeholder="请输入经度" />
-        </el-form-item>
-        <el-form-item label="纬度" prop="latitude">
-          <el-input v-model="form.latitude" placeholder="请输入纬度" />
-        </el-form-item>
-        <el-form-item label="摄像头类型" prop="cameraType">
-          <el-select v-model="form.cameraType" placeholder="请选择摄像头类型">
-            <el-option v-for="dict in dict.type.tob_camera_type" :key="dict.value" :label="dict.label"
-              :value="dict.value"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="摄像头组号" prop="cameraGroupIndication">
-          <el-input v-model="form.cameraGroupIndication" placeholder="请输入摄像头组号" />
-        </el-form-item>
-        <el-form-item label="摄像头应用方向" prop="cameraApplicationType">
-          <el-select v-model="form.cameraApplicationType" placeholder="请选择摄像头应用方向">
-            <el-option v-for="dict in dict.type.tob_driving_irection" :key="dict.value" :label="dict.label"
-              :value="dict.value"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio v-for="dict in dict.type.sys_normal_disable" :key="dict.value" :label="dict.value">{{ dict.label
-              }}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="删除标记" prop="delFlag">
-          <el-input v-model="form.delFlag" placeholder="请输入删除标记" />
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
-        </el-form-item>
-        <el-form-item label="地区id" prop="districtId">
-          <el-input v-model="form.districtId" placeholder="请输入地区id" />
-        </el-form-item>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="摄像头ip" prop="cameraIp">
+              <el-input v-model="form.cameraIp" placeholder="请输入摄像头ip" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="摄像头型号" prop="cameraModel">
+              <el-input v-model="form.cameraModel" placeholder="请输入摄像头型号" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="摄像头厂商" prop="cameraManufacturer">
+              <el-input v-model="form.cameraManufacturer" placeholder="请输入摄像头厂商" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="检测点" prop="detectionId">
+              <el-select v-model="form.detectionId" placeholder="请选择所管理的监测点" filterable @change="handleDetectionChange">
+                <el-option v-for="item in detectionOptions" :key="item.detectionId"
+                  :label="getDetectionName(item.detectionId)" :value="item.detectionId"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="分辨率" prop="resolutionRatio">
+              <el-select v-model="form.resolutionRatio" placeholder="请选择摄像头分辨率">
+                <el-option v-for="dict in dict.type.tob_resolution_ratio" :key="dict.value" :label="dict.label"
+                  :value="dict.value"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="帧率" prop="frameRate">
+              <el-select v-model="form.frameRate" placeholder="请选择摄像头帧率">
+                <el-option v-for="dict in dict.type.tob_frame_rate" :key="dict.value" :label="dict.label"
+                  :value="dict.value"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="夜视能力" prop="nightVision">
+              <el-radio-group v-model="form.nightVision">
+                <el-radio v-for="dict in dict.type.tob_night_vision" :key="dict.value" :label="dict.value">{{ dict.label
+                  }}</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="连接方式" prop="connectionType">
+              <el-input v-model="form.connectionType" placeholder="请输入连接方式" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="安装日期" prop="installationDate">
+              <el-date-picker clearable v-model="form.installationDate" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择安装日期">
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="质保截止日期" prop="guaranteePeriod">
+              <el-date-picker clearable v-model="form.guaranteePeriod" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择质保截止日期">
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="7">
+            <el-form-item label="经度" prop="longitude">
+              <el-input v-model="form.longitude" placeholder="请输入经度" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="7">
+            <el-form-item label="纬度" prop="latitude">
+              <el-input v-model="form.latitude" placeholder="请输入纬度" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="2">
+            <el-form-item>
+              <el-button type="primary" plain @click="getLocation">获取经纬度</el-button>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="摄像头类型" prop="cameraType">
+              <el-select v-model="form.cameraType" placeholder="请选择摄像头类型">
+                <el-option v-for="dict in dict.type.tob_camera_type" :key="dict.value" :label="dict.label"
+                  :value="dict.value"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="摄像头组号" prop="cameraGroupIndication">
+              <el-input v-model="form.cameraGroupIndication" placeholder="请输入摄像头组号" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="摄像头应用方向" prop="cameraApplicationType">
+              <el-select v-model="form.cameraApplicationType" placeholder="请选择摄像头应用方向">
+                <el-option v-for="dict in dict.type.tob_driving_irection" :key="dict.value" :label="dict.label"
+                  :value="dict.value"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="状态" prop="status">
+              <el-radio-group v-model="form.status">
+                <el-radio v-for="dict in dict.type.sys_normal_disable" :key="dict.value" :label="dict.value">{{
+      dict.label
+    }}</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="删除标记" prop="delFlag">
+              <el-radio-group v-model="form.delFlag">
+                <el-radio v-for="dict in dict.type.tob_del_flag" :key="dict.value" :label="dict.value">{{ dict.label
+                  }}</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="监测点所属地区ID" prop="districtId">
+              <el-input v-model="form.districtId" :disabled="true" placeholder="选择监测点以填入所属地区ID" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="24">
+            <el-form-item label="备注" prop="remark">
+              <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -262,18 +356,18 @@
 <script>
 import { listCamera, getCamera, delCamera, addCamera, updateCamera, listCameraByDistrictId } from "@/api/cigarette/detection/camera";
 import { listDetection, listDetectionByDistrictId } from "@/api/cigarette/detection/detection"; // 导入检测点列表接口
-import { districtTreeSelect } from "@/api/cigarette/detection/district"; // 导入地区列表接口
-
+import { districtTreeSelect, listDistrict } from "@/api/cigarette/detection/district"; // 导入地区列表接口
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
 export default {
   name: "Camera",
-  dicts: ['sys_normal_disable', 'tob_driving_irection', 'tob_camera_type'],
+  dicts: ['sys_normal_disable', 'tob_driving_irection', 'tob_camera_type', 'tob_del_flag', 'tob_connection_type', 'tob_night_vision', 'tob_frame_rate', 'tob_resolution_ratio'],
   detectionOptions: [], // 初始化检测点选项
   components: { Treeselect },
   data() {
     return {
+      districtOptions: [], // 用于存储地区选项的数组
       // 地区树选项
       districtTreeOptions: undefined,
       // 地区名称
@@ -317,10 +411,14 @@ export default {
         cameraApplicationType: null,
         status: null,
         detectionName: null,
-        districtId: null
+        districtId: null,
+        delFlag: null,
       },
       // 表单参数
-      form: {},
+      form: {
+        longitude: '',
+        latitude: ''
+      },
       // 表单校验
       rules: {
         cameraIp: [
@@ -395,11 +493,44 @@ export default {
   },
   created() {
     this.getList();
-    this.loadDetectionOptions(); // 加载检测点选项
+    this.getListByDistrictId(),
+      this.loadDetectionOptions(); // 加载检测点选项
     this.getDistrictTree()//加载地区树
     this.loadDistrictOptions(); // 加载地区选项
   },
   methods: {
+    //获取经纬度
+    getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            this.form.longitude = position.coords.longitude;
+            this.form.latitude = position.coords.latitude;
+          },
+          error => {
+            console.error('Error getting location:', error);
+            alert('无法获取当前位置，请检查定位服务是否启用。');
+          }
+        );
+      } else {
+        alert('您的浏览器不支持定位功能');
+      }
+    },
+    //加载地区选项
+    loadDistrictOptions() {
+      listDistrict().then(response => {
+        this.districtOptions = response.data.map(item => ({
+          districtId: item.districtId,
+          districtName: item.districtName
+        }));
+      }).catch(error => {
+        console.error("Failed to load district options:", error);
+      });
+    },
+    getDistrictName(districtId) {
+      const district = this.districtOptions.find(item => item.districtId === districtId);
+      return district ? district.districtName : '未知地区';
+    },
     // 当检测点变更时触发，自动填充地区ID
     handleDetectionChange(newValue) {
       // 通过检测点ID找到对应的地区ID
