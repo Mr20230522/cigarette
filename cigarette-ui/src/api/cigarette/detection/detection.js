@@ -8,7 +8,14 @@ export function listDetection(query) {
     params: query
   })
 }
-
+//根据地区数据查询监测区域列表
+export function listDetectionByDistrictId(query) {
+  return request({
+    url: '/cigarette/detection/detection/listByDistrictId',
+    method: 'get',
+    params: query
+  })
+}
 // 查询监测区域详细
 export function getDetection(detectionId) {
   return request({

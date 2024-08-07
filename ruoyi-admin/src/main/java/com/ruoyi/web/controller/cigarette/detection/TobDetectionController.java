@@ -23,9 +23,9 @@ import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
  * 监测区域Controller
- * 
- * @author cigarette
- * @date 2024-07-28
+ *
+ * @author ruoyi
+ * @date 2024-07-24
  */
 @RestController
 @RequestMapping("/cigarette/detection/detection")
@@ -37,7 +37,7 @@ public class TobDetectionController extends BaseController
     /**
      * 查询监测区域列表
      */
-    @PreAuthorize("@ss.hasPermi('detection:detection:list')")
+    @PreAuthorize("@ss.hasPermi('cigarette:detection:list')")
     @GetMapping("/list")
     public TableDataInfo list(TobDetection tobDetection)
     {
@@ -47,9 +47,19 @@ public class TobDetectionController extends BaseController
     }
 
     /**
-     * 导出监测区域列表
+     * 根据地区数据查询监测区域列表
      */
-    @PreAuthorize("@ss.hasPermi('detection:detection:export')")
+    @PreAuthorize("@ss.hasPermi('cigarette:detection:listByDistrictId')")
+    @GetMapping("/listByDistrictId")
+    public TableDataInfo listByDistrictId(TobDetection tobDetection)
+    {
+        startPage();
+        List<TobDetection> list = tobDetectionService.selectTobDetectionListByDistrictId(tobDetection);
+        return getDataTable(list);
+    }
+
+
+    @PreAuthorize("@ss.hasPermi('cigarette:detection:export')")
     @Log(title = "监测区域", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, TobDetection tobDetection)
@@ -62,7 +72,7 @@ public class TobDetectionController extends BaseController
     /**
      * 获取监测区域详细信息
      */
-    @PreAuthorize("@ss.hasPermi('detection:detection:query')")
+    @PreAuthorize("@ss.hasPermi('cigarette:detection:query')")
     @GetMapping(value = "/{detectionId}")
     public AjaxResult getInfo(@PathVariable("detectionId") Long detectionId)
     {
@@ -72,7 +82,7 @@ public class TobDetectionController extends BaseController
     /**
      * 新增监测区域
      */
-    @PreAuthorize("@ss.hasPermi('detection:detection:add')")
+    @PreAuthorize("@ss.hasPermi('cigarette:detection:add')")
     @Log(title = "监测区域", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody TobDetection tobDetection)
@@ -83,7 +93,7 @@ public class TobDetectionController extends BaseController
     /**
      * 修改监测区域
      */
-    @PreAuthorize("@ss.hasPermi('detection:detection:edit')")
+    @PreAuthorize("@ss.hasPermi('cigarette:detection:edit')")
     @Log(title = "监测区域", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody TobDetection tobDetection)
@@ -94,7 +104,7 @@ public class TobDetectionController extends BaseController
     /**
      * 删除监测区域
      */
-    @PreAuthorize("@ss.hasPermi('detection:detection:remove')")
+    @PreAuthorize("@ss.hasPermi('cigarette:detection:remove')")
     @Log(title = "监测区域", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{detectionIds}")
     public AjaxResult remove(@PathVariable Long[] detectionIds)

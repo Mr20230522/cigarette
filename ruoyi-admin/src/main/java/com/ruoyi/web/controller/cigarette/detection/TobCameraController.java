@@ -23,7 +23,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
  * 摄像头Controller
- * 
+ *
  * @author cigarette
  * @date 2024-07-28
  */
@@ -45,7 +45,17 @@ public class TobCameraController extends BaseController
         List<TobCamera> list = tobCameraService.selectTobCameraList(tobCamera);
         return getDataTable(list);
     }
-
+    /**
+     * 根据地区数据查询摄像头列表
+     */
+    @PreAuthorize("@ss.hasPermi('detection:camera:listByDistrictId')")
+    @GetMapping("/listByDistrictId")
+    public TableDataInfo listByDistrictId(TobCamera tobCamera)
+    {
+        startPage();
+        List<TobCamera> list = tobCameraService.selectTobCameraListByDistrictId(tobCamera);
+        return getDataTable(list);
+    }
     /**
      * 导出摄像头列表
      */

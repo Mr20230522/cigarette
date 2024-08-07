@@ -6,8 +6,8 @@ import com.ruoyi.system.domain.TobStaff;
 /**
  * 工作人员Service接口
  * 
- * @author cigarette
- * @date 2024-07-27
+ * @author ruoyi
+ * @date 2024-07-25
  */
 public interface ITobStaffService 
 {
