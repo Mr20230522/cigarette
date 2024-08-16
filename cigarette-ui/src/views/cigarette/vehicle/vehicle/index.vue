@@ -5,10 +5,9 @@
         <el-input v-model="queryParams.licensePlate" placeholder="请输入车牌" clearable @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item label="车型" prop="carTypeId">
-        <el-select v-model="queryParams.carTypeId" placeholder="请选择车型" clearable clearable
-          @keyup.enter.native="handleQuery">
-          <el-option v-for="carType in carTypeList" :key="carType.carTypeId" :label="carType.carTypeName"
-            :value="carType.carTypeId" />
+        <el-select v-model="queryParams.carTypeId" placeholder="请选择车型" clearable>
+          <el-option v-for="dict in dict.type.tob_vehicle_type" :key="dict.value" :label="dict.label"
+            :value="dict.value" />
         </el-select>
       </el-form-item>
       <el-form-item label="车身颜色" prop="carColor">
@@ -61,7 +60,10 @@
           <dict-tag :options="dict.type.tob_licenseplatetype" :value="scope.row.licensePlateType" />
         </template>
       </el-table-column>
-      <el-table-column label="车型" align="center" prop="carTypeId" :formatter="formatCarTypeName">
+      <el-table-column label="车型" align="center" prop="carTypeId">
+        <template slot-scope="scope">
+          <dict-tag :options="dict.type.tob_vehicle_type" :value="scope.row.carTypeId" />
+        </template>
       </el-table-column>
       <el-table-column label="车身颜色" align="center" prop="carColor" />
       <el-table-column label="出现次数" align="center" prop="occurrenceNumber" />
@@ -124,10 +126,10 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="车型" prop="carTypeId">
-              <el-select v-model="form.carTypeId" placeholder="请选择车型" clearable>
-                <el-option v-for="carType in carTypeList" :key="carType.carTypeId" :label="carType.carTypeName"
-                  :value="carType.carTypeId" />
-              </el-select>
+              <el-select v-model="queryParams.carTypeId" placeholder="请选择车型" clearable>
+          <el-option v-for="dict in dict.type.tob_vehicle_type" :key="dict.value" :label="dict.label"
+            :value="dict.value" />
+        </el-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -147,7 +149,7 @@
                 </el-card>
               </el-scrollbar>
             </el-form-item>
-
+            <el-row>
           <el-col :span="12">
             <el-form-item label="车主姓名" prop="name">
               <el-input :disabled="true" v-model="form.name" placeholder="请输入车主姓名" />
@@ -205,15 +207,12 @@
     updateVehicle
   } from "@/api/cigarette/vehicle/vehicle";
   import {
-    listCarType
-  } from "@/api/cigarette/vehicle/carType";
-  import {
     listUser,
     getUser
   } from "@/api/system/user";
   export default {
     name: "Vehicle",
-    dicts: ['tob_illegal_status', 'sys_normal_disable', 'tob_licenseplatetype'],
+    dicts: ['tob_illegal_status', 'sys_normal_disable', 'tob_licenseplatetype','tob_vehicle_type'],
     data() {
       return {
         // 遮罩层
@@ -230,7 +229,6 @@
         total: 0,
         // 车辆表格数据
         vehicleList: [],
-        carTypeList: [],
         // 弹出层标题
         title: "",
         // 是否显示弹出层
@@ -305,9 +303,6 @@
         listVehicle(this.queryParams).then(response => {
           this.vehicleList = response.rows;
           this.total = response.total;
-        });
-        listCarType(this.queryParams).then(response2 => {
-          this.carTypeList = response2.rows;
           this.loading = false;
         });
       },
@@ -422,18 +417,6 @@
         this.download('cigarette/vehicle/vehicle/export', {
           ...this.queryParams
         }, `vehicle_${new Date().getTime()}.xlsx`)
-      },
-      // 将carTypeId转化显示为carTypeName
-      formatCarTypeName(row) {
-        // 根据 carTypeId 找到对应的 carTypeName
-        const carType = this.getCarTypeByCarTypeId(row.carTypeId);
-        return carType ? carType.carTypeName : '';
-      },
-      // 根据 carTypeId 获取 carType 对象
-      getCarTypeByCarTypeId(carTypeId) {
-        // 这里假设 carTypeList 是一个包含所有车型信息的数组
-        // 您需要确保 carTypeList 已经在 data 中定义，并且包含 carTypeId 和 carTypeName
-        return this.carTypeList.find(carType => carType.carTypeId === carTypeId);
       },
       // 选择数据化进行数据填充
       filterUsers() {

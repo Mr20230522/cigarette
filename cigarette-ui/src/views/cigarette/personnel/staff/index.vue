@@ -4,6 +4,13 @@
       <el-form-item label="用户id" prop="userId">
         <el-input v-model="queryParams.userId" placeholder="请输入用户id" clearable @keyup.enter.native="handleQuery" />
       </el-form-item>
+      <el-form-item label="检测点id" prop="detectionId">
+        <el-input v-model="queryParams.detectionId" placeholder="请输入检测点id" clearable
+          @keyup.enter.native="handleQuery" />
+      </el-form-item>
+      <el-form-item label="值班表id" prop="dutyId">
+        <el-input v-model="queryParams.dutyId" placeholder="请输入值班表id" clearable @keyup.enter.native="handleQuery" />
+      </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
           <el-option v-for="dict in dict.type.sys_normal_disable" :key="dict.value" :label="dict.label"
@@ -40,6 +47,12 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="工作人员编号" align="center" prop="staffId" />
       <el-table-column label="用户id" align="center" prop="userId" />
+      <el-table-column label="检测点" align="center" prop="detectionId">
+        <template slot-scope="scope">
+          {{ getDetectionName(scope.row.detectionId) }}
+        </template>
+      </el-table-column>
+      <el-table-column label="值班表id" align="center" prop="dutyId" />
       <el-table-column label="人脸特征编码" align="center" prop="faceFeature">
         <template slot-scope="scope">
           <!-- 使用作用域数据 scope.row 来访问行数据 -->
@@ -104,12 +117,23 @@
 
           </el-col>
         </el-row>
+        <el-form-item label="检测点" prop="detectionId">
+          <el-select v-model="form.detectionId" placeholder="请选择所管理的监测点" filterable>
+            <el-option v-for="item in detectionOptions" :key="item.detectionId"
+              :label="getDetectionName(item.detectionId)" :value="item.detectionId"></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="值班表id" prop="dutyId">
+          <el-input v-model="form.dutyId" placeholder="请输入值班表id" />
+        </el-form-item>
 
 
 
         <el-form-item label="人脸特征编码" prop="faceFeature">
           <el-input v-model="form.faceFeature" placeholder="请输入人脸特征编码" />
         </el-form-item>
+
         <el-form-item label="状态" prop="status">
           <el-select v-model="form.status" placeholder="请选择状态" clearable>
             <el-option v-for="dict in dict.type.sys_normal_disable" :key="dict.value" :label="dict.label"
@@ -140,6 +164,7 @@
     listUser,
     getUser
   } from "@/api/system/user";
+import { listDetection } from "@/api/cigarette/detection/detection"; // 导入检测点列表接口
 
   export default {
     name: "Staff",
@@ -169,6 +194,8 @@
           pageNum: 1,
           pageSize: 10,
           userId: null,
+          detectionId: null,
+          dutyId: null,
           faceFeature: null,
           status: null,
         },
@@ -183,6 +210,7 @@
         filteredUsers: [],
         // 存储所选用户信息
         selectedUser: null,
+        detectionOptions: [], // 初始化检测点选项
         // 表单校验
         rules: {
           userId: [{
@@ -215,6 +243,7 @@
     },
     created() {
       this.getList();
+      this.loadDetectionOptions(); // 加载检测点选项
     },
     mounted() {
       this.filteredUsers = [];
@@ -244,6 +273,23 @@
           this.loading = false;
         });
       },
+          // 加载检测点选项
+    loadDetectionOptions() {
+      listDetection().then(response => {
+        this.detectionOptions = response.rows.map(item => ({
+          detectionId: item.detectionId,
+          detectionName: item.detectionName
+        }));
+      }).catch(error => {
+        console.error("Failed to load detection options:", error);
+      });
+    },
+        // 根据 detectionId 获取监测点名字
+        getDetectionName(detectionId) {
+      const detection = this.detectionOptions.find(item => item.detectionId === detectionId)
+      return detection ? detection.detectionName : '未知监测点';
+    },
+
       // 取消按钮
       cancel() {
         this.open = false;

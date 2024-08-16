@@ -5,10 +5,9 @@
         <el-input v-model="queryParams.carId" placeholder="请输入车id" clearable @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item label="车型" prop="carTypeId">
-        <el-select v-model="queryParams.carTypeId" placeholder="请选择车型" clearable clearable
-          @keyup.enter.native="handleQuery">
-          <el-option v-for="carType in carTypeList" :key="carType.carTypeId" :label="carType.carTypeName"
-            :value="carType.carTypeId" />
+              <el-select v-model="queryParams.carTypeId" placeholder="请选择车型" clearable>
+          <el-option v-for="dict in dict.type.tob_vehicle_type" :key="dict.value" :label="dict.label"
+            :value="dict.value" />
         </el-select>
       </el-form-item>
       <el-form-item label="车身颜色" prop="carColor">
@@ -71,12 +70,15 @@
       <el-table-column label="车辆行为序号" align="center" prop="behaviorId" />
       <el-table-column label="车辆序号" align="center" prop="carId" />
       <el-table-column label="车牌编号" align="center" prop="licensePlate" />
-      <el-table-column label="车型" align="center" prop="carTypeId" :formatter="formatCarTypeName" min-width="120px">
+      <el-table-column  label="车型" prop="carTypeId">
+        <template slot-scope="scope">
+          <dict-tag :options="dict.type.tob_vehicle_type" :value="scope.row.carTypeId" />
+        </template>
       </el-table-column>
       <el-table-column label="车身颜色" align="center" prop="carColor" />
       <el-table-column label="嫌疑程度" align="center" prop="degreeSuspicion" />
 
-      <el-table-column label="驾驶人编号" align="center" prop="driverId" />
+      <el-table-column label="车员编号" align="center" prop="driverId" />
       <el-table-column label="驾驶人姓名" align="center" prop="driverName" min-width="120px" />
       <el-table-column label="行驶方向" align="center" prop="drivingDirection">
         <template slot-scope="scope">
@@ -96,6 +98,7 @@
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="同伙id" align="center" prop="accompliceId" />
       <el-table-column label="同伙姓名" align="center" prop="name" min-width="120px" />
+      <el-table-column label="记录时间" align="center" prop="createTime" min-width="160px" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="120px">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
@@ -143,12 +146,12 @@
 
 
         <el-row>
-          <el-col :span="12">
-            <el-form-item label="车型" prop="carTypeId">
-              <el-select v-model="form.carTypeId" placeholder="请选择车型" clearable>
-                <el-option v-for="carType in carTypeList" :key="carType.carTypeId" :label="carType.carTypeName"
-                  :value="carType.carTypeId" />
-              </el-select>
+          <el-col :span="12">           
+  <el-form-item label="车型" prop="carTypeId">
+              <el-select v-model="queryParams.carTypeId" placeholder="请选择车型" clearable>
+          <el-option v-for="dict in dict.type.tob_vehicle_type" :key="dict.value" :label="dict.label"
+            :value="dict.value" />
+        </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -199,7 +202,7 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-        <el-form-item label="驾驶人编号" prop="driverId">
+        <el-form-item label="车员编号" prop="driverId">
           <el-input :disabled="true" v-model="form.driverId" placeholder="请输入驾驶员编号" />
         </el-form-item>
           </el-col>
@@ -255,9 +258,6 @@
     updateVehicleBehavior
   } from "@/api/cigarette/vehicle/vehicleBehavior";
   import {
-    listCarType
-  } from "@/api/cigarette/vehicle/carType";
-  import {
     listPerson
   } from "@/api/cigarette/personnel/person";
   import {
@@ -266,7 +266,7 @@
 
   export default {
     name: "VehicleBehavior",
-    dicts: ['tob_illegal_status', 'sys_normal_disable', 'tob_driving_irection'],
+    dicts: ['tob_illegal_status', 'sys_normal_disable', 'tob_driving_irection','tob_vehicle_type'],
     data() {
       return {
         // 遮罩层
@@ -390,9 +390,6 @@
         listVehicleBehaviorVo(this.queryParams).then(response => {
           this.vehicleBehaviorList = response.rows;
           this.total = response.total;
-        });
-        listCarType(this.queryParams).then(response2 => {
-          this.carTypeList = response2.rows;
           this.loading = false;
         });
       },

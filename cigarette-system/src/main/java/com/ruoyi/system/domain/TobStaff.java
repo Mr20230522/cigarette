@@ -22,6 +22,14 @@ public class TobStaff extends BaseEntity
     @Excel(name = "用户id")
     private Long userId;
 
+    /** 检测点id */
+    @Excel(name = "检测点id")
+    private Long detectionId;
+
+    /** 值班表id */
+    @Excel(name = "值班表id")
+    private Long dutyId;
+
     /** 人脸特征编码 */
     @Excel(name = "人脸特征编码")
     private String faceFeature;
