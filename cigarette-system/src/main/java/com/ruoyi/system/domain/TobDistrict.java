@@ -63,11 +63,6 @@ public class TobDistrict extends BaseEntity {
     @Excel(name = "状态")
     private String status;
     /**
-     * 删除标记
-     */
-    @Excel(name = "删除标记")
-    private String delFlag;
-    /**
      * 父地区名称
      */
     private String parentName;
@@ -166,14 +161,6 @@ public class TobDistrict extends BaseEntity {
         return status;
     }
 
-    public void setDelFlag(String delFlag) {
-        this.delFlag = delFlag;
-    }
-
-    public String getDelFlag() {
-        return delFlag;
-    }
-
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
@@ -186,7 +173,6 @@ public class TobDistrict extends BaseEntity {
                 .append("phone", getPhone())
                 .append("email", getEmail())
                 .append("status", getStatus())
-                .append("delFlag", getDelFlag())
                 .append("createTime", getCreateTime())
                 .append("updateTime", getUpdateTime())
                 .append("remark", getRemark())
