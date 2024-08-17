@@ -76,7 +76,6 @@
             <if test="status != null and status != ''">
                 AND td.status = #{status}
             </if>
-                AND td.del_flag = 0
             <if test="responsibleId != null">
                 AND td.responsible_id = #{responsibleId}
             </if>
