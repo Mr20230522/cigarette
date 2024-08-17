@@ -40,7 +40,7 @@
                 #{detectionName}, '%')
             </if>
             <if test="status != null  and status != ''">and status = #{status}</if>
-            <if test="delFlag != null  and delFlag != ''">and del_flag = #{delFlag}</if>
+            and del_flag = 0
             <if test="responsibleId != null ">and responsible_id = #{responsibleId}</if>
         </where>
     </select>
@@ -76,9 +76,7 @@
             <if test="status != null and status != ''">
                 AND td.status = #{status}
             </if>
-            <if test="delFlag != null and delFlag != ''">
-                AND td.del_flag = #{delFlag}
-            </if>
+                AND td.del_flag = 0
             <if test="responsibleId != null">
                 AND td.responsible_id = #{responsibleId}
             </if>
@@ -92,7 +90,7 @@
             <if test="orderNum != null">order_num,</if>
             <if test="detectionName != null and detectionName != ''">detection_name,</if>
             <if test="status != null and status != ''">status,</if>
-            <if test="delFlag != null">del_flag,</if>
+            del_flag,
             <if test="remark != null">remark,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateTime != null">update_time,</if>
@@ -103,7 +101,7 @@
             <if test="orderNum != null">#{orderNum},</if>
             <if test="detectionName != null and detectionName != ''">#{detectionName},</if>
             <if test="status != null and status != ''">#{status},</if>
-            <if test="delFlag != null">#{delFlag},</if>
+            0,
             <if test="remark != null">#{remark},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateTime != null">#{updateTime},</if>

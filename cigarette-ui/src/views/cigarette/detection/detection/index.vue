@@ -31,12 +31,6 @@
                 :value="dict.value" />
             </el-select>
           </el-form-item>
-          <el-form-item label="删除标记" prop="delFlag">
-            <el-select v-model="queryParams.delFlag" placeholder="请选择删除标记" clearable>
-              <el-option v-for="dict in dict.type.tob_del_flag" :key="dict.value" :label="dict.label"
-                :value="dict.value" />
-            </el-select>
-          </el-form-item>
           <el-form-item label="负责人" prop="responsibleId">
             <el-input v-model="queryParams.responsibleId" placeholder="请选择负责人" clearable
               @keyup.enter.native="handleQuery" />
@@ -84,11 +78,6 @@
               <dict-tag :options="dict.type.tob_dd_status" :value="scope.row.status" />
             </template>
           </el-table-column>
-          <el-table-column label="删除标记" align="center" prop="delFlag">
-            <template slot-scope="scope">
-              <dict-tag :options="dict.type.tob_del_flag" :value="scope.row.delFlag" />
-            </template>
-          </el-table-column>
           <el-table-column label="备注" align="center" prop="remark" />
           <el-table-column label="负责人" align="center" prop="responsibleId">
             <template slot-scope="scope">
@@ -133,12 +122,6 @@
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="form.status">
             <el-radio v-for="dict in dict.type.tob_dd_status" :key="dict.value" :label="dict.value">{{ dict.label
-              }}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="删除标记" prop="delFlag">
-          <el-radio-group v-model="form.delFlag">
-            <el-radio v-for="dict in dict.type.tob_del_flag" :key="dict.value" :label="dict.value">{{ dict.label
               }}</el-radio>
           </el-radio-group>
         </el-form-item>
@@ -208,7 +191,6 @@ export default {
         orderNum: null,
         detectionName: null,
         status: null,
-        delFlag: null,
         responsibleId: null,
         districtId: null
       },
@@ -365,7 +347,6 @@ export default {
         orderNum: null,
         districtName: null,
         status: null,
-        delFlag: null,
         remark: null,
         createTime: null,
         updateTime: null,

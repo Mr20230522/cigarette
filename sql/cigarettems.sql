@@ -11,7 +11,7 @@
  Target Server Version : 80039
  File Encoding         : 65001
 
- Date: 16/08/2024 20:19:51
+ Date: 17/08/2024 13:23:41
 */
 
 SET NAMES utf8mb4;
@@ -883,6 +883,7 @@ INSERT INTO `sys_logininfor` VALUES (164, 'admin', '127.0.0.1', '内网IP', 'Chr
 INSERT INTO `sys_logininfor` VALUES (165, 'admin', '127.0.0.1', '内网IP', 'Chrome 12', 'Windows 10', '0', '登录成功', '2024-08-16 13:14:27');
 INSERT INTO `sys_logininfor` VALUES (166, 'admin', '127.0.0.1', '内网IP', 'Chrome 12', 'Windows 10', '0', '登录成功', '2024-08-16 15:03:46');
 INSERT INTO `sys_logininfor` VALUES (167, 'admin', '127.0.0.1', '内网IP', 'Chrome 12', 'Windows 10', '0', '登录成功', '2024-08-16 18:28:11');
+INSERT INTO `sys_logininfor` VALUES (168, 'admin', '127.0.0.1', '内网IP', 'Chrome 12', 'Windows 10', '0', '登录成功', '2024-08-17 12:52:09');
 
 -- ----------------------------
 -- Table structure for sys_menu
@@ -1522,7 +1523,7 @@ CREATE TABLE `sys_user`  (
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES (1, 103, 'admin', '若依', '00', 'ry@163.com', '15888888888', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', '2024-08-16 18:28:11', 'admin', '2024-07-13 15:12:20', '', '2024-08-16 18:28:11', '管理员');
+INSERT INTO `sys_user` VALUES (1, 103, 'admin', '若依', '00', 'ry@163.com', '15888888888', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', '2024-08-17 12:52:09', 'admin', '2024-07-13 15:12:20', '', '2024-08-17 12:52:09', '管理员');
 INSERT INTO `sys_user` VALUES (2, 105, 'ry', '若依', '00', 'ry@qq.com', '15666666666', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', '2024-07-13 15:12:20', 'admin', '2024-07-13 15:12:20', '', NULL, '测试员');
 INSERT INTO `sys_user` VALUES (100, 103, 'test1', '测试1', '00', '', '15112312311', '0', '', '$2a$10$1kSBEX3EDonvfiqi.AxuFuo9olWss27TnO5kHnsCp5q4qpyVF8IIu', '0', '0', '', NULL, 'admin', '2024-08-01 14:58:28', '', NULL, NULL);
 INSERT INTO `sys_user` VALUES (101, 104, 'test2', '测试2', '00', '', '15124533513', '0', '', '$2a$10$4YEGKimy.AOzwcOUIO06xe2p8eCIBn3Yd20EeUrQlmcl1LL1D7omy', '0', '0', '', NULL, 'admin', '2024-08-01 14:59:40', '', NULL, NULL);
@@ -1719,7 +1720,6 @@ CREATE TABLE `tob_district`  (
   `phone` varchar(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '联系电话',
   `email` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '邮箱',
   `status` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '状态',
-  `del_flag` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '删除标记',
   `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
   `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
   `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '备注',
@@ -1729,13 +1729,13 @@ CREATE TABLE `tob_district`  (
 -- ----------------------------
 -- Records of tob_district
 -- ----------------------------
-INSERT INTO `tob_district` VALUES (4, 0, '0', '云南', 1, 'admin', '13888888888', 'ruoyi@123.com', '0', '0', '2024-07-24 12:57:50', '2024-07-28 12:10:58', NULL);
-INSERT INTO `tob_district` VALUES (5, 4, '0,4', '昆明', 1, 'adimin', '13888888888', 'ruoyi@123.com', '0', '0', '2024-07-24 12:58:16', '2024-07-24 13:15:39', NULL);
-INSERT INTO `tob_district` VALUES (6, 5, '0,4,5', '盘龙区', 1, 'admin', '13888888888', 'ruoyi@123.com', '0', '0', '2024-07-24 13:03:38', NULL, NULL);
-INSERT INTO `tob_district` VALUES (7, 4, '0,4', '曲靖', 2, 'admin', '13888888888', 'ruoyi@123.com', '0', '0', '2024-07-25 19:23:17', NULL, NULL);
-INSERT INTO `tob_district` VALUES (8, 7, '0,4,7', '马龙区', 1, 'admin', '13888888888', 'ruoyi@123.com', '0', '0', '2024-07-25 19:25:52', NULL, NULL);
-INSERT INTO `tob_district` VALUES (10, 4, '0,4', '玉溪', 3, 'admin', '13888888888', 'ruoyi@123.com', '0', '0', '2024-07-28 14:05:08', NULL, NULL);
-INSERT INTO `tob_district` VALUES (11, 5, '0,4,5', '晋宁区', 2, 'admin', '13888888888', 'ruoyi@123.com', '0', '0', '2024-07-28 14:07:08', NULL, NULL);
+INSERT INTO `tob_district` VALUES (4, 0, '0', '云南', 1, 'admin', '13888888888', 'ruoyi@123.com', '0', '2024-07-24 12:57:50', '2024-07-28 12:10:58', NULL);
+INSERT INTO `tob_district` VALUES (5, 4, '0,4', '昆明', 1, 'adimin', '13888888888', 'ruoyi@123.com', '0', '2024-07-24 12:58:16', '2024-07-24 13:15:39', NULL);
+INSERT INTO `tob_district` VALUES (6, 5, '0,4,5', '盘龙区', 1, 'admin', '13888888888', 'ruoyi@123.com', '0', '2024-07-24 13:03:38', NULL, NULL);
+INSERT INTO `tob_district` VALUES (7, 4, '0,4', '曲靖', 2, 'admin', '13888888888', 'ruoyi@123.com', '0', '2024-07-25 19:23:17', NULL, NULL);
+INSERT INTO `tob_district` VALUES (8, 7, '0,4,7', '马龙区', 1, 'admin', '13888888888', 'ruoyi@123.com', '0', '2024-07-25 19:25:52', NULL, NULL);
+INSERT INTO `tob_district` VALUES (10, 4, '0,4', '玉溪', 3, 'admin', '13888888888', 'ruoyi@123.com', '0', '2024-07-28 14:05:08', NULL, NULL);
+INSERT INTO `tob_district` VALUES (11, 5, '0,4,5', '晋宁区', 2, 'admin', '13888888888', 'ruoyi@123.com', '0', '2024-07-28 14:07:08', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for tob_document

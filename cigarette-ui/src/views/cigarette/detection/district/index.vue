@@ -11,18 +11,10 @@
       <el-form-item label="联系电话" prop="phone">
         <el-input v-model="queryParams.phone" placeholder="请输入联系电话" clearable @keyup.enter.native="handleQuery" />
       </el-form-item>
-      <el-form-item label="邮箱" prop="email">
-        <el-input v-model="queryParams.email" placeholder="请输入邮箱" clearable @keyup.enter.native="handleQuery" />
-      </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
           <el-option v-for="dict in dict.type.tob_dd_status" :key="dict.value" :label="dict.label"
             :value="dict.value" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="删除标记" prop="delFlag">
-        <el-select v-model="queryParams.delFlag" placeholder="请选择删除标记" clearable>
-          <el-option v-for="dict in dict.type.tob_del_flag" :key="dict.value" :label="dict.label" :value="dict.value" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -52,11 +44,6 @@
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.tob_dd_status" :value="scope.row.status" />
-        </template>
-      </el-table-column>
-      <el-table-column label="删除标记" align="center" prop="delFlag">
-        <template slot-scope="scope">
-          <dict-tag :options="dict.type.tob_del_flag" :value="scope.row.delFlag" />
         </template>
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
@@ -93,12 +80,6 @@
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="form.status">
             <el-radio v-for="dict in dict.type.tob_dd_status" :key="dict.value"
-              :label="dict.value">{{ dict.label }}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="删除标记" prop="delFlag">
-          <el-radio-group v-model="form.delFlag">
-            <el-radio v-for="dict in dict.type.tob_del_flag" :key="dict.value"
               :label="dict.value">{{ dict.label }}</el-radio>
           </el-radio-group>
         </el-form-item>
@@ -148,9 +129,7 @@ export default {
         districtName: null,
         leader: null,
         phone: null,
-        email: null,
         status: null,
-        delFlag: null,
       },
       // 表单参数
       form: {},
@@ -170,9 +149,6 @@ export default {
         ],
         status: [
           { required: true, message: "状态不能为空", trigger: "change" }
-        ],
-        delFlag: [
-          { required: true, message: "删除标记不能为空", trigger: "change" }
         ],
       }
     };
@@ -226,7 +202,6 @@ export default {
         phone: null,
         email: null,
         status: null,
-        delFlag: null,
         createTime: null,
         updateTime: null,
         remark: null
