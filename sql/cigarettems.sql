@@ -11,7 +11,7 @@
  Target Server Version : 80039
  File Encoding         : 65001
 
- Date: 17/08/2024 13:23:41
+ Date: 17/08/2024 17:31:36
 */
 
 SET NAMES utf8mb4;
@@ -44,7 +44,7 @@ CREATE TABLE `gen_table`  (
   `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
   `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`table_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '代码生成业务表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '代码生成业务表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of gen_table
@@ -94,7 +94,7 @@ CREATE TABLE `gen_table_column`  (
   `update_by` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '' COMMENT '更新者',
   `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
   PRIMARY KEY (`column_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 209 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '代码生成业务表字段' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 210 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '代码生成业务表字段' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of gen_table_column
@@ -610,7 +610,7 @@ CREATE TABLE `sys_dict_data`  (
   `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
   `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`dict_code`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 147 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '字典数据表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 150 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '字典数据表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_dict_data
@@ -711,7 +711,7 @@ CREATE TABLE `sys_dict_type`  (
   `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`dict_id`) USING BTREE,
   UNIQUE INDEX `dict_type`(`dict_type` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 30 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '字典类型表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 32 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '字典类型表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_dict_type
@@ -787,7 +787,7 @@ CREATE TABLE `sys_job_log`  (
   `exception_info` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '' COMMENT '异常信息',
   `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
   PRIMARY KEY (`job_log_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '定时任务调度日志表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '定时任务调度日志表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_job_log
@@ -810,7 +810,7 @@ CREATE TABLE `sys_logininfor`  (
   PRIMARY KEY (`info_id`) USING BTREE,
   INDEX `idx_sys_logininfor_s`(`status` ASC) USING BTREE,
   INDEX `idx_sys_logininfor_lt`(`login_time` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 167 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '系统访问记录' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 169 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '系统访问记录' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_logininfor
@@ -911,7 +911,7 @@ CREATE TABLE `sys_menu`  (
   `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
   `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '' COMMENT '备注',
   PRIMARY KEY (`menu_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2029 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '菜单权限表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 2031 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '菜单权限表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_menu
@@ -1021,6 +1021,8 @@ INSERT INTO `sys_menu` VALUES (2025, '视图检索', 2022, 4, 'keyPicture', 'cig
 INSERT INTO `sys_menu` VALUES (2026, '执法记录', 2022, 5, 'dutyLog', 'cigarette/detection/dutyLog/index', NULL, '', 1, 0, 'C', '0', '0', 'detection:dutyLog:list', '#', 'admin', '2024-07-27 15:01:26', 'admin', '2024-08-16 15:11:37', '');
 INSERT INTO `sys_menu` VALUES (2027, '数据分析', 2018, 2, 'timeVideo', 'cigarette/multimediaResource/timeVideo/index', NULL, '', 1, 0, 'C', '0', '0', NULL, 'checkbox', 'admin', '2024-08-16 15:24:07', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (2028, '预警配置', 2014, 2, 'cautionLog', 'cigarette/caution/cautionLog/index', NULL, '', 1, 0, 'C', '0', '0', NULL, 'component', 'admin', '2024-08-16 15:25:39', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (2029, '测试', 0, 5, 'test', 'cigarette/test/test', NULL, '', 1, 0, 'C', '0', '0', NULL, 'bug', 'admin', '2024-08-17 14:48:19', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (2030, '反馈建议', 0, 15, 'feedBack', 'cigarette/feedBack/feedBack', NULL, '', 1, 0, 'C', '0', '0', '', 'question', 'admin', '2024-08-17 15:42:40', 'admin', '2024-08-17 15:43:59', '');
 
 -- ----------------------------
 -- Table structure for sys_notice
@@ -1072,7 +1074,7 @@ CREATE TABLE `sys_oper_log`  (
   INDEX `idx_sys_oper_log_bt`(`business_type` ASC) USING BTREE,
   INDEX `idx_sys_oper_log_s`(`status` ASC) USING BTREE,
   INDEX `idx_sys_oper_log_ot`(`oper_time` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 424 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '操作日志记录' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 441 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '操作日志记录' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_oper_log
@@ -1407,6 +1409,17 @@ INSERT INTO `sys_oper_log` VALUES (426, '字典类型', 2, 'com.ruoyi.web.contro
 INSERT INTO `sys_oper_log` VALUES (427, '字典数据', 1, 'com.ruoyi.web.controller.system.SysDictDataController.add()', 'POST', 1, 'admin', '研发部门', '/system/dict/data', '127.0.0.1', '内网IP', '{\"createBy\":\"admin\",\"default\":false,\"dictLabel\":\"SUV\",\"dictSort\":1,\"dictType\":\"tob_vehicle_typr\",\"dictValue\":\"1\",\"listClass\":\"primary\",\"params\":{},\"status\":\"0\"}', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2024-08-16 16:42:34', 18);
 INSERT INTO `sys_oper_log` VALUES (428, '字典数据', 1, 'com.ruoyi.web.controller.system.SysDictDataController.add()', 'POST', 1, 'admin', '研发部门', '/system/dict/data', '127.0.0.1', '内网IP', '{\"createBy\":\"admin\",\"default\":false,\"dictLabel\":\"轿车\",\"dictSort\":2,\"dictType\":\"tob_vehicle_typr\",\"dictValue\":\"2\",\"listClass\":\"primary\",\"params\":{},\"status\":\"0\"}', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2024-08-16 16:42:45', 17);
 INSERT INTO `sys_oper_log` VALUES (429, '字典数据', 1, 'com.ruoyi.web.controller.system.SysDictDataController.add()', 'POST', 1, 'admin', '研发部门', '/system/dict/data', '127.0.0.1', '内网IP', '{\"createBy\":\"admin\",\"default\":false,\"dictLabel\":\"面包车\",\"dictSort\":3,\"dictType\":\"tob_vehicle_typr\",\"dictValue\":\"3\",\"listClass\":\"primary\",\"params\":{},\"status\":\"0\"}', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2024-08-16 16:42:56', 18);
+INSERT INTO `sys_oper_log` VALUES (430, '监测区域', 1, 'com.ruoyi.web.controller.cigarette.detection.TobDetectionController.add()', 'POST', 1, 'admin', '研发部门', '/cigarette/detection/detection', '127.0.0.1', '内网IP', '{\"createTime\":\"2024-08-17 14:33:08\",\"detectionId\":3,\"detectionName\":\"A区\",\"districtId\":6,\"orderNum\":\"2\",\"params\":{},\"responsibleId\":1,\"status\":\"0\"}', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2024-08-17 14:33:08', 50);
+INSERT INTO `sys_oper_log` VALUES (431, '监测区域', 1, 'com.ruoyi.web.controller.cigarette.detection.TobDetectionController.add()', 'POST', 1, 'admin', '研发部门', '/cigarette/detection/detection', '127.0.0.1', '内网IP', '{\"createTime\":\"2024-08-17 14:33:28\",\"detectionId\":4,\"detectionName\":\"B区\",\"districtId\":5,\"orderNum\":\"2\",\"params\":{},\"responsibleId\":2,\"status\":\"0\"}', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2024-08-17 14:33:28', 16);
+INSERT INTO `sys_oper_log` VALUES (432, '监测区域', 1, 'com.ruoyi.web.controller.cigarette.detection.TobDetectionController.add()', 'POST', 1, 'admin', '研发部门', '/cigarette/detection/detection', '127.0.0.1', '内网IP', '{\"createTime\":\"2024-08-17 14:33:40\",\"detectionId\":5,\"detectionName\":\"C区\",\"districtId\":11,\"orderNum\":\"3\",\"params\":{},\"responsibleId\":3,\"status\":\"0\"}', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2024-08-17 14:33:40', 15);
+INSERT INTO `sys_oper_log` VALUES (433, '监测区域', 1, 'com.ruoyi.web.controller.cigarette.detection.TobDetectionController.add()', 'POST', 1, 'admin', '研发部门', '/cigarette/detection/detection', '127.0.0.1', '内网IP', '{\"createTime\":\"2024-08-17 14:34:01\",\"detectionId\":6,\"detectionName\":\"D区\",\"districtId\":6,\"orderNum\":\"5\",\"params\":{},\"status\":\"0\"}', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2024-08-17 14:34:01', 15);
+INSERT INTO `sys_oper_log` VALUES (434, '监测区域', 1, 'com.ruoyi.web.controller.cigarette.detection.TobDetectionController.add()', 'POST', 1, 'admin', '研发部门', '/cigarette/detection/detection', '127.0.0.1', '内网IP', '{\"createTime\":\"2024-08-17 14:34:13\",\"detectionId\":7,\"detectionName\":\"E区\",\"districtId\":8,\"orderNum\":\"6\",\"params\":{},\"responsibleId\":2,\"status\":\"0\"}', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2024-08-17 14:34:13', 15);
+INSERT INTO `sys_oper_log` VALUES (435, '监测区域', 1, 'com.ruoyi.web.controller.cigarette.detection.TobDetectionController.add()', 'POST', 1, 'admin', '研发部门', '/cigarette/detection/detection', '127.0.0.1', '内网IP', '{\"createTime\":\"2024-08-17 14:34:24\",\"detectionId\":8,\"detectionName\":\"F区\",\"districtId\":8,\"orderNum\":\"8\",\"params\":{},\"responsibleId\":2,\"status\":\"0\"}', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2024-08-17 14:34:24', 17);
+INSERT INTO `sys_oper_log` VALUES (436, '监测区域', 1, 'com.ruoyi.web.controller.cigarette.detection.TobDetectionController.add()', 'POST', 1, 'admin', '研发部门', '/cigarette/detection/detection', '127.0.0.1', '内网IP', '{\"createTime\":\"2024-08-17 14:34:39\",\"detectionId\":9,\"detectionName\":\"G区\",\"districtId\":10,\"orderNum\":\"9\",\"params\":{},\"responsibleId\":3,\"status\":\"0\"}', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2024-08-17 14:34:39', 14);
+INSERT INTO `sys_oper_log` VALUES (437, '菜单管理', 1, 'com.ruoyi.web.controller.system.SysMenuController.add()', 'POST', 1, 'admin', '研发部门', '/system/menu', '127.0.0.1', '内网IP', '{\"children\":[],\"component\":\"cigarette/test/test\",\"createBy\":\"admin\",\"icon\":\"bug\",\"isCache\":\"0\",\"isFrame\":\"1\",\"menuName\":\"测试\",\"menuType\":\"C\",\"orderNum\":5,\"params\":{},\"parentId\":0,\"path\":\"test\",\"status\":\"0\",\"visible\":\"0\"}', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2024-08-17 14:48:19', 12);
+INSERT INTO `sys_oper_log` VALUES (438, '菜单管理', 1, 'com.ruoyi.web.controller.system.SysMenuController.add()', 'POST', 1, 'admin', '研发部门', '/system/menu', '127.0.0.1', '内网IP', '{\"children\":[],\"component\":\"cigarette/feedBack/index\",\"createBy\":\"admin\",\"icon\":\"question\",\"isCache\":\"0\",\"isFrame\":\"1\",\"menuName\":\"反馈建议\",\"menuType\":\"C\",\"orderNum\":15,\"params\":{},\"parentId\":0,\"path\":\"feedBack\",\"status\":\"0\",\"visible\":\"0\"}', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2024-08-17 15:42:40', 32);
+INSERT INTO `sys_oper_log` VALUES (439, '菜单管理', 2, 'com.ruoyi.web.controller.system.SysMenuController.edit()', 'PUT', 1, 'admin', '研发部门', '/system/menu', '127.0.0.1', '内网IP', '{\"children\":[],\"component\":\"cigarette/feedBack/index\",\"createTime\":\"2024-08-17 15:42:40\",\"icon\":\"question\",\"isCache\":\"0\",\"isFrame\":\"1\",\"menuId\":2030,\"menuName\":\"反馈建议\",\"menuType\":\"C\",\"orderNum\":15,\"params\":{},\"parentId\":0,\"path\":\"index\",\"perms\":\"\",\"status\":\"0\",\"updateBy\":\"admin\",\"visible\":\"0\"}', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2024-08-17 15:43:10', 12);
+INSERT INTO `sys_oper_log` VALUES (440, '菜单管理', 2, 'com.ruoyi.web.controller.system.SysMenuController.edit()', 'PUT', 1, 'admin', '研发部门', '/system/menu', '127.0.0.1', '内网IP', '{\"children\":[],\"component\":\"cigarette/feedBack/feedBack\",\"createTime\":\"2024-08-17 15:42:40\",\"icon\":\"question\",\"isCache\":\"0\",\"isFrame\":\"1\",\"menuId\":2030,\"menuName\":\"反馈建议\",\"menuType\":\"C\",\"orderNum\":15,\"params\":{},\"parentId\":0,\"path\":\"feedBack\",\"perms\":\"\",\"status\":\"0\",\"updateBy\":\"admin\",\"visible\":\"0\"}', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2024-08-17 15:43:59', 18);
 
 -- ----------------------------
 -- Table structure for sys_post
@@ -1424,7 +1437,7 @@ CREATE TABLE `sys_post`  (
   `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
   `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`post_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '岗位信息表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '岗位信息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_post
@@ -1630,14 +1643,16 @@ CREATE TABLE `tob_case_information`  (
   `del_flag` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '0' COMMENT '删除标记',
   `inspector_id` bigint NOT NULL COMMENT '检查人员',
   `degree_of_case` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '案件严重程度',
+  `detection_id` bigint NOT NULL COMMENT '监测区域id',
+  `district_id` bigint NOT NULL COMMENT '地区id',
   PRIMARY KEY (`case_id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '案件信息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of tob_case_information
 -- ----------------------------
-INSERT INTO `tob_case_information` VALUES (1, '1', '1', '2024-08-13', '2024-09-05', 12.00, 'D', 1, '3', '1', '1', 'A', 'B', 'C', '2024-08-20 00:00:00', 101, 'F', '0', 2, '1');
-INSERT INTO `tob_case_information` VALUES (2, '222', '222', '2024-08-13', '2024-08-20', 232.00, 'AAA', 1, '1', '2', '0', 'A', 'B', 'D', '2024-08-14 00:00:00', 101, NULL, '0', 101, '0');
+INSERT INTO `tob_case_information` VALUES (1, '1', '1', '2024-08-13', '2024-09-05', 12.00, 'D', 1, '3', '1', '1', 'A', 'B', 'C', '2024-08-20 00:00:00', 101, 'F', '0', 2, '1', 0, 0);
+INSERT INTO `tob_case_information` VALUES (2, '222', '222', '2024-08-13', '2024-08-20', 232.00, 'AAA', 1, '1', '2', '0', 'A', 'B', 'D', '2024-08-14 00:00:00', 101, NULL, '0', 101, '0', 0, 0);
 
 -- ----------------------------
 -- Table structure for tob_caution
@@ -1645,7 +1660,7 @@ INSERT INTO `tob_case_information` VALUES (2, '222', '222', '2024-08-13', '2024-
 DROP TABLE IF EXISTS `tob_caution`;
 CREATE TABLE `tob_caution`  (
   `caution_id` bigint NOT NULL AUTO_INCREMENT COMMENT '警示记录id',
-  `detection_id` bigint NOT NULL COMMENT '监测点id',
+  `detection_id` bigint NOT NULL COMMENT '监测区域id',
   `behavior_id` bigint NOT NULL COMMENT '车行为id',
   `warning_effect` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '警示效果',
   `status` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '状态',
@@ -1653,6 +1668,7 @@ CREATE TABLE `tob_caution`  (
   `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '备注',
   `create_time` datetime NOT NULL COMMENT '创建时间',
   `update_time` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `district_id` bigint NOT NULL COMMENT '地区id',
   PRIMARY KEY (`caution_id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '预警记录表' ROW_FORMAT = DYNAMIC;
 
@@ -1676,6 +1692,8 @@ CREATE TABLE `tob_clock_log`  (
   `create_time` datetime NOT NULL COMMENT '创建时间',
   `update_time` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `flag` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '0' COMMENT '出勤有误',
+  `detection_id` bigint NOT NULL COMMENT '监测区域id',
+  `district_id` bigint NOT NULL COMMENT '地区id',
   PRIMARY KEY (`commuting_id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '出勤记录表' ROW_FORMAT = DYNAMIC;
 
@@ -1699,12 +1717,19 @@ CREATE TABLE `tob_detection`  (
   `update_time` datetime NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `responsible_id` bigint NULL DEFAULT NULL COMMENT '负责人id',
   PRIMARY KEY (`detection_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '监测区域表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 81 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '监测区域表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of tob_detection
 -- ----------------------------
 INSERT INTO `tob_detection` VALUES (2, 8, '1', '和平', '0', '0', NULL, '2024-07-28 19:37:29', '2024-08-07 18:20:43', 3);
+INSERT INTO `tob_detection` VALUES (3, 6, '2', 'A区', '0', '0', NULL, '2024-08-17 14:33:09', NULL, 1);
+INSERT INTO `tob_detection` VALUES (4, 5, '2', 'B区', '0', '0', NULL, '2024-08-17 14:33:29', NULL, 2);
+INSERT INTO `tob_detection` VALUES (5, 11, '3', 'C区', '0', '0', NULL, '2024-08-17 14:33:41', NULL, 3);
+INSERT INTO `tob_detection` VALUES (6, 6, '5', 'D区', '0', '0', NULL, '2024-08-17 14:34:02', '2024-08-17 16:46:04', NULL);
+INSERT INTO `tob_detection` VALUES (7, 8, '6', 'E区', '0', '0', NULL, '2024-08-17 14:34:14', NULL, 2);
+INSERT INTO `tob_detection` VALUES (8, 8, '8', 'F区', '0', '0', NULL, '2024-08-17 14:34:25', '2024-08-17 16:46:06', 2);
+INSERT INTO `tob_detection` VALUES (9, 10, '9', 'G区', '0', '0', NULL, '2024-08-17 14:34:39', NULL, 3);
 
 -- ----------------------------
 -- Table structure for tob_district
@@ -1756,6 +1781,8 @@ CREATE TABLE `tob_document`  (
   `update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '更新人',
   `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '备注',
   `preview_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '预览URL',
+  `detection_id` bigint NOT NULL COMMENT '监测区域id',
+  `district_id` bigint NOT NULL COMMENT '地区id',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '文档表' ROW_FORMAT = DYNAMIC;
 
@@ -1780,6 +1807,8 @@ CREATE TABLE `tob_duty_log`  (
   `video_id` bigint NULL DEFAULT NULL COMMENT '视频id',
   `behavior` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '行为',
   `work_flag` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '是否工作',
+  `detection_id` bigint NOT NULL COMMENT '监测区域id',
+  `district_id` bigint NOT NULL COMMENT '地区id',
   PRIMARY KEY (`duty_id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '执勤记录表' ROW_FORMAT = DYNAMIC;
 
@@ -1804,7 +1833,7 @@ CREATE TABLE `tob_duty_schedule`  (
   `dept_id` bigint NULL DEFAULT NULL COMMENT '部门ID',
   `duty_type` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '值班类型',
   PRIMARY KEY (`duty_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '值班表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '值班表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of tob_duty_schedule
@@ -1827,7 +1856,7 @@ CREATE TABLE `tob_key_picture`  (
   `status` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '状态',
   `del_flag` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '0' COMMENT '删除标记',
   PRIMARY KEY (`key_picture_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '关键帧图片表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '关键帧图片表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of tob_key_picture
@@ -1852,7 +1881,7 @@ CREATE TABLE `tob_key_video`  (
   `del_flag` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '删除标记',
   `create_time` datetime NOT NULL COMMENT '创建时间',
   PRIMARY KEY (`video_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '关键帧视频表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '关键帧视频表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of tob_key_video
@@ -1897,7 +1926,7 @@ DROP TABLE IF EXISTS `tob_staff`;
 CREATE TABLE `tob_staff`  (
   `staff_id` bigint NOT NULL AUTO_INCREMENT COMMENT '工作人员id',
   `user_id` bigint NOT NULL COMMENT '用户id',
-  `detection_id` bigint NULL DEFAULT NULL COMMENT '检测点id',
+  `detection_id` bigint NULL DEFAULT NULL COMMENT '检测区域id',
   `duty_id` bigint NULL DEFAULT NULL COMMENT '值班表id',
   `face_feature` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '人脸特征编码',
   `status` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '状态',
@@ -1905,18 +1934,19 @@ CREATE TABLE `tob_staff`  (
   `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '备注',
   `create_time` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `district_id` bigint NOT NULL COMMENT '地区id',
   PRIMARY KEY (`staff_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '工作人员表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '工作人员表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of tob_staff
 -- ----------------------------
-INSERT INTO `tob_staff` VALUES (1, 102, 0, 0, NULL, '0', '0', NULL, '2024-08-01 14:44:59', '2024-08-07 18:01:15');
-INSERT INTO `tob_staff` VALUES (2, 103, 0, 0, NULL, '0', '0', NULL, '2024-08-01 15:25:46', '2024-08-01 15:25:46');
-INSERT INTO `tob_staff` VALUES (3, 101, 0, 0, NULL, '0', '0', NULL, '2024-08-01 15:51:09', '2024-08-01 15:51:09');
-INSERT INTO `tob_staff` VALUES (4, 101, 0, 0, '312ew', '0', '0', NULL, '2024-08-07 18:14:03', '2024-08-07 18:14:03');
-INSERT INTO `tob_staff` VALUES (5, 103, 0, 0, NULL, '1', '0', NULL, '2024-08-07 18:21:09', '2024-08-07 18:21:09');
-INSERT INTO `tob_staff` VALUES (6, 101, NULL, NULL, '231', '0', '0', NULL, '2024-08-16 16:32:17', '2024-08-16 16:32:17');
+INSERT INTO `tob_staff` VALUES (1, 102, 0, 0, NULL, '0', '0', NULL, '2024-08-01 14:44:59', '2024-08-07 18:01:15', 0);
+INSERT INTO `tob_staff` VALUES (2, 103, 0, 0, NULL, '0', '0', NULL, '2024-08-01 15:25:46', '2024-08-01 15:25:46', 0);
+INSERT INTO `tob_staff` VALUES (3, 101, 0, 0, NULL, '0', '0', NULL, '2024-08-01 15:51:09', '2024-08-01 15:51:09', 0);
+INSERT INTO `tob_staff` VALUES (4, 101, 0, 0, '312ew', '0', '0', NULL, '2024-08-07 18:14:03', '2024-08-07 18:14:03', 0);
+INSERT INTO `tob_staff` VALUES (5, 103, 0, 0, NULL, '1', '0', NULL, '2024-08-07 18:21:09', '2024-08-07 18:21:09', 0);
+INSERT INTO `tob_staff` VALUES (6, 101, NULL, NULL, '231', '0', '0', NULL, '2024-08-16 16:32:17', '2024-08-16 16:32:17', 0);
 
 -- ----------------------------
 -- Table structure for tob_time_video
@@ -1935,7 +1965,7 @@ CREATE TABLE `tob_time_video`  (
   `camera_id` bigint NULL DEFAULT NULL COMMENT '摄像头id',
   `create_time` datetime NOT NULL COMMENT '创建时间',
   PRIMARY KEY (`video_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '片段化视频表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '片段化视频表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of tob_time_video
@@ -1989,14 +2019,16 @@ CREATE TABLE `tob_vehicle_behavior`  (
   `create_time` datetime NOT NULL COMMENT '创建时间',
   `update_time` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `accomplice_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '同伙id',
+  `detection_id` bigint NOT NULL COMMENT '监测区域id',
+  `district_id` bigint NOT NULL COMMENT '地区id',
   PRIMARY KEY (`behavior_id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '车辆行为记录表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of tob_vehicle_behavior
 -- ----------------------------
-INSERT INTO `tob_vehicle_behavior` VALUES (1, 1, 2, '白色', 33, 1, '0', '1', '0', '0', '22', '2024-08-01 13:26:37', '2024-08-04 16:36:40', '22');
-INSERT INTO `tob_vehicle_behavior` VALUES (5, 2, 1, '紫色', 27, 103, '0', '0', '0', '0', NULL, '2024-08-04 16:55:30', '2024-08-04 16:55:30', NULL);
-INSERT INTO `tob_vehicle_behavior` VALUES (6, 2, 1, '蓝色', 37, 3, '0', '0', '0', '0', NULL, '2024-08-04 17:20:41', '2024-08-04 17:20:41', NULL);
+INSERT INTO `tob_vehicle_behavior` VALUES (1, 1, 2, '白色', 33, 1, '0', '1', '0', '0', '22', '2024-08-01 13:26:37', '2024-08-04 16:36:40', '22', 0, 0);
+INSERT INTO `tob_vehicle_behavior` VALUES (5, 2, 1, '紫色', 27, 103, '0', '0', '0', '0', NULL, '2024-08-04 16:55:30', '2024-08-04 16:55:30', NULL, 0, 0);
+INSERT INTO `tob_vehicle_behavior` VALUES (6, 2, 1, '蓝色', 37, 3, '0', '0', '0', '0', NULL, '2024-08-04 17:20:41', '2024-08-04 17:20:41', NULL, 0, 0);
 
 SET FOREIGN_KEY_CHECKS = 1;

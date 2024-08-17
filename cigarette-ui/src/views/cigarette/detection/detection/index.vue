@@ -191,6 +191,7 @@ export default {
         orderNum: null,
         detectionName: null,
         status: null,
+        delFlag: null,
         responsibleId: null,
         districtId: null
       },
@@ -347,6 +348,7 @@ export default {
         orderNum: null,
         districtName: null,
         status: null,
+        delFlag: null,
         remark: null,
         createTime: null,
         updateTime: null,
