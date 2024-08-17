@@ -42,6 +42,12 @@ public class TobStaff extends BaseEntity
     @Excel(name = "删除标记")
     private String delFlag;
 
+    /**
+     * 地区id
+     */
+    @Excel(name = "地区id")
+    private Long districtId;
+
     public void setStaffId(Long staffId) 
     {
         this.staffId = staffId;
@@ -88,6 +94,30 @@ public class TobStaff extends BaseEntity
         return delFlag;
     }
 
+    public Long getDetectionId() {
+        return detectionId;
+    }
+
+    public void setDetectionId(Long detectionId) {
+        this.detectionId = detectionId;
+    }
+
+    public Long getDutyId() {
+        return dutyId;
+    }
+
+    public void setDutyId(Long dutyId) {
+        this.dutyId = dutyId;
+    }
+
+    public Long getDistrictId() {
+        return districtId;
+    }
+
+    public void setDistrictId(Long districtId) {
+        this.districtId = districtId;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -99,6 +129,9 @@ public class TobStaff extends BaseEntity
             .append("remark", getRemark())
             .append("createTime", getCreateTime())
             .append("updateTime", getUpdateTime())
+                .append("detectionId", getDetectionId())
+                .append("dutyId", getDutyId())
+                .append("districtId", getDistrictId())
             .toString();
     }
 }

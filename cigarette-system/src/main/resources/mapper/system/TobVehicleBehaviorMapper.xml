@@ -19,6 +19,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createTime"    column="create_time"    />
         <result property="updateTime"    column="update_time"    />
         <result property="accompliceId"    column="accomplice_id"    />
+        <result property="detectionId" column="detection_id"/>
+        <result property="districtId" column="district_id"/>
     </resultMap>
 
     <resultMap type="TobVehicleBehaviorVo" id="TobVehicleBehaviorVoResult">
@@ -38,10 +40,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="driverName"    column="name"    />
         <result property="licensePlate"    column="license_plate"    />
         <result property="accompliceId"    column="accomplice_id"    />
+        <result property="detectionId" column="detection_id"/>
+        <result property="districtId" column="district_id"/>
     </resultMap>
 
     <sql id="selectTobVehicleBehaviorVo">
-        select behavior_id, car_id, car_type_id, car_color, degree_suspicion, driver_id, driving_direction, illegal_status, status, del_flag, remark, create_time, update_time, accomplice_id from tob_vehicle_behavior
+        select behavior_id, car_id, car_type_id, car_color, degree_suspicion, driver_id, driving_direction, illegal_status, status, del_flag, remark, create_time, update_time, accomplice_id, detection_id,district_id from tob_vehicle_behavior
     </sql>
 
     <select id="selectTobVehicleBehaviorList" parameterType="TobVehicleBehavior" resultMap="TobVehicleBehaviorResult">
@@ -56,6 +60,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="illegalStatus != null  and illegalStatus != ''"> and illegal_status = #{illegalStatus}</if>
             <if test="status != null  and status != ''"> and status = #{status}</if>
             <if test="accompliceId != null  and accompliceId != ''"> and accomplice_id = #{accompliceId}</if>
+             <if test="detectionId != null "> and detection_id = #{detectionId}</if>
+              <if test="districtId != null "> and district_id = #{districtId}</if>
         </where>
     </select>
 
@@ -69,15 +75,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                  INNER JOIN tob_vehicle AS b ON a.car_id = b.car_id
                  INNER JOIN tob_person AS c ON a.driver_id = c.suspect_id
         <where>
-            <if test="carId != null "> and car_id = #{carId}</if>
-            <if test="carTypeId != null "> and car_type_id = #{carTypeId}</if>
-            <if test="carColor != null  and carColor != ''"> and car_color = #{carColor}</if>
-            <if test="degreeSuspicion != null "> and degree_suspicion = #{degreeSuspicion}</if>
-            <if test="driverId != null "> and driver_id = #{driverId}</if>
-            <if test="drivingDirection != null  and drivingDirection != ''"> and driving_direction = #{drivingDirection}</if>
-            <if test="illegalStatus != null  and illegalStatus != ''"> and illegal_status = #{illegalStatus}</if>
-            <if test="status != null  and status != ''"> and status = #{status}</if>
-            <if test="accompliceId != null  and accompliceId != ''"> and accomplice_id = #{accompliceId}</if>
+            <if test="carId != null "> and a.car_id = #{carId}</if>
+            <if test="carTypeId != null "> and a.car_type_id = #{carTypeId}</if>
+            <if test="carColor != null  and carColor != ''"> and a.car_color = #{carColor}</if>
+            <if test="degreeSuspicion != null "> and a.degree_suspicion = #{degreeSuspicion}</if>
+            <if test="driverId != null "> and a.driver_id = #{driverId}</if>
+            <if test="drivingDirection != null  and drivingDirection != ''"> and a.driving_direction = #{drivingDirection}</if>
+            <if test="illegalStatus != null  and illegalStatus != ''"> and a.illegal_status = #{illegalStatus}</if>
+            <if test="status != null  and status != ''"> and a.status = #{status}</if>
+            <if test="accompliceId != null  and accompliceId != ''"> and a.accomplice_id = #{accompliceId}</if>
+             <if test="detectionId != null "> and a.detection_id = #{detectionId}</if>
+              <if test="districtId != null "> and a.district_id = #{districtId}</if>
         </where>
 
     </select>
@@ -104,6 +112,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             create_time,
             update_time,
             <if test="accompliceId != null">accomplice_id,</if>
+            <if test="detectionId != null">detection_id,</if>
+            <if test="districtId != null">district_id,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="carId != null">#{carId},</if>
@@ -119,6 +129,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             sysdate(),
             sysdate(),
             <if test="accompliceId != null">#{accompliceId},</if>
+            <if test="detectionId != null">#{detectionId},</if>
+            <if test="districtId != null">#{districtId},</if>
          </trim>
     </insert>
 
@@ -136,6 +148,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="remark != null">remark = #{remark},</if>
             update_time = sysdate(),
             <if test="accompliceId != null">accomplice_id = #{accompliceId},</if>
+            <if test="detectionId != null">detection_id = #{detectionId},</if>
+            <if test="districtId != null">district_id = #{districtId},</if>
         </trim>
         where behavior_id = #{behaviorId}
     </update>

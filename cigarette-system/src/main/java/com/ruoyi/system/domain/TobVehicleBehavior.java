@@ -57,6 +57,18 @@ public class TobVehicleBehavior extends BaseEntity
     @Excel(name = "同伙id")
     private String accompliceId;
 
+    /**
+     * 监测区域id
+     */
+    @Excel(name = "监测区域id")
+    private Long detectionId;
+
+    /**
+     * 地区id
+     */
+    @Excel(name = "地区id")
+    private Long districtId;
+
     public void setBehaviorId(Long behaviorId) 
     {
         this.behaviorId = behaviorId;
@@ -157,6 +169,22 @@ public class TobVehicleBehavior extends BaseEntity
         return accompliceId;
     }
 
+    public Long getDetectionId() {
+        return detectionId;
+    }
+
+    public void setDetectionId(Long detectionId) {
+        this.detectionId = detectionId;
+    }
+
+    public Long getDistrictId() {
+        return districtId;
+    }
+
+    public void setDistrictId(Long districtId) {
+        this.districtId = districtId;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -174,6 +202,8 @@ public class TobVehicleBehavior extends BaseEntity
             .append("createTime", getCreateTime())
             .append("updateTime", getUpdateTime())
             .append("accompliceId", getAccompliceId())
+                .append("detectionId", getDetectionId())
+                .append("districtId", getDistrictId())
             .toString();
     }
 }

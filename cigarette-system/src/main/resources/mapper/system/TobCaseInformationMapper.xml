@@ -23,8 +23,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="delFlag"    column="del_flag"    />
         <result property="remark"    column="remark"    />
         <result property="caseUserId"    column="case_user_id"    />
-        <result property="inspectorId"    column="inspector_id"    />
+        <result property="staffId"    column="staff_id"    />
         <result property="degreeOfCase"    column="degree_of_case"    />
+        <result property="detectionId" column="detection_id"/>
+        <result property="districtId" column="district_id"/>
     </resultMap>
 
     <resultMap type="TobCaseInformationVo" id="TobCaseInformationVoResult">
@@ -46,16 +48,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="delFlag"    column="del_flag"    />
         <result property="remark"    column="remark"    />
         <result property="caseUserId"    column="case_user_id"    />
-        <result property="inspectorId"    column="inspector_id"    />
+        <result property="staffId"    column="staff_id"    />
         <result property="degreeOfCase"    column="degree_of_case"    />
         <result property="driverName"    column="driver_name"    />
-        <result property="inspectorName"    column="inspector_name"    />
+        <result property="staffName"    column="staff_name"    />
         <result property="caseUserName"    column="case_user_name"    />
         <result property="licensePlate"    column="license_plate"    />
+        <result property="detectionId" column="detection_id"/>
+        <result property="districtId" column="district_id"/>
     </resultMap>
 
     <sql id="selectTobCaseInformationVo">
-        select case_id, case_code, case_name, case_start_date, case_end_date, case_value, incident_location, behavior_id, case_source, case_type, case_status, main_charge, secondary_charge, main_case_details, entry_date, del_flag, remark, case_user_id, inspector_id, degree_of_case from tob_case_information
+        select case_id, case_code, case_name, case_start_date, case_end_date, case_value, incident_location, behavior_id, case_source, case_type, case_status, main_charge, secondary_charge, main_case_details, entry_date, del_flag, remark, case_user_id, staff_id, degree_of_case,detection_id,district_id from tob_case_information
     </sql>
 
     <select id="selectTobCaseInformationList" parameterType="TobCaseInformation" resultMap="TobCaseInformationResult">
@@ -76,8 +80,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="mainCaseDetails != null  and mainCaseDetails != ''"> and main_case_details = #{mainCaseDetails}</if>
             <if test="entryDate != null "> and entry_date = #{entryDate}</if>
             <if test="caseUserId != null "> and case_user_id = #{caseUserId}</if>
-            <if test="inspectorId != null "> and inspector_id = #{inspectorId}</if>
+            <if test="StaffId != null "> and staff_id = #{staffId}</if>
             <if test="degreeOfCase != null "> and degree_of_case = #{degreeOfCase}</if>
+            <if test="detectionId != null "> and detection_id = #{detectionId}</if>
+            <if test="districtId != null "> and district_id = #{districtId}</if>
         </where>
     </select>
     
@@ -90,7 +96,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT
             a.*,
             b.user_name AS case_user_name,
-            c.user_name AS inspector_name,
+            c.user_name AS staff_name,
             f.`name` AS driver_name,
             g.license_plate
         FROM
@@ -100,7 +106,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             ON a.case_user_id = b.user_id
                 INNER JOIN
             sys_user AS c
-            ON a.inspector_id = c.user_id
+            ON a.staff_id = c.user_id
                 INNER JOIN
             tob_vehicle_behavior AS d
             ON a.behavior_id = d.behavior_id
@@ -122,10 +128,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="mainCharge != null  and mainCharge != ''"> and a.main_charge LIKE CONCAT('%', #{mainCharge}, '%') </if>
             <if test="secondaryCharge != null  and secondaryCharge != ''"> and a.secondary_charge LIKE CONCAT('%', #{secondaryCharge}, '%') </if>
             <if test="driverName != null "> and f.name LIKE CONCAT('%', #{driverName}, '%')</if>
-            <if test="inspectorName != null "> and c.user_name LIKE CONCAT('%', #{inspectorName}, '%') </if>
+            <if test="staffName != null "> and c.user_name LIKE CONCAT('%', #{staffName}, '%') </if>
             <if test="degreeOfCase != null "> and a.degree_of_case = #{degreeOfCase}</if>
             <if test="caseUserName != null "> and b.user_name LIKE CONCAT('%', #{caseUserName}, '%') </if>
             <if test="licensePlate != null "> and g.license_plate LIKE CONCAT('%', #{licensePlate}, '%')</if>
+
+            <if test="detectionId != null "> and a.detection_id = #{detectionId}</if>
+            <if test="districtId != null "> and a.district_id = #{districtId}</if>
         </where>
 
 
@@ -151,8 +160,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             del_flag,
             <if test="remark != null">remark,</if>
             <if test="caseUserId != null">case_user_id,</if>
-            <if test="inspectorId != null">inspector_id,</if>
+            <if test="staffId != null">staff_id,</if>
             <if test="degreeOfCase != null">degree_of_case,</if>
+            <if test="detectionId != null ">detection_id, </if>
+            <if test="districtId != null ">district_id ,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="caseCode != null and caseCode != ''">#{caseCode},</if>
@@ -172,8 +183,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             0,
             <if test="remark != null">#{remark},</if>
             <if test="caseUserId != null">#{caseUserId},</if>
-            <if test="inspectorId != null">#{inspectorId},</if>
+            <if test="staffId != null">#{staffId},</if>
             <if test="degreeOfCase != null">#{degreeOfCase},</if>
+            <if test="detectionId != null ">#{detectionId}</if>
+            <if test="districtId != null ">#{districtId}</if>
          </trim>
     </insert>
 
@@ -197,8 +210,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="delFlag != null">del_flag = #{delFlag},</if>
             <if test="remark != null">remark = #{remark},</if>
             <if test="caseUserId != null">case_user_id = #{caseUserId},</if>
-            <if test="inspectorId != null">inspector_id = #{inspectorId},</if>
+            <if test="staffId != null">staff_id = #{staffId},</if>
             <if test="degreeOfCase != null">degree_of_case = #{degreeOfCase},</if>
+            <if test="detectionId != null "> detection_id = #{detectionId}</if>
+            <if test="districtId != null "> district_id = #{districtId}</if>
         </trim>
         where case_id = #{caseId}
     </update>

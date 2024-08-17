@@ -37,7 +37,22 @@ public class TobCaution extends BaseEntity
     /** 删除标记 */
     private String delFlag;
 
-    public void setCautionId(Long cautionId) 
+
+    /**
+     * 地区id
+     */
+    @Excel(name = "地区id")
+    private Long districtId;
+
+    public Long getDistrictId() {
+        return districtId;
+    }
+
+    public void setDistrictId(Long districtId) {
+        this.districtId = districtId;
+    }
+
+    public void setCautionId(Long cautionId)
     {
         this.cautionId = cautionId;
     }
@@ -104,6 +119,7 @@ public class TobCaution extends BaseEntity
             .append("remark", getRemark())
             .append("createTime", getCreateTime())
             .append("updateTime", getUpdateTime())
+                .append("districtId", getDistrictId())
             .toString();
     }
 }

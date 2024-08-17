@@ -19,10 +19,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateBy"    column="update_by"    />
         <result property="remark"    column="remark"    />
         <result property="previewUrl"    column="preview_url"    />
+        <result property="detectionId" column="detection_id"/>
+        <result property="districtId" column="district_id"/>
     </resultMap>
 
     <sql id="selectTobDocumentVo">
-        select id, fileName, fileType, uploadPath, uploadFileName, pdfPath, pdfName, documentType, create_time, create_by, update_time, update_by, remark, preview_url from tob_document
+        select id, fileName, fileType, uploadPath, uploadFileName, pdfPath, pdfName, documentType, create_time, create_by, update_time, update_by, remark, preview_url,detection_id,district_id from tob_document
     </sql>
 
     <select id="selectTobDocumentList" parameterType="TobDocument" resultMap="TobDocumentResult">
@@ -36,6 +38,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="pdfName != null  and pdfName != ''"> and pdfName like concat('%', #{pdfName}, '%')</if>
             <if test="documentType != null  and documentType != ''"> and documentType = #{documentType}</if>
             <if test="previewUrl != null  and previewUrl != ''"> and preview_url = #{previewUrl}</if>
+            <if test="detectionId != null "> and detection_id = #{detectionId}</if>
+            <if test="districtId != null "> and district_id = #{districtId}</if>
         </where>
     </select>
     
@@ -60,6 +64,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null and updateBy != ''">update_by,</if>
             <if test="remark != null">remark,</if>
             <if test="previewUrl != null">preview_url,</if>
+            <if test="detectionId != null "> detection_id</if>
+            <if test="districtId != null "> district_id </if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="fileName != null and fileName != ''">#{fileName},</if>
@@ -75,6 +81,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
             <if test="remark != null">#{remark},</if>
             <if test="previewUrl != null">#{previewUrl},</if>
+            <if test="detectionId != null ">  #{detectionId}</if>
+            <if test="districtId != null ">  #{districtId}</if>
          </trim>
     </insert>
 
@@ -94,6 +102,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
             <if test="remark != null">remark = #{remark},</if>
             <if test="previewUrl != null">preview_url = #{previewUrl},</if>
+            <if test="detectionId != null ">detection_id = #{detectionId}</if>
+            <if test="districtId != null "> district_id = #{districtId}</if>
         </trim>
         where id = #{id}
     </update>

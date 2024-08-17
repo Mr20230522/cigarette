@@ -50,6 +50,18 @@ public class TobDocument extends BaseEntity
     @Excel(name = "预览URL")
     private String previewUrl;
 
+    /**
+     * 监测区域id
+     */
+    @Excel(name = "监测区域id")
+    private Long detectionId;
+
+    /**
+     * 地区id
+     */
+    @Excel(name = "地区id")
+    private Long districtId;
+
     public void setId(Long id) 
     {
         this.id = id;
@@ -132,6 +144,22 @@ public class TobDocument extends BaseEntity
         return previewUrl;
     }
 
+    public Long getDetectionId() {
+        return detectionId;
+    }
+
+    public void setDetectionId(Long detectionId) {
+        this.detectionId = detectionId;
+    }
+
+    public Long getDistrictId() {
+        return districtId;
+    }
+
+    public void setDistrictId(Long districtId) {
+        this.districtId = districtId;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -149,6 +177,8 @@ public class TobDocument extends BaseEntity
             .append("updateBy", getUpdateBy())
             .append("remark", getRemark())
             .append("previewUrl", getPreviewUrl())
+                .append("detectionId", getDetectionId())
+                .append("districtId", getDistrictId())
             .toString();
     }
 }

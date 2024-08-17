@@ -23,7 +23,7 @@ public class TobCaseInformationVo extends TobCaseInformation {
 
     /** 检查人员姓名 */
     @Excel(name = "检查人员姓名")
-    private String inspectorName;
+    private String staffName;
 
     /** 案件录入人员姓名 */
     @Excel(name = "案件录入人员姓名")
@@ -45,12 +45,12 @@ public class TobCaseInformationVo extends TobCaseInformation {
         this.driverName = driverName;
     }
 
-    public String getInspectorName() {
-        return inspectorName;
+    public String getStaffName() {
+        return staffName;
     }
 
-    public void setInspectorName(String inspectorName) {
-        this.inspectorName = inspectorName;
+    public void setStaffName(String staffName) {
+        this.staffName = staffName;
     }
 
     public String getCaseUserName() {
@@ -84,7 +84,7 @@ public class TobCaseInformationVo extends TobCaseInformation {
                 .append("caseUserId", getCaseUserId())
                 .append("licensePlate", getLicensePlate())
                 .append("driverName", getDriverName())
-                .append("inspectorName", getInspectorName())
+                .append("staffName", getStaffName())
                 .append("caseUserName", getCaseUserName())
                 .toString();
     }

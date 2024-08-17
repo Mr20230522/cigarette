@@ -22,7 +22,7 @@ public class TobClockLog extends BaseEntity
 
     /** 检测人员id */
     @Excel(name = "检测人员id")
-    private Long inspectorId;
+    private Long staffId;
 
     /** 值班日期 */
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -50,7 +50,35 @@ public class TobClockLog extends BaseEntity
     @Excel(name = "出勤有误")
     private String flag;
 
-    public void setCommutingId(Long commutingId) 
+    /**
+     * 监测区域id
+     */
+    @Excel(name = "监测区域id")
+    private Long detectionId;
+
+    /**
+     * 地区id
+     */
+    @Excel(name = "地区id")
+    private Long districtId;
+
+    public Long getDetectionId() {
+        return detectionId;
+    }
+
+    public void setDetectionId(Long detectionId) {
+        this.detectionId = detectionId;
+    }
+
+    public Long getDistrictId() {
+        return districtId;
+    }
+
+    public void setDistrictId(Long districtId) {
+        this.districtId = districtId;
+    }
+
+    public void setCommutingId(Long commutingId)
     {
         this.commutingId = commutingId;
     }
@@ -59,16 +87,16 @@ public class TobClockLog extends BaseEntity
     {
         return commutingId;
     }
-    public void setInspectorId(Long inspectorId) 
-    {
-        this.inspectorId = inspectorId;
+
+    public Long getStaffId() {
+        return staffId;
     }
 
-    public Long getInspectorId() 
-    {
-        return inspectorId;
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
     }
-    public void setDutyDate(Date dutyDate) 
+
+    public void setDutyDate(Date dutyDate)
     {
         this.dutyDate = dutyDate;
     }
@@ -127,7 +155,7 @@ public class TobClockLog extends BaseEntity
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("commutingId", getCommutingId())
-            .append("inspectorId", getInspectorId())
+                .append("staffId", getStaffId())
             .append("dutyDate", getDutyDate())
             .append("startTime", getStartTime())
             .append("endTime", getEndTime())
@@ -137,6 +165,8 @@ public class TobClockLog extends BaseEntity
             .append("createTime", getCreateTime())
             .append("updateTime", getUpdateTime())
             .append("flag", getFlag())
+                .append("detectionId", getDetectionId())
+                .append("districtId", getDistrictId())
             .toString();
     }
 }

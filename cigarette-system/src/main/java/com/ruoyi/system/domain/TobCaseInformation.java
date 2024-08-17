@@ -89,13 +89,41 @@ public class TobCaseInformation extends BaseEntity
 
     /** 检查人员 */
     @Excel(name = "检查人员")
-    private Long inspectorId;
+    private Long staffId;
 
     /** 案件严重程度 */
     @Excel(name = "案件严重程度")
     private String degreeOfCase;
 
-    public void setCaseId(Long caseId) 
+    /**
+     * 监测区域id
+     */
+    @Excel(name = "监测区域id")
+    private Long detectionId;
+
+    /**
+     * 地区id
+     */
+    @Excel(name = "地区id")
+    private Long districtId;
+
+    public Long getDetectionId() {
+        return detectionId;
+    }
+
+    public void setDetectionId(Long detectionId) {
+        this.detectionId = detectionId;
+    }
+
+    public Long getDistrictId() {
+        return districtId;
+    }
+
+    public void setDistrictId(Long districtId) {
+        this.districtId = districtId;
+    }
+
+    public void setCaseId(Long caseId)
     {
         this.caseId = caseId;
     }
@@ -245,12 +273,12 @@ public class TobCaseInformation extends BaseEntity
         return caseUserId;
     }
 
-    public Long getInspectorId() {
-        return inspectorId;
+    public Long getStaffId() {
+        return staffId;
     }
 
-    public void setInspectorId(Long inspectorId) {
-        this.inspectorId = inspectorId;
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
     }
 
     public String getDegreeOfCase() {
@@ -282,8 +310,10 @@ public class TobCaseInformation extends BaseEntity
             .append("delFlag", getDelFlag())
             .append("remark", getRemark())
             .append("caseUserId", getCaseUserId())
-                .append("inspectorId", getInspectorId())
+                .append("staffId", getStaffId())
                 .append("degreeOfCase", getDegreeOfCase())
+                .append("detectionId", getDetectionId())
+                .append("districtId", getDistrictId())
 
 
             .toString();
