@@ -87,6 +87,67 @@ export const constantRoutes = [
         meta: { title: '个人中心', icon: 'user' }
       }
     ]
+  },
+  {
+    path: '/cigaretteFront',
+    component: () => import('@/views/cigaretteFront/menu/menu'),
+    hidden: true,
+    redirect: 'noredirect',
+    children: [
+      {
+        path: '/cigaretteIndex',
+        name: 'cigaretteIndex',
+        component: () => import('@/views/cigaretteFront/menu/cigaretteIndex') 
+      },{
+        path: '/uploadCase',
+        name: 'uploadCase',
+        component: () => import('@/views/cigaretteFront/caution/uploadCase') 
+      },{
+        path: '/uploadCaution',
+        name: 'uploadCaution',
+        component: () => import('@/views/cigaretteFront/caution/uploadCaution') 
+      },{
+        path: '/uploadPersonnel',
+        name: 'uploadPersonnel',
+        component: () => import('@/views/cigaretteFront/caution/uploadPersonnel') 
+      },{
+        path: '/uploadVehicle',
+        name: 'uploadVehicle',
+        component: () => import('@/views/cigaretteFront/caution/uploadVehicle') 
+      },{
+        path: '/carema',
+        name: 'carema',
+        component: () => import('@/views/cigaretteFront/detection/carema') 
+      },{
+        path: '/personelInformation',
+        name: 'personelInformation',
+        component: () => import('@/views/cigaretteFront/detection/personelInformation') 
+      },{
+        path: '/vehicleInformation',
+        name: 'vehicleInformation',
+        component: () => import('@/views/cigaretteFront/detection/vehicleInformation') 
+      },{
+        path: '/clockLog',
+        name: 'clockLog',
+        component: () => import('@/views/cigaretteFront/document/clockLog') 
+      },{
+        path: '/document',
+        name: 'document',
+        component: () => import('@/views/cigaretteFront/document/document') 
+      },{
+        path: '/dutyLog',
+        name: 'dutyLog',
+        component: () => import('@/views/cigaretteFront/document/dutyLog') 
+      },{
+        path: '/feedBack',
+        name: 'feedBack',
+        component: () => import('@/views/cigaretteFront/document/feedBack') 
+      },{
+        path: '/notice',
+        name: 'notice',
+        component: () => import('@/views/cigaretteFront/document/notice') 
+      }
+    ]
   }
 ]
 
