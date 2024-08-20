@@ -60,28 +60,46 @@
     </el-table>
 
     <!-- 添加或修改地区管理对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="50%" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="地区名称" prop="districtName">
           <el-input v-model="form.districtName" placeholder="请输入地区名称" />
         </el-form-item>
-        <el-form-item label="显示顺序" prop="orderNum">
-          <el-input v-model="form.orderNum" placeholder="请输入显示顺序" />
+        <el-form-item label="搜索">
+          <el-input v-model="searchInput" @input="filterUsers" placeholder="请输入用户名称、邮箱或电话号码" clearable
+            suffix-icon="el-icon-search"></el-input>
+          <el-scrollbar wrap-class="scrollbar-wrapper" style="max-height: auto;">
+            <el-card class="user-list">
+              <el-row v-for="(user, index) in filteredUsers" :key="index" class="user-info"
+                :class="{ 'bg-color': index % 2 === 1, 'selected': user === selectedUser }">
+                <el-col :span="24">
+                  <span @click="selectUser(user)" class="label" style="cursor:pointer;">用户名称:{{ user.username
+                    }}&nbsp;&nbsp;电话号码:{{ user.phonenumber }}&nbsp;&nbsp;邮箱:{{ user.email }}
+                  </span>
+                </el-col>
+              </el-row>
+            </el-card>
+          </el-scrollbar>
         </el-form-item>
+
         <el-form-item label="负责人" prop="leader">
-          <el-input v-model="form.leader" placeholder="请输入负责人" />
+          <el-input :disabled="true" v-model="form.leader" placeholder="请在上方搜索人员" />
         </el-form-item>
         <el-form-item label="联系电话" prop="phone">
-          <el-input v-model="form.phone" placeholder="请输入联系电话" />
+          <el-input :disabled="true" v-model="form.phone" placeholder="请在上方搜索人员" />
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
-          <el-input v-model="form.email" placeholder="请输入邮箱" />
+          <el-input :disabled="true" v-model="form.email" placeholder="请在上方搜索人员" />
+        </el-form-item>
+        <el-form-item label="显示顺序" prop="orderNum">
+          <el-input-number v-model="form.orderNum" controls-position="right" :min="0" />
         </el-form-item>
         <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio v-for="dict in dict.type.tob_dd_status" :key="dict.value"
-              :label="dict.value">{{ dict.label }}</el-radio>
-          </el-radio-group>
+          <el-select v-model="form.status">
+            <el-option v-for="dict in dict.type.tob_dd_status" :key="dict.value" :label="dict.label"
+              :value="dict.value">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
@@ -99,6 +117,9 @@
 import { listDistrict, getDistrict, delDistrict, addDistrict, updateDistrict } from "@/api/cigarette/detection/district";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
+import {
+  listUser,
+} from "@/api/system/user";
 
 export default {
   name: "District",
@@ -124,15 +145,33 @@ export default {
       isExpandAll: true,
       // 重新渲染表格状态
       refreshTable: true,
+      searchInput: '',
+      userIdList: [],
+      filteredUsers: [],
+      selectedUser: null,
       // 查询参数
       queryParams: {
+        districtId: null,
         districtName: null,
         leader: null,
         phone: null,
+        email: null,
+        orderNum: null,
         status: null,
+        remark: null,
       },
       // 表单参数
-      form: {},
+      form: {
+        // 搜索人
+        // 存储搜索信息
+        searchInput: '',
+        // 存储用户信息
+        userIdList: [],
+        // 存储根据搜索条件过滤后的用户列表数据
+        filteredUsers: [],
+        // 存储所选用户信息
+        selectedUser: null,
+      },
       // 表单校验
       rules: {
         districtName: [
@@ -155,8 +194,40 @@ export default {
   },
   created() {
     this.getList();
+    this.getUserList();
+  },
+  mounted() {
+    this.filteredUsers = [];
   },
   methods: {
+    /** 查询工作人员列表 */
+    getUserList() {
+      this.loading = true;
+      listUser({
+        pageNum: null,
+        pageSize: 100000
+      }).then(response => {
+        // 获取到用户信息后，保存原始用户列表数据
+        this.userIdList = response.rows.map(user => {
+          return {
+            username: user.nickName,
+            phonenumber: user.phonenumber,
+            email: user.email,
+          };
+        });
+      }).catch(error => {
+        console.error('Failed to fetch user list:', error);
+      })
+        .finally(() => {
+          this.loading = false;
+        });
+
+      listStaff(this.queryParams).then(response => {
+        this.staffList = response.rows;
+        this.total = response.total;
+        this.loading = false;
+      });
+    },
     /** 查询地区管理列表 */
     getList() {
       this.loading = true;
@@ -204,13 +275,15 @@ export default {
         status: null,
         createTime: null,
         updateTime: null,
-        remark: null
+        remark: null,
+        userId: null,
       };
       this.resetForm("form");
     },
     /** 搜索按钮操作 */
     handleQuery() {
       this.getList();
+      this.getUserList();
     },
     /** 重置按钮操作 */
     resetQuery() {
@@ -278,7 +351,46 @@ export default {
         this.getList();
         this.$modal.msgSuccess("删除成功");
       }).catch(() => { });
-    }
+    },
+    // 选择数据化进行数据填充
+    filterUsers() {
+      const searchInput = this.searchInput.toLowerCase().trim();
+      if (!searchInput) {
+        // 如果搜索条件为空，不显示任何用户
+        this.filteredUsers = [];
+        return;
+      }
+      this.filteredUsers = this.userIdList.filter(user => {
+        // 在用户名 邮箱和电话号码中进行搜索匹配
+        return (
+          user.username.toLowerCase().includes(searchInput) ||
+          user.email.toString().includes(searchInput) ||
+          user.phonenumber.toString().includes(searchInput)
+        );
+      }).slice(0, 10);
+    },
+    // 搜索用户并筛选数据
+    selectUser(user) {
+      // 将所选用户信息存储到 selectedUser 变量中
+      this.selectedUser = user;
+      // 更新表单数据
+      this.$set(this.form, "email", user.email);
+      this.$set(this.form, "leader", user.username);
+      this.$set(this.form, "phone", user.phonenumber);
+      // 清空搜索输入框和搜索结果
+      this.searchInput = '';
+      this.filteredUsers = [];
+    },
   }
 };
 </script>
+<style>
+.bg-color {
+  background-color: #f0f0f0;
+}
+
+.selected {
+  background-color: #d0e8f2;
+  /* 天蓝色背景 */
+}
+</style>
