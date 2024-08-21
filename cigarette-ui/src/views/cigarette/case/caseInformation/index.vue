@@ -1,5 +1,20 @@
 <template>
-  <div class="app-container">
+<div>
+        <el-row :gutter="20">
+            <!-- 地区数据 -->
+            <el-col :span="4" :xs="24">
+                <!-- <div>
+                    <el-input v-model="districtName" placeholder="请输入地区名称" clearable size="small"
+                        prefix-icon="el-icon-search" style="margin-bottom: 20px" />
+                </div> -->
+                <div>
+                    <el-tree :data="treeData" node-key="nodeKey" default-expand-all :props="defaultProps"
+                        @node-click="handleNodeClick">
+                    </el-tree>
+                </div>
+            </el-col>
+            <!-- 摄像头数据 -->
+            <el-col :span="20" :xs="24">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="案件代码" prop="caseCode">
         <el-input v-model="queryParams.caseCode" placeholder="请输入案件代码" clearable @keyup.enter.native="handleQuery" />
@@ -154,7 +169,8 @@
 
     <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize"
       @pagination="getList" />
-
+    </el-col>
+  </el-row>
     <!-- 添加或修改案件信息对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="70%" append-to-body :close-on-click-modal="false">
       <el-row>
@@ -416,6 +432,10 @@
   import {
     listVehicleBehaviorVo
   } from "@/api/cigarette/vehicle/vehicleBehavior";
+
+import { listDistrict } from "@/api/cigarette/detection/district";
+import { listDetection } from "@/api/cigarette/detection/detection";
+
   export default {
     name: "CaseInformation",
     dicts: ['tob_case_status', 'tob_case_source', 'tob_case_type', 'tob_degree_case'],
@@ -563,17 +583,132 @@
     },
     created() {
       this.getList();
+      this.loadDetectionOptions(); // 加载检测点选项
+      this.loadDistrictOptions(); // 加载地区选项
     },
     methods: {
-      /** 查询案件信息列表 */
-      getList() {
-        this.loading = true;
-        listCaseInformationVo(this.queryParams).then(response => {
+       //加载地区选项
+       loadDistrictOptions() {
+            listDistrict().then(response => {
+                this.districtOptions = response.data.map(item => ({
+                    districtId: item.districtId,
+                    districtName: item.districtName
+                }));
+            }).catch(error => {
+                console.error("Failed to load district options:", error);
+            });
+        },
+        // 加载检测点选项
+        loadDetectionOptions() {
+            listDetection().then(response => {
+                this.detectionOptions = response.rows.map(item => ({
+                    detectionId: item.detectionId,
+                    districtId: item.districtId,
+                    detectionName: item.detectionName
+                }));
+            }).catch(error => {
+                console.error("Failed to load detection options:", error);
+            });
+        },
+        async getList() {
+            try {
+                const districtsResponse = await listDistrict();
+                this.districts = districtsResponse.data;
+
+                const detectionsResponse = await listDetection();
+                this.detections = detectionsResponse.rows;
+
+                listCaseInformationVo(this.queryParams).then(response => {
           this.caseInformationList = response.rows;
           this.total = response.total;
-          this.loading = false;
         });
-      },
+
+                this.buildTreeData();
+                this.loading = false;
+            } catch (error) {
+                console.error('Failed to fetch data:', error);
+                this.loading = false;
+            }
+        },
+        buildTreeData() {
+            const districtMap = new Map();
+
+            this.districts.forEach(district => {
+                districtMap.set(district.districtId, {
+                    ...district,
+                    label: district.districtName,
+                    nodeKey: `district-${district.districtId}`,
+                    children: []
+                });
+            });
+
+            this.detections.forEach(detection => {
+                const district = districtMap.get(detection.districtId);
+                if (district) {
+                    district.children.push({
+                        label: detection.detectionName,
+                        nodeKey: `detection-${detection.detectionId}`,
+                        type: 'detection',
+                        ...detection
+                    });
+                }
+            });
+
+            this.treeData = [];
+            districtMap.forEach((node, districtId) => {
+                if (node.parentId === null || node.parentId === 0) {
+                    this.treeData.push(node);
+                } else {
+                    const parentNode = districtMap.get(node.parentId);
+                    if (parentNode) {
+                        parentNode.children.push(node);
+                    }
+                }
+            });
+        },
+        handleNodeClick(data, node) {
+            const detectionIds = [];
+
+            const collectDetectionIds = (node) => {
+                if (node.type === 'detection') {
+                    detectionIds.push(node.detectionId);
+                }
+                if (node.children && node.children.length) {
+                    node.children.forEach(child => collectDetectionIds(child));
+                }
+            };
+
+            collectDetectionIds(data);
+
+            // 如果有多个 detectionId，循环发送请求并合并结果
+            if (detectionIds.length > 1) {
+                this.cameraList = [];
+                detectionIds.forEach(async (id) => {
+                    this.queryParams.detectionId = id;
+                    const response = await listCamera(this.queryParams);
+                    this.cameraList.push(...response.rows);
+                });
+            } else {
+                // 只有一个 detectionId，直接发送请求
+                this.queryParams.detectionId = detectionIds[0];
+                this.getList();
+            }
+        },
+
+        handleSelectionChange(selection) {
+            this.ids = selection.map(item => item.cameraId);
+            this.single = selection.length !== 1;
+            this.multiple = !selection.length;
+        },
+      /** 查询案件信息列表 */
+      // getList() {
+      //   this.loading = true;
+      //   listCaseInformationVo(this.queryParams).then(response => {
+      //     this.caseInformationList = response.rows;
+      //     this.total = response.total;
+      //     this.loading = false;
+      //   });
+      // },
       // 取消按钮
       cancel() {
         this.open = false;
