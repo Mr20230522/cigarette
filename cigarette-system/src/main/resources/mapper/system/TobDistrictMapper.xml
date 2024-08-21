@@ -70,7 +70,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="leader != null and leader != ''">#{leader},</if>
             <if test="phone != null and phone != ''">#{phone},</if>
             <if test="email != null">#{email},</if>
-            <if test="status != null and status != ''">#{status},</if>/if>
+            <if test="status != null and status != ''">#{status},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateTime != null">#{updateTime},</if>
             <if test="remark != null">#{remark},</if>

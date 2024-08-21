@@ -99,10 +99,10 @@
       </el-col>
     </el-row>
     <!-- 添加或修改监测区域对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="监测点顺序" prop="orderNum">
-          <el-input v-model="form.orderNum" placeholder="请输入监测点顺序" />
+          <el-input-number v-model="form.orderNum" controls-position="right" :min="0" placeholder="请输入监测点顺序" />
         </el-form-item>
         <el-form-item label="监测点名称" prop="detectionName">
           <el-input v-model="form.detectionName" placeholder="请输入监测点名称" />
@@ -118,12 +118,12 @@
           <treeselect v-model="form.districtId" :options="districtTreeOptions" placeholder="请选择所属地区" />
         </el-form-item>
 
-
         <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio v-for="dict in dict.type.tob_dd_status" :key="dict.value" :label="dict.value">{{ dict.label
-              }}</el-radio>
-          </el-radio-group>
+          <el-select v-model="form.status">
+            <el-option v-for="status in dict.type.tob_dd_status" :key="status.value" :label="status.label"
+              :value="status.value">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
@@ -131,8 +131,11 @@
         <!-- 添加下拉框以选择负责人所对应的工作人员 -->
         <el-form-item label="负责人" prop="responsibleId">
           <el-select v-model="form.responsibleId" placeholder="请选择负责人" filterable>
-            <el-option v-for="item in staffOptions" :key="item.staffId" :label="getStaffName(item.staffId)"
-              :value="item.staffId"></el-option>
+            <el-option 
+            v-for="item in staffOptions" 
+            :key="item.staffId" 
+            :label="`${getStaffName(item.staffId)} (${item.phone || '无电话'})`"
+            :value="item.staffId"></el-option>
           </el-select>
         </el-form-item>
 
@@ -228,18 +231,33 @@ export default {
     this.loadUserOptions(); // 加载用户选项
     this.getDistrictTree()//加载地区树
   },
+  computed: {
+  districtOptionsMap() {
+    return this.districtOptions.reduce((map, item) => {
+      map[item.districtId] = item.districtName;
+      return map;
+    }, {});
+  },
+  staffOptionsMap() {
+    return this.staffOptions.reduce((map, item) => {
+      map[item.staffId] = item;
+      return map;
+    }, {});
+  }
+},
   methods: {
-    //加载用户选项
-    loadUserOptions() {
-      listUser().then(response => {
-        this.userOptions = response.rows.map(item => ({
-          userId: item.userId,
-          userName: item.userName
-        }));
-      }).catch(error => {
-        console.error("Failed to load user options:", error);
-      });
-    },
+     // 加载用户选项
+  loadUserOptions() {
+    listUser().then(response => {
+      this.userOptions = response.rows.reduce((map, item) => {
+        map[item.userId] = item;
+        return map;
+      }, {});
+      this.loadStaffOptions(); // 在这里调用加载工作人员选项的函数
+    }).catch(error => {
+      console.error("Failed to load user options:", error);
+    });
+  },
     //加载地区选项
     loadDistrictOptions() {
       listDistrict().then(response => {
@@ -256,34 +274,35 @@ export default {
       return district ? district.districtName : '未知地区';
     },
     // 加载工作人员选项
-    loadStaffOptions() {
-      listStaff().then(response => {
-        this.staffOptions = response.rows.map(item => ({
-          staffId: item.staffId,
-          userId: item.userId
-        }));
-      }).catch(error => {
-        console.error("Failed to load staff options:", error);
-      });
+  loadStaffOptions() {
+    listStaff().then(response => {
+      this.staffOptions = response.rows.map(item => ({
+        staffId: item.staffId,
+        userId: item.userId,
+        phone: this.userOptions[item.userId]?.phonenumber || '无电话'
+      }));
+    }).catch(error => {
+      console.error("Failed to load staff options:", error);
+    });
+  },
+    // 获取用户信息的方法
+    getUserById(userId) {
+      return this.userOptions.find(user => user.userId === userId) || {};
     },
     getStaffInfo(staffId) {
       return this.staffOptions.find(item => item.staffId === staffId) || {};
     },
     // 根据 responsibleId 获取用户姓名
-    getStaffName(staffId) {
-      const staffInfo = this.getStaffInfo(staffId);
-      // 确保 staffInfo 中有 userId
-      if (staffInfo.userId) {
-        // 调用 getUserName 方法获取 userName
-        return this.getUserName(staffInfo.userId);
-      }
-      return '未知工作人员';
-    },
+  // 获取工作人员姓名
+  getStaffName(staffId) {
+    const staffInfo = this.staffOptions.find(item => item.staffId === staffId);
+    return staffInfo ? this.userOptions[staffInfo.userId]?.nickName || '未知工作人员' : '未知工作人员';
+  },
     // 通过 userId 获取 userName
     getUserName(userId) {
       // 使用 userOptions 数组来查找 userName
       const user = this.userOptions.find(item => item.userId === userId);
-      return user ? user.userName : '未知用户名';
+      return user ? user.nickName : '未知用户名';
     },
     /** 查询监测区域列表 */
     getList() {
