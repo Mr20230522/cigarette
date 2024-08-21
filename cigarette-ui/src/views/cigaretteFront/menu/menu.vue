@@ -1,0 +1,291 @@
+  <template >
+  <el-container class="fathercontainer" >
+    <!-- 顶部导航栏 -->
+    <el-header :class="{ hidden: isNavHidden }" style="height: 80px; border-bottom: 0px solid;">
+  <el-menu
+    :default-active="activeIndex"
+    class="el-menu-demo"
+    mode="horizontal"
+    @select="handleSelect"
+    background-color="#000"
+    text-color="#fff"
+    active-text-color="#1eb0df"
+    style="width: 100%; border-bottom: 10px solid;"
+  >
+  <el-menu-item index="1" @click="goto('cigaretteIndex')">首页</el-menu-item>
+    <el-submenu index="2"  >
+      <template  slot="title">        智慧监控      </template>
+      <!-- 同上，添加二级菜单项 -->
+      <el-menu-item index="2-1" @click="goto('carema')">查看监控</el-menu-item>
+      <el-menu-item index="2-2" @click="goto('personelInformation')">人车信息案底一览</el-menu-item>
+      <el-menu-item index="2-3" @click="goto('vehicleInformation')">车辆行踪预测一览</el-menu-item>
+    </el-submenu>
+    <el-submenu index="3" >
+      <template  slot="title">
+        预警中心
+      </template>
+      <!-- 添加二级菜单项 -->
+      <el-menu-item index="3-1" @click="goto('uploadCaution')">上报预警效果</el-menu-item>
+      <el-menu-item index="3-2" @click="goto('uploadVehicle')">上报车辆信息</el-menu-item>
+      <el-menu-item index="3-3" @click="goto('uploadPersonnel')">上报人员信息</el-menu-item>
+      <el-menu-item index="3-4" @click="goto('uploadCase')">上报案例信息</el-menu-item>
+    </el-submenu>
+    <el-submenu index="4" >
+      <template  slot="title">        人员文档      </template>
+      <!-- 添加二级菜单项 -->
+      <el-menu-item index="4-1" @click="goto('notice')">通知公告</el-menu-item>
+      <el-menu-item index="4-2" @click="goto('document')">执行文档</el-menu-item>
+      <el-menu-item index="4-3" @click="goto('clockLog')">出勤信息</el-menu-item>
+      <el-menu-item index="4-4" @click="goto('dutyLog')">执勤信息</el-menu-item>
+      <el-menu-item index="4-5" @click="goto('feedBack')">反馈信息</el-menu-item>
+    </el-submenu>
+    <div class="right-menu">
+      <el-menu-item index="8" class="centered-login">
+        登录信息
+      </el-menu-item>
+      <el-menu-item index="9" class="centered-login" @click="goToLogin">
+        进入后台
+      </el-menu-item>
+    </div>
+  </el-menu>
+</el-header>
+    <!-- 左侧边栏区域 -->
+    <el-container class="childrencontainer">
+ 
+      <!-- 内容主体区域 -->
+      <el-main style="min-height: 100%;  ">
+          <!-- 路由占位符 -->
+                   <router-view ></router-view>
+      </el-main>
+       </el-container>
+      <!-- 底部区域 -->
+      <el-footer style="height: 100px; ">
+       <!-- 第一行 -->
+       <!-- 第二行 -->
+       <div class="tworow">
+
+        <div>
+        占位
+        </div>
+        <div>
+            隐私
+        </div>
+        <div>备案</div>
+        <div>法律</div>
+       </div>
+       <!-- 第三行 -->
+       <div class="threerow">
+      网站运行时长：{{ formattedTimeDifference }}（版权号）
+       </div>
+      </el-footer>
+
+  </el-container>
+</template>
+
+<script>
+  // import { listNotice } from "@/api/system/notice";
+export default {
+  name: 'Menu',
+  data () {
+    return {
+      activeIndex: sessionStorage.getItem("activeIndex") || '4', // 假设默认选中第一个菜单项
+      isNavHidden: false, // 初始状态为导航栏显示
+      lastScrollTop: 0 ,// 上次滚动位置
+      timeDifference: 0, // 初始时间差值为 0
+      specifiedTime: new Date('2023-10-17T00:00:00').getTime(), // 指定时间
+    }
+  },
+   created () {
+    window.addEventListener('scroll', this.handleScrollheader);
+  },
+  destroyed () {
+    window.removeEventListener('scroll', this.handleScrollheader)
+  },
+  computed: {
+    formattedTimeDifference() {
+      const msPerMinute = 60 * 1000;
+      const msPerHour = msPerMinute * 60;
+      const msPerDay = msPerHour * 24;
+      const msPerMonth = msPerDay * 30; // 这里以30天来近似一个月
+      const msPerYear = msPerDay * 365; // 这里以365天来近似一年
+
+      const years = Math.floor(this.timeDifference / msPerYear);
+      this.timeDifference %= msPerYear;
+
+      const months = Math.floor(this.timeDifference / msPerMonth);
+      this.timeDifference %= msPerMonth;
+
+      const days = Math.floor(this.timeDifference / msPerDay);
+      this.timeDifference %= msPerDay;
+
+      const hours = Math.floor(this.timeDifference / msPerHour);
+      this.timeDifference %= msPerHour;
+
+      const minutes = Math.floor(this.timeDifference / msPerMinute);
+      this.timeDifference %= msPerMinute;
+
+      const seconds = Math.floor(this.timeDifference / 1000);
+
+      return `${years}年 ${months}月 ${days}日 ${hours}小时 ${minutes}分钟 ${seconds}秒`;
+    }
+  },
+  mounted() {
+    this.calculateTimeDifference();
+    this.timer = setInterval(() => {
+      this.calculateTimeDifference();
+    }, 1000); // 每秒更新时间差
+  },
+  beforeDestroy() {
+    clearInterval(this.timer); // 组件销毁时清除定时器
+  },
+  methods: {
+    // 隐藏与显示导航栏
+    handleScrollheader () {
+      const st = window.pageYOffset || document.documentElement.scrollTop
+      if (st > this.lastScrollTop) {
+        this.isNavHidden = true // 向下滚动，隐藏导航栏
+      } else {
+        this.isNavHidden = false // 向上滚动，显示导航栏
+      }
+      this.lastScrollTop = st
+    },
+    // 点击路由实现跳转功能
+    handleSelect (index, goto) {
+      sessionStorage.setItem("activeIndex", index)
+      this.activeIndex = sessionStorage.getItem("activeIndex", index)
+      if (goto) {
+        this.goto(goto)
+      }
+    },
+    // 跳转网页
+    goto (url) {
+      this.$router.push({ path: url })
+    },
+    // 计算时间
+    calculateTimeDifference() {
+          const now = new Date().getTime();
+          this.timeDifference = now - this.specifiedTime;
+        },
+        goToLogin() {
+              this.$router.push('/login');
+            }
+  },
+
+
+}
+</script>
+
+
+<style scoped>
+/* 总页布局 */
+.fathercontainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+ min-height: 100%;
+ 
+  background-size: 100% ;
+  background-attachment:fixed;
+
+}
+/* 顶部导航栏 */
+.el-header {
+  z-index: 20;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  transition: top 0.3s; /* 添加过渡效果 */
+}
+
+.hidden {
+  top: -100px; /* 隐藏导航栏 */
+}
+.el-menu-demo {
+   position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin:0px ;
+  padding: 0px;
+  width: 100%;
+  height: 80px;
+  opacity:0.6;
+}
+
+.el-menu-demo .el-menu-item {
+  text-align: center; /* 居中文本 */
+  height: 80px;
+  line-height: 80px;
+  font-size: 20px; /* 设置"登录"菜单项的字体大小 */
+}
+
+.left-menu,
+.centered-menu,
+.right-menu {
+  display: flex;
+  align-items: center;
+}
+ 
+
+.centered-menu .el-menu-item {
+  margin: 0 10px; /* 调整菜单项之间的间距 */
+}
+/* 中下布局 */
+.childrencontainer {
+  margin-top:80px ;
+  margin-bottom:0px ;
+
+}
+
+/* 展示区区域 */
+.el-main {
+  background-color:rgba(170, 170, 170,0.1) ;
+  z-index:10;
+
+
+}
+/* 底部区域 */
+.el-footer {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: #000;
+  opacity: 0.5;
+  color: #fff;
+}
+.tworow{
+
+  width: 100%;
+  height: 70px;
+  margin: 0;
+  padding: 0;
+}
+.tworow {
+  display: flex; /* 使用 Flexbox 布局 */
+  justify-content: space-between; /* 均匀分布五个列 */
+  align-items: center; /* 垂直居中 */
+}
+.tworow > div {
+  flex: 1; /* 利用 flex 属性使五个列宽度相等 */
+  text-align: center; /* 文本水平居中 */
+  margin: 0 5px; /* 左右间距为 5px */
+  align-items: center; /* 垂直居中 */
+}
+
+.threerow{
+
+  width: 100%;
+  height: 30px;
+  margin: 0;
+  padding: 0;
+  text-align: center; /* 文本水平居中 */
+}
+
+</style>
