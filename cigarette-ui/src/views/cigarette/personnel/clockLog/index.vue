@@ -145,12 +145,15 @@
 <script>
 import { listLog, getLog, delLog, addLog, updateLog } from "@/api/cigarette/personnel/clockLog";
 import { listDistrict } from "@/api/cigarette/detection/district";
-import { listDetection } from "@/api/cigarette/detection/detection";
+import { listDetection } from "@/api/cigarette/detection/detection"; 
 
 export default {
   name: "Log",
+
+  dicts: ['tob_clock_correct',],
   data() {
     return {
+      treeData:[],
       // 遮罩层
       loading: true,
       // 选中数组
