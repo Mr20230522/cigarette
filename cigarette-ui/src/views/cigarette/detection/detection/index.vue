@@ -99,14 +99,38 @@
       </el-col>
     </el-row>
     <!-- 添加或修改监测区域对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="监测点顺序" prop="orderNum">
-          <el-input-number v-model="form.orderNum" controls-position="right" :min="0" placeholder="请输入监测点顺序" />
-        </el-form-item>
-        <el-form-item label="监测点名称" prop="detectionName">
+    <el-dialog :title="title" :visible.sync="open" width="50%" append-to-body style="margin-top: 100px;">
+      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
+        <el-row>
+          <el-col :span="12"> 
+            <el-form-item label="监测点名称" prop="detectionName">
           <el-input v-model="form.detectionName" placeholder="请输入监测点名称" />
         </el-form-item>
+          </el-col>
+          <el-col :span="12"> 
+            <el-form-item label="所属地区" prop="districtId">
+          <treeselect v-model="form.districtId" :options="districtTreeOptions" placeholder="请选择所属地区" />
+        </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12"> 
+            <el-form-item label="状态" prop="status">
+          <el-select v-model="form.status">
+            <el-option v-for="status in dict.type.tob_dd_status" :key="status.value" :label="status.label"
+              :value="status.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+          </el-col>
+          <el-col :span="12"> 
+            <el-form-item label="监测点顺序" prop="orderNum">
+          <el-input-number v-model="form.orderNum" controls-position="right" :min="0" placeholder="请输入监测点顺序" />
+        </el-form-item>
+          </el-col>
+        </el-row>
+
+
         <!-- 添加下拉框以选择检测区域所属地区 -->
         <!-- <el-form-item label="所属地区" prop="districtId">
           <el-select v-model="form.districtId" placeholder="请选择所属地区" filterable>
@@ -114,17 +138,9 @@
               :value="item.districtId"></el-option>
           </el-select>
         </el-form-item> -->
-        <el-form-item label="所属地区" prop="districtId">
-          <treeselect v-model="form.districtId" :options="districtTreeOptions" placeholder="请选择所属地区" />
-        </el-form-item>
 
-        <el-form-item label="状态" prop="status">
-          <el-select v-model="form.status">
-            <el-option v-for="status in dict.type.tob_dd_status" :key="status.value" :label="status.label"
-              :value="status.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
+
+
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>

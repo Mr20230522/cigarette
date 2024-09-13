@@ -1,8 +1,18 @@
 <template>
+    <div>
+        关键图片
+    </div>
 </template>
 
 <script>
-</script>
+export default {
+    name: "keyPicture",
 
-<style>
-</style>
+    data() {
+        return {
+        };
+    },
+    methods: {
+    }
+};
+</script>

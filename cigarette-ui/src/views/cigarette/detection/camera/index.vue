@@ -165,8 +165,8 @@
             </el-col>
         </el-row>
         <!-- 表单 -->
-        <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
-            <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-dialog :title="title" :visible.sync="open" width="60%" append-to-body>
+            <el-form ref="form" :model="form" :rules="rules" label-width="120px">
                 <el-row :gutter="20">
                     <el-col :span="12">
                         <el-form-item label="摄像头ip" prop="cameraIp">
@@ -245,23 +245,7 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-row :gutter="20">
-                    <el-col :span="7">
-                        <el-form-item label="经度" prop="longitude">
-                            <el-input v-model="form.longitude" placeholder="请输入经度" />
-                        </el-form-item>
-                    </el-col>
-                    <el-col :span="7">
-                        <el-form-item label="纬度" prop="latitude">
-                            <el-input v-model="form.latitude" placeholder="请输入纬度" />
-                        </el-form-item>
-                    </el-col>
-                    <el-col :span="2">
-                        <el-form-item>
-                            <el-button type="primary" plain @click="getLocation">获取经纬度</el-button>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
+
                 <el-row :gutter="20">
                     <el-col :span="12">
                         <el-form-item label="摄像头类型" prop="cameraType">
@@ -296,25 +280,27 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-row :gutter="20">
-                    <el-col :span="12">
-                        <el-form-item label="删除标记" prop="delFlag">
-                            <el-select v-model="form.delFlag" placeholder="请选择删除标记">
-                                <el-option v-for="dict in dict.type.tob_del_flag" :key="dict.value" :label="dict.label"
-                                    :value="dict.value">
-                                </el-option>
-                            </el-select>
+ 
+                <el-row  >
+                    <el-col :span="4">
+                        <el-form-item>
+                            <el-button type="primary" plain @click="getLocation">获取经纬度</el-button>
                         </el-form-item>
                     </el-col>
-                    <el-col :span="12">
-                        <!-- <el-form-item label="监测点所属地区ID" prop="districtId">
-              <el-input v-model="form.districtId" :disabled="true" placeholder="选择监测点以填入所属地区ID" />
-            </el-form-item> -->
-                        <el-form-item label="备注" prop="remark">
-                            <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+                    <el-col :span="9">
+                        <el-form-item label="经度" prop="longitude">
+                            <el-input v-model="form.longitude" placeholder="请输入经度" />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="9">
+                        <el-form-item label="纬度" prop="latitude">
+                            <el-input v-model="form.latitude" placeholder="请输入纬度" />
                         </el-form-item>
                     </el-col>
                 </el-row>
+                        <el-form-item label="备注" prop="remark">
+                            <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+                        </el-form-item>
 
             </el-form>
             <div slot="footer" class="dialog-footer">
