@@ -162,7 +162,7 @@
     />
 
     <!-- 添加或修改值班对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="50%" append-to-body style="margin-top: 100px;">
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="值班表名称" prop="scheduleName">
           <el-input v-model="form.scheduleName" placeholder="请输入值班表名称" />

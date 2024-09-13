@@ -1,8 +1,18 @@
 <template>
+    <div>
+        片段视频
+    </div>
 </template>
 
 <script>
-</script>
+export default {
+    name: "timeVideo",
 
-<style>
-</style>
+    data() {
+        return {
+        };
+    },
+    methods: {
+    }
+};
+</script>
