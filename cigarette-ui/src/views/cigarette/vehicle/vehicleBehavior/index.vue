@@ -343,6 +343,11 @@ export default {
       filteredCar: [],
       // 存储所选用户信息
       selectedCar: null,
+      defaultProps: {
+        children: 'children',
+        label: 'label'
+      },
+      treeData : [],
       // 表单校验
       rules: {
         carId: [{
