@@ -85,6 +85,11 @@
               <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.status" />
             </template>
           </el-table-column>
+          <el-table-column label="工作人员图片" align="center" prop="picture" width="100">
+        <template slot-scope="scope">
+          <image-preview :src="scope.row.picture" :width="50" :height="50"/>
+        </template>
+      </el-table-column>
           <el-table-column label="备注" align="center" prop="remark" />
           <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
             <template slot-scope="scope">
@@ -157,6 +162,9 @@
               :value="dict.value" />
           </el-select>
         </el-form-item>
+        <el-form-item label="工作人员图片" prop="picture">
+          <image-upload v-model="form.picture"/>
+        </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
@@ -216,6 +224,7 @@ export default {
         dutyId: null,
         faceFeature: null,
         status: null,
+        picture: null
       },
       // 表单参数
       form: {},
@@ -442,7 +451,8 @@ export default {
         delFlag: null,
         remark: null,
         createTime: null,
-        updateTime: null
+        updateTime: null,
+        picture: null
       };
       this.resetForm("form");
     },

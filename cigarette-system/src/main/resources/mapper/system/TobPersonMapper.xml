@@ -3,7 +3,7 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.TobPersonMapper">
-    
+
     <resultMap type="TobPerson" id="TobPersonResult">
         <result property="suspectId"    column="suspect_id"    />
         <result property="identityCard"    column="identity_card"    />
@@ -22,15 +22,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createTime"    column="create_time"    />
         <result property="updateTime"    column="update_time"    />
         <result property="casesInvolved"    column="cases_Involved"    />
+        <result property="picture"    column="picture"    />
     </resultMap>
 
     <sql id="selectTobPersonVo">
-        select suspect_id, identity_card, face_feature, phone, suspect_license_number, name, age, gender, address, occurrence_number, illegal_status, status, del_flag, remark, create_time, update_time, cases_Involved from tob_person
+        select suspect_id, identity_card, face_feature, phone, suspect_license_number, name, age, gender, address, occurrence_number, illegal_status, status, del_flag, remark, create_time, update_time, cases_Involved, picture from tob_person
     </sql>
 
     <select id="selectTobPersonList" parameterType="TobPerson" resultMap="TobPersonResult">
         <include refid="selectTobPersonVo"/>
-        <where>  
+        <where>
             <if test="identityCard != null "> and identity_card = #{identityCard}</if>
             <if test="faceFeature != null  and faceFeature != ''"> and face_feature = #{faceFeature}</if>
             <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
@@ -43,9 +44,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="illegalStatus != null  and illegalStatus != ''"> and illegal_status = #{illegalStatus}</if>
             <if test="status != null  and status != ''"> and status = #{status}</if>
             <if test="casesInvolved != null "> and cases_Involved = #{casesInvolved}</if>
+            <if test="picture != null  and picture != ''"> and picture = #{picture}</if>
         </where>
     </select>
-    
+
     <select id="selectTobPersonBySuspectId" parameterType="Long" resultMap="TobPersonResult">
         <include refid="selectTobPersonVo"/>
         where suspect_id = #{suspectId}
@@ -70,6 +72,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             create_time,
             update_time,
             <if test="casesInvolved != null">cases_Involved,</if>
+            <if test="picture != null">picture,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="identityCard != null">#{identityCard},</if>
@@ -88,6 +91,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             sysdate(),
             sysdate(),
             <if test="casesInvolved != null">#{casesInvolved},</if>
+            <if test="picture != null">#{picture},</if>
          </trim>
     </insert>
 
@@ -108,6 +112,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="remark != null">remark = #{remark},</if>
             update_time = sysdate(),
             <if test="casesInvolved != null">cases_Involved = #{casesInvolved},</if>
+            <if test="picture != null">picture = #{picture},</if>
         </trim>
         where suspect_id = #{suspectId}
     </update>
@@ -117,7 +122,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteTobPersonBySuspectIds" parameterType="String">
-        delete from tob_person where suspect_id in 
+        delete from tob_person where suspect_id in
         <foreach item="suspectId" collection="array" open="(" separator="," close=")">
             #{suspectId}
         </foreach>

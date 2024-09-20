@@ -7,7 +7,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
  * 工作人员对象 tob_staff
- * 
+ *
  * @author ruoyi
  * @date 2024-07-25
  */
@@ -48,48 +48,53 @@ public class TobStaff extends BaseEntity
     @Excel(name = "地区id")
     private Long districtId;
 
-    public void setStaffId(Long staffId) 
+    /** 工作人员图片 */
+    @Excel(name = "工作人员图片")
+    private String picture;
+
+
+    public void setStaffId(Long staffId)
     {
         this.staffId = staffId;
     }
 
-    public Long getStaffId() 
+    public Long getStaffId()
     {
         return staffId;
     }
-    public void setUserId(Long userId) 
+    public void setUserId(Long userId)
     {
         this.userId = userId;
     }
 
-    public Long getUserId() 
+    public Long getUserId()
     {
         return userId;
     }
-    public void setFaceFeature(String faceFeature) 
+    public void setFaceFeature(String faceFeature)
     {
         this.faceFeature = faceFeature;
     }
 
-    public String getFaceFeature() 
+    public String getFaceFeature()
     {
         return faceFeature;
     }
-    public void setStatus(String status) 
+    public void setStatus(String status)
     {
         this.status = status;
     }
 
-    public String getStatus() 
+    public String getStatus()
     {
         return status;
     }
-    public void setDelFlag(String delFlag) 
+    public void setDelFlag(String delFlag)
     {
         this.delFlag = delFlag;
     }
 
-    public String getDelFlag() 
+    public String getDelFlag()
     {
         return delFlag;
     }
@@ -117,21 +122,30 @@ public class TobStaff extends BaseEntity
     public void setDistrictId(Long districtId) {
         this.districtId = districtId;
     }
+    public void setPicture(String picture)
+    {
+        this.picture = picture;
+    }
 
+    public String getPicture()
+    {
+        return picture;
+    }
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("staffId", getStaffId())
-            .append("userId", getUserId())
-            .append("faceFeature", getFaceFeature())
-            .append("status", getStatus())
-            .append("delFlag", getDelFlag())
-            .append("remark", getRemark())
-            .append("createTime", getCreateTime())
-            .append("updateTime", getUpdateTime())
+                .append("staffId", getStaffId())
+                .append("userId", getUserId())
                 .append("detectionId", getDetectionId())
                 .append("dutyId", getDutyId())
+                .append("faceFeature", getFaceFeature())
+                .append("status", getStatus())
+                .append("delFlag", getDelFlag())
+                .append("remark", getRemark())
+                .append("createTime", getCreateTime())
+                .append("updateTime", getUpdateTime())
                 .append("districtId", getDistrictId())
-            .toString();
+                .append("picture", getPicture())
+                .toString();
     }
 }
