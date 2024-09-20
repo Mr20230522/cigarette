@@ -506,6 +506,11 @@ import { listDetection } from "@/api/cigarette/detection/detection";
         filteredBehaviors: [],
         // 存储所选用户信息
         selectedBehavior: null,
+        defaultProps: {
+        children: 'children',
+        label: 'label'
+      },
+      treeData : [],
         // 表单校验
         rules: {
           caseCode: [{
