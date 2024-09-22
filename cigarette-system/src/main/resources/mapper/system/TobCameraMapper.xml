@@ -152,7 +152,7 @@
             <if test="delFlag != null and delFlag != ''">del_flag,</if>
             <if test="remark != null">remark,</if>
             <if test="createTime != null">create_time,</if>
-            <if test="updateTime != null">update_time,</if>
+            update_time,
             <if test="districtId != null">district_id,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -175,7 +175,7 @@
             <if test="delFlag != null and delFlag != ''">#{delFlag},</if>
             <if test="remark != null">#{remark},</if>
             <if test="createTime != null">#{createTime},</if>
-            <if test="updateTime != null">#{updateTime},</if>
+            sysdate(),
             <if test="districtId != null">#{districtId},</if>
         </trim>
     </insert>

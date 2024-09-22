@@ -1,22 +1,9 @@
 <template>
   <div class="component-upload-image">
-    <el-upload
-      multiple
-      :action="uploadImgUrl"
-      list-type="picture-card"
-      :on-success="handleUploadSuccess"
-      :before-upload="handleBeforeUpload"
-      :limit="limit"
-      :on-error="handleUploadError"
-      :on-exceed="handleExceed"
-      ref="imageUpload"
-      :on-remove="handleDelete"
-      :show-file-list="true"
-      :headers="headers"
-      :file-list="fileList"
-      :on-preview="handlePictureCardPreview"
-      :class="{hide: this.fileList.length >= this.limit}"
-    >
+    <el-upload multiple :action="uploadImgUrl" list-type="picture-card" :on-success="handleUploadSuccess"
+      :before-upload="handleBeforeUpload" :limit="limit" :on-error="handleUploadError" :on-exceed="handleExceed"
+      ref="imageUpload" :on-remove="handleDelete" :show-file-list="true" :headers="headers" :file-list="fileList"
+      :on-preview="handlePictureCardPreview" :class="{ hide: this.fileList.length >= this.limit }">
       <i class="el-icon-plus"></i>
     </el-upload>
 
@@ -28,22 +15,15 @@
       的文件
     </div>
 
-    <el-dialog
-      :visible.sync="dialogVisible"
-      title="预览"
-      width="800"
-      append-to-body
-    >
-      <img
-        :src="dialogImageUrl"
-        style="display: block; max-width: 100%; margin: 0 auto"
-      />
+    <el-dialog :visible.sync="dialogVisible" title="预览" width="800" append-to-body>
+      <img :src="dialogImageUrl" style="display: block; max-width: 100%; margin: 0 auto" />
     </el-dialog>
   </div>
 </template>
 
 <script>
 import { getToken } from "@/utils/auth";
+import { deleteImage } from "@/api/common";
 
 export default {
   props: {
@@ -55,7 +35,7 @@ export default {
     },
     // 大小限制(MB)
     fileSize: {
-       type: Number,
+      type: Number,
       default: 5,
     },
     // 文件类型, 例如['png', 'jpg', 'jpeg']
@@ -94,9 +74,9 @@ export default {
           this.fileList = list.map(item => {
             if (typeof item === "string") {
               if (item.indexOf(this.baseUrl) === -1) {
-                  item = { name: this.baseUrl + item, url: this.baseUrl + item };
+                item = { name: this.baseUrl + item, url: this.baseUrl + item };
               } else {
-                  item = { name: item, url: item };
+                item = { name: item, url: item };
               }
             }
             return item;
@@ -167,12 +147,40 @@ export default {
     },
     // 删除图片
     handleDelete(file) {
+      var fileName = file.name.replace(this.baseUrl, "");
+      console.log("Deleting file:", fileName);  // 输出文件名，检查是否正确
+      deleteImage({ fileName: fileName }).then(res => {
+      }).catch(() => {
+      });
       const findex = this.fileList.map(f => f.name).indexOf(file.name);
       if (findex > -1) {
         this.fileList.splice(findex, 1);
         this.$emit("input", this.listToString(this.fileList));
       }
     },
+
+    // handleDelete(file) {
+    //   var fileName = file.name.replace(this.baseUrl, "");
+    //   console.log("Deleting file:", fileName);  // 输出文件名，检查是否正确
+
+    //   deleteFile({ fileName: fileName })
+    //     .then(res => {
+    //       if (res.code === 200) {  // 确保后端返回的状态码正确
+    //         // 更新 fileList
+    //         const findex = this.fileList.map(f => f.name).indexOf(file.name);
+    //         if (findex > -1) {
+    //           this.fileList.splice(findex, 1);
+    //           this.$emit("input", this.listToString(this.fileList));
+    //         }
+    //       } else {
+    //         this.$message.error('删除失败，错误信息：' + res.msg);
+    //       }
+    //     })
+    //     .catch(() => {
+    //       this.$message.error('删除图片失败');
+    //     });
+    // },
+
     // 上传失败
     handleUploadError() {
       this.$modal.msgError("上传图片失败，请重试");
@@ -210,17 +218,18 @@ export default {
 <style scoped lang="scss">
 // .el-upload--picture-card 控制加号部分
 ::v-deep.hide .el-upload--picture-card {
-    display: none;
+  display: none;
 }
+
 // 去掉动画效果
 ::v-deep .el-list-enter-active,
 ::v-deep .el-list-leave-active {
-    transition: all 0s;
+  transition: all 0s;
 }
 
-::v-deep .el-list-enter, .el-list-leave-active {
+::v-deep .el-list-enter,
+.el-list-leave-active {
   opacity: 0;
   transform: translateY(0);
 }
 </style>
-

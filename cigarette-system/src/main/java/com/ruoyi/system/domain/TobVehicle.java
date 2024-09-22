@@ -9,9 +9,9 @@ import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
  * 车辆对象 tob_vehicle
- * 
+ *
  * @author cigarette
- * @date 2024-07-27
+ * @date 2024-09-12
  */
 public class TobVehicle extends BaseEntity
 {
@@ -32,17 +32,17 @@ public class TobVehicle extends BaseEntity
     @Excel(name = "车型")
     private Long carTypeId;
 
-    /** 车的颜色 */
-    @Excel(name = "车的颜色")
+    /** 车身颜色 */
+    @Excel(name = "车身颜色")
     private String carColor;
 
     /** 出现次数 */
     @Excel(name = "出现次数")
     private Long occurrenceNumber;
 
-    /** 涉案数 */
-    @Excel(name = "涉案数")
-    private Long casesInvolved;
+    /** 案件涉及数量 */
+    @Excel(name = "案件涉及数量")
+    private String casesInvolved;
 
     /** 车主id */
     @Excel(name = "车主id")
@@ -64,133 +64,147 @@ public class TobVehicle extends BaseEntity
     /** 删除标记 */
     private String delFlag;
 
-    public void setCarId(Long carId) 
+    /** 图片路径 */
+    @Excel(name = "图片路径")
+    private String picture;
+
+    public void setCarId(Long carId)
     {
         this.carId = carId;
     }
 
-    public Long getCarId() 
+    public Long getCarId()
     {
         return carId;
     }
-    public void setLicensePlate(String licensePlate) 
+    public void setLicensePlate(String licensePlate)
     {
         this.licensePlate = licensePlate;
     }
 
-    public String getLicensePlate() 
+    public String getLicensePlate()
     {
         return licensePlate;
     }
-    public void setLicensePlateType(Long licensePlateType) 
+    public void setLicensePlateType(Long licensePlateType)
     {
         this.licensePlateType = licensePlateType;
     }
 
-    public Long getLicensePlateType() 
+    public Long getLicensePlateType()
     {
         return licensePlateType;
     }
-    public void setCarTypeId(Long carTypeId) 
+    public void setCarTypeId(Long carTypeId)
     {
         this.carTypeId = carTypeId;
     }
 
-    public Long getCarTypeId() 
+    public Long getCarTypeId()
     {
         return carTypeId;
     }
-    public void setCarColor(String carColor) 
+    public void setCarColor(String carColor)
     {
         this.carColor = carColor;
     }
 
-    public String getCarColor() 
+    public String getCarColor()
     {
         return carColor;
     }
-    public void setOccurrenceNumber(Long occurrenceNumber) 
+    public void setOccurrenceNumber(Long occurrenceNumber)
     {
         this.occurrenceNumber = occurrenceNumber;
     }
 
-    public Long getOccurrenceNumber() 
+    public Long getOccurrenceNumber()
     {
         return occurrenceNumber;
     }
-    public void setCasesInvolved(Long casesInvolved) 
+    public void setCasesInvolved(String casesInvolved)
     {
         this.casesInvolved = casesInvolved;
     }
 
-    public Long getCasesInvolved() 
+    public String getCasesInvolved()
     {
         return casesInvolved;
     }
-    public void setCarOwnerId(Long carOwnerId) 
+    public void setCarOwnerId(Long carOwnerId)
     {
         this.carOwnerId = carOwnerId;
     }
 
-    public Long getCarOwnerId() 
+    public Long getCarOwnerId()
     {
         return carOwnerId;
     }
-    public void setVehiclePurchaseDate(Date vehiclePurchaseDate) 
+    public void setVehiclePurchaseDate(Date vehiclePurchaseDate)
     {
         this.vehiclePurchaseDate = vehiclePurchaseDate;
     }
 
-    public Date getVehiclePurchaseDate() 
+    public Date getVehiclePurchaseDate()
     {
         return vehiclePurchaseDate;
     }
-    public void setIllegalStatus(String illegalStatus) 
+    public void setIllegalStatus(String illegalStatus)
     {
         this.illegalStatus = illegalStatus;
     }
 
-    public String getIllegalStatus() 
+    public String getIllegalStatus()
     {
         return illegalStatus;
     }
-    public void setStatus(String status) 
+    public void setStatus(String status)
     {
         this.status = status;
     }
 
-    public String getStatus() 
+    public String getStatus()
     {
         return status;
     }
-    public void setDelFlag(String delFlag) 
+    public void setDelFlag(String delFlag)
     {
         this.delFlag = delFlag;
     }
 
-    public String getDelFlag() 
+    public String getDelFlag()
     {
         return delFlag;
+    }
+    public void setPicture(String picture)
+    {
+        this.picture = picture;
+    }
+
+    public String getPicture()
+    {
+        return picture;
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("carId", getCarId())
-            .append("licensePlate", getLicensePlate())
-            .append("licensePlateType", getLicensePlateType())
-            .append("carTypeId", getCarTypeId())
-            .append("carColor", getCarColor())
-            .append("occurrenceNumber", getOccurrenceNumber())
-            .append("casesInvolved", getCasesInvolved())
-            .append("carOwnerId", getCarOwnerId())
-            .append("vehiclePurchaseDate", getVehiclePurchaseDate())
-            .append("illegalStatus", getIllegalStatus())
-            .append("status", getStatus())
-            .append("delFlag", getDelFlag())
-            .append("remark", getRemark())
-            .append("createTime", getCreateTime())
-            .append("updateTime", getUpdateTime())
-            .toString();
+                .append("carId", getCarId())
+                .append("licensePlate", getLicensePlate())
+                .append("licensePlateType", getLicensePlateType())
+                .append("carTypeId", getCarTypeId())
+                .append("carColor", getCarColor())
+                .append("occurrenceNumber", getOccurrenceNumber())
+                .append("casesInvolved", getCasesInvolved())
+                .append("carOwnerId", getCarOwnerId())
+                .append("vehiclePurchaseDate", getVehiclePurchaseDate())
+                .append("illegalStatus", getIllegalStatus())
+                .append("status", getStatus())
+                .append("delFlag", getDelFlag())
+                .append("remark", getRemark())
+                .append("createTime", getCreateTime())
+                .append("updateTime", getUpdateTime())
+                .append("picture", getPicture())
+                .toString();
     }
 }
