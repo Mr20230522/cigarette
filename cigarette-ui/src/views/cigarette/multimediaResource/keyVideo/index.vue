@@ -1,8 +1,18 @@
 <template>
+    <div>
+        关键视频
+    </div>
 </template>
 
 <script>
-</script>
+export default {
+    name: "keyVideo",
 
-<style>
-</style>
+    data() {
+        return {
+        };
+    },
+    methods: {
+    }
+};
+</script>
