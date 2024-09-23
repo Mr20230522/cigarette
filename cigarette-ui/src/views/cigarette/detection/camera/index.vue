@@ -351,6 +351,7 @@ export default {
                 children: 'children',
                 label: 'label'
             },
+            detectionOptions:[],    //json数组，用于存储检测点选项
             loading: true,
             // 查询参数
             queryParams: {

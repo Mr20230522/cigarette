@@ -1,37 +1,50 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.TobStaffMapper">
-    
+
     <resultMap type="TobStaff" id="TobStaffResult">
-        <result property="staffId"    column="staff_id"    />
-        <result property="userId"    column="user_id"    />
-        <result property="faceFeature"    column="face_feature"    />
-        <result property="status"    column="status"    />
-        <result property="delFlag"    column="del_flag"    />
-        <result property="remark"    column="remark"    />
-        <result property="createTime"    column="create_time"    />
-        <result property="updateTime"    column="update_time"    />
+        <result property="staffId" column="staff_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="faceFeature" column="face_feature"/>
+        <result property="status" column="status"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
         <result property="detectionId" column="detection_id"/>
         <result property="districtId" column="district_id"/>
+        <result property="picture" column="picture"/>
     </resultMap>
 
     <sql id="selectTobStaffVo">
-        select staff_id, user_id, face_feature, status, del_flag, remark, create_time, update_time, detection_id,district_id from tob_staff
+        select staff_id,
+               user_id,
+               face_feature,
+               status,
+               del_flag,
+               remark,
+               create_time,
+               update_time,
+               detection_id,
+               district_id,
+               picture
+        from tob_staff
     </sql>
 
     <select id="selectTobStaffList" parameterType="TobStaff" resultMap="TobStaffResult">
         <include refid="selectTobStaffVo"/>
-        <where>  
-            <if test="userId != null "> and user_id = #{userId}</if>
-            <if test="faceFeature != null  and faceFeature != ''"> and face_feature = #{faceFeature}</if>
-            <if test="status != null  and status != ''"> and status = #{status}</if>
-             <if test="detectionId != null "> and detection_id = #{detectionId}</if>
-              <if test="districtId != null "> and district_id = #{districtId}</if>
+        <where>
+            <if test="userId != null ">and user_id = #{userId}</if>
+            <if test="faceFeature != null  and faceFeature != ''">and face_feature = #{faceFeature}</if>
+            <if test="status != null  and status != ''">and status = #{status}</if>
+            <if test="detectionId != null ">and detection_id = #{detectionId}</if>
+            <if test="districtId != null ">and district_id = #{districtId}</if>
+            <if test="picture != null  and picture != ''">and picture = #{picture}</if>
         </where>
     </select>
-    
+
     <select id="selectTobStaffByStaffId" parameterType="Long" resultMap="TobStaffResult">
         <include refid="selectTobStaffVo"/>
         where staff_id = #{staffId}
@@ -49,7 +62,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             update_time,
             <if test="detectionId != null">detection_id,</if>
             <if test="districtId != null">district_id,</if>
-         </trim>
+            <if test="picture != null">picture,</if>
+        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="userId != null">#{userId},</if>
             <if test="faceFeature != null">#{faceFeature},</if>
@@ -57,10 +71,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             0,
             <if test="remark != null">#{remark},</if>
             sysdate(),
-        sysdate(),
+            sysdate(),
             <if test="detectionId != null">#{detectionId},</if>
             <if test="districtId != null">#{districtId},</if>
-         </trim>
+            <if test="picture != null">#{picture},</if>
+        </trim>
     </insert>
 
     <update id="updateTobStaff" parameterType="TobStaff">
@@ -74,16 +89,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateTime != null">update_time = sysdate(),</if>
             <if test="detectionId != null">detection_id = #{detectionId},</if>
             <if test="districtId != null">district_id = #{districtId},</if>
+            <if test="picture != null">picture = #{picture},</if>
         </trim>
         where staff_id = #{staffId}
     </update>
 
     <delete id="deleteTobStaffByStaffId" parameterType="Long">
-        delete from tob_staff where staff_id = #{staffId}
+        delete
+        from tob_staff
+        where staff_id = #{staffId}
     </delete>
 
     <delete id="deleteTobStaffByStaffIds" parameterType="String">
-        delete from tob_staff where staff_id in 
+        delete from tob_staff where staff_id in
         <foreach item="staffId" collection="array" open="(" separator="," close=")">
             #{staffId}
         </foreach>

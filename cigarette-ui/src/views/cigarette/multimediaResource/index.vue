@@ -1,5 +1,5 @@
 <template>
-    <el-tabs v-model="activeName" @tab-click="handleClick" stretch="true">
+    <el-tabs v-model="activeName" @tab-click="handleClick" :stretch="true">
       <el-tab-pane label="关键图片" name="keyPicture">
         <div style="width: 100%;">
           <keyPicture></keyPicture>

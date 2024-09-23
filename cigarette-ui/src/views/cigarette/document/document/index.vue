@@ -194,6 +194,11 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      defaultProps: {
+        children: 'children',
+        label: 'label'
+      },
+      treeData : [],
       // 查询参数
       queryParams: {
         pageNum: 1,

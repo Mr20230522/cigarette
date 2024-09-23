@@ -1,5 +1,5 @@
 <template>
-  <el-tabs v-model="activeName" @tab-click="handleClick" stretch="true">
+  <el-tabs v-model="activeName" @tab-click="handleClick" :stretch="true">
     <el-tab-pane label="值班记录" name="ClockLog">
       <div style="width: 100%;">
         <ClockLog></ClockLog>

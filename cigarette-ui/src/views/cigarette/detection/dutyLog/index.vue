@@ -111,43 +111,44 @@
           </el-scrollbar>
         </el-form-item>
         <el-row>
-          <el-col :span="12"> 
+          <el-col :span="12">
             <el-form-item label="监测人员ID" prop="leader">
-          <el-input :disabled="true" v-model="form.leader" placeholder="请在上方搜索人员" />
-        </el-form-item>
+              <el-input :disabled="true" v-model="form.leader" placeholder="请在上方搜索人员" />
+            </el-form-item>
           </el-col>
-          <el-col :span="12"> 
+          <el-col :span="12">
             <el-form-item label="联系电话" prop="phone">
-          <el-input :disabled="true" v-model="form.phone" placeholder="请在上方搜索人员" />
-        </el-form-item>
+              <el-input :disabled="true" v-model="form.phone" placeholder="请在上方搜索人员" />
+            </el-form-item>
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="12"> 
+          <el-col :span="12">
             <el-form-item label="执勤时间" prop="dutyTime">
-          <el-date-picker clearable v-model="form.dutyTime" type="date" value-format="yyyy-MM-dd" placeholder="请选择执勤时间">
-          </el-date-picker>
-        </el-form-item>
+              <el-date-picker clearable v-model="form.dutyTime" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择执勤时间">
+              </el-date-picker>
+            </el-form-item>
           </el-col>
-          <el-col :span="12"> 
+          <el-col :span="12">
             <el-form-item label="执勤有误" prop="flag">
-          <el-select v-model="form.flag" placeholder="请选择执勤有误">
-            <el-option v-for="dict in dict.type.tob_clock_correct" :key="dict.value" :label="dict.label"
-              :value="dict.value"></el-option>
-          </el-select>
-        </el-form-item>
+              <el-select v-model="form.flag" placeholder="请选择执勤有误">
+                <el-option v-for="dict in dict.type.tob_clock_correct" :key="dict.value" :label="dict.label"
+                  :value="dict.value"></el-option>
+              </el-select>
+            </el-form-item>
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="12"> 
+          <el-col :span="12">
             <el-form-item label="图片编号" prop="keyPictureId">
-          <el-input v-model="form.keyPictureId" placeholder="请输入图片编号" />
-        </el-form-item>
+              <el-input v-model="form.keyPictureId" placeholder="请输入图片编号" />
+            </el-form-item>
           </el-col>
-          <el-col :span="12"> 
+          <el-col :span="12">
             <el-form-item label="视频编号" prop="videoId">
-          <el-input v-model="form.videoId" placeholder="请输入视频编号" />
-        </el-form-item>
+              <el-input v-model="form.videoId" placeholder="请输入视频编号" />
+            </el-form-item>
           </el-col>
         </el-row>
         <el-form-item label="行为编号" prop="behavior">
@@ -172,7 +173,9 @@
 import { listDutyLog, getDutyLog, delDutyLog, addDutyLog, updateDutyLog } from "@/api/cigarette/detection/dutyLog";
 import { listDistrict } from "@/api/cigarette/detection/district";
 import { listDetection } from "@/api/cigarette/detection/detection";
-import {  listUser,} from "@/api/system/user";
+import { listUser, } from "@/api/system/user";
+import { listStaff } from "@/api/cigarette/personnel/staff"; // 导入工作人员列表接口
+
 export default {
   name: "DutyLog",
   dicts: ['tob_clock_correct'],
@@ -200,8 +203,12 @@ export default {
       userIdList: [],
       filteredUsers: [],
       selectedUser: null,
-            // 表单参数
-            form: {
+      defaultProps: {
+        children: 'children',
+        label: 'label'
+      },
+      // 表单参数
+      form: {
         // 搜索人
         // 存储搜索信息
         searchInput: '',
@@ -212,6 +219,12 @@ export default {
         // 存储所选用户信息
         selectedUser: null,
       },
+      defaultProps: {
+        children: 'children',
+        label: 'label'
+      },
+      treeData : [],
+      
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -499,8 +512,8 @@ export default {
         ...this.queryParams
       }, `dutyLog_${new Date().getTime()}.xlsx`)
     },
-     // 选择数据化进行数据填充
-     filterUsers() {
+    // 选择数据化进行数据填充
+    filterUsers() {
       const searchInput = this.searchInput.toLowerCase().trim();
       if (!searchInput) {
         // 如果搜索条件为空，不显示任何用户

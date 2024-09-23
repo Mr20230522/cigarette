@@ -25,7 +25,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
  * 车辆行为记录Controller
- * 
+ *
  * @author cigarette
  * @date 2024-07-27
  */

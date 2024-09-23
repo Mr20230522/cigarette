@@ -125,48 +125,50 @@
           </el-scrollbar>
         </el-form-item>
         <el-row>
-          <el-col :span="12"> 
+          <el-col :span="12">
             <el-form-item label="监测人员" prop="leader">
-          <el-input :disabled="true" v-model="form.leader" placeholder="请在上方搜索人员" />
-        </el-form-item>
+              <el-input :disabled="true" v-model="form.leader" placeholder="请在上方搜索人员" />
+            </el-form-item>
           </el-col>
-          <el-col :span="12"> 
+          <el-col :span="12">
             <el-form-item label="联系电话" prop="phone">
-          <el-input :disabled="true" v-model="form.phone" placeholder="请在上方搜索人员" />
-        </el-form-item>
+              <el-input :disabled="true" v-model="form.phone" placeholder="请在上方搜索人员" />
+            </el-form-item>
           </el-col>
         </el-row>
 
         <el-row>
           <el-col :span="12">
             <el-form-item label="开始时间" prop="startTime">
-          <el-date-picker clearable v-model="form.startTime" type="date" value-format="yyyy-MM-dd"
-            placeholder="请选择开始时间">
-          </el-date-picker>
-        </el-form-item>
+              <el-date-picker clearable v-model="form.startTime" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择开始时间">
+              </el-date-picker>
+            </el-form-item>
           </el-col>
           <el-col :span="12">
-        <el-form-item label="结束时间" prop="endTime">
-          <el-date-picker clearable v-model="form.endTime" type="date" value-format="yyyy-MM-dd" placeholder="请选择结束时间">
-          </el-date-picker>
-        </el-form-item>
+            <el-form-item label="结束时间" prop="endTime">
+              <el-date-picker clearable v-model="form.endTime" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择结束时间">
+              </el-date-picker>
+            </el-form-item>
           </el-col>
         </el-row>
 
         <el-row>
           <el-col :span="12">
             <el-form-item label="值班日期" prop="dutyDate">
-          <el-date-picker clearable v-model="form.dutyDate" type="date" value-format="yyyy-MM-dd" placeholder="请选择值班日期">
-          </el-date-picker>
-        </el-form-item>
+              <el-date-picker clearable v-model="form.dutyDate" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择值班日期">
+              </el-date-picker>
+            </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="出勤有误" prop="flag">
-          <el-select v-model="form.flag" placeholder="请输入出勤有误">
-            <el-option v-for="dict in dict.type.tob_clock_correct" :key="dict.value" :label="dict.label"
-              :value="dict.value"></el-option>
-          </el-select>
-        </el-form-item>
+              <el-select v-model="form.flag" placeholder="请输入出勤有误">
+                <el-option v-for="dict in dict.type.tob_clock_correct" :key="dict.value" :label="dict.label"
+                  :value="dict.value"></el-option>
+              </el-select>
+            </el-form-item>
           </el-col>
         </el-row>
 
@@ -174,7 +176,7 @@
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
 
- 
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -187,8 +189,9 @@
 <script>
 import { listLog, getLog, delLog, addLog, updateLog } from "@/api/cigarette/personnel/clockLog";
 import { listDistrict } from "@/api/cigarette/detection/district";
-import { listDetection } from "@/api/cigarette/detection/detection"; 
-import {  listUser,} from "@/api/system/user";
+import { listDetection } from "@/api/cigarette/detection/detection";
+import { listUser, } from "@/api/system/user";
+import { listStaff } from "@/api/cigarette/personnel/staff"; // 导入工作人员列表接口
 
 export default {
   name: "ClockLog",
@@ -196,7 +199,6 @@ export default {
   dicts: ['tob_clock_correct'],
   data() {
     return {
-      treeData:[],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -218,19 +220,24 @@ export default {
       searchInput: '',
       userIdList: [],
       filteredUsers: [],
-      selectedUser: null,
-            // 表单参数
-            form: {
-        // 搜索人
-        // 存储搜索信息
-        searchInput: '',
-        // 存储用户信息
-        userIdList: [],
-        // 存储根据搜索条件过滤后的用户列表数据
-        filteredUsers: [],
-        // 存储所选用户信息
-        selectedUser: null,
+      defaultProps: {
+        children: 'children',
+        label: 'label'
       },
+      treeData: [],
+      selectedUser: null,
+      // 表单参数
+      form: {},
+      // 搜索人
+      // 存储搜索信息
+      searchInput: '',
+      // 存储用户信息
+      userIdList: [],
+      // 存储根据搜索条件过滤后的用户列表数据
+      filteredUsers: [],
+      // 存储所选用户信息
+      selectedUser: null,
+
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -280,7 +287,7 @@ export default {
     this.getList();
     this.loadDetectionOptions(); // 加载检测点选项
     this.loadDistrictOptions(); // 加载地区选项
-        this.getUserList();
+    this.getUserList();
   },
   mounted() {
     this.filteredUsers = [];
@@ -525,8 +532,8 @@ export default {
         ...this.queryParams
       }, `log_${new Date().getTime()}.xlsx`)
     },
-     // 选择数据化进行数据填充
-     filterUsers() {
+    // 选择数据化进行数据填充
+    filterUsers() {
       const searchInput = this.searchInput.toLowerCase().trim();
       if (!searchInput) {
         // 如果搜索条件为空，不显示任何用户
