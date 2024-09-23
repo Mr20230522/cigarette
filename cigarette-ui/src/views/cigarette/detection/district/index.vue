@@ -138,6 +138,7 @@ import { listDistrict, getDistrict, delDistrict, addDistrict, updateDistrict } f
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import {  listUser,} from "@/api/system/user";
+import { listStaff } from "@/api/cigarette/personnel/staff"; // 导入工作人员列表接口
 
 export default {
   name: "District",

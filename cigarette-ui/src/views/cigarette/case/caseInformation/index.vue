@@ -520,6 +520,11 @@ export default {
       filteredBehaviors: [],
       // 存储所选用户信息
       selectedBehavior: null,
+      treeData:[],
+      defaultProps: {
+        children: "children",
+        label: "label"
+      },
       // 表单校验
       rules: {
         caseCode: [{
