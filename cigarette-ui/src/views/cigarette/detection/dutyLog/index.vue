@@ -174,6 +174,8 @@ import { listDutyLog, getDutyLog, delDutyLog, addDutyLog, updateDutyLog } from "
 import { listDistrict } from "@/api/cigarette/detection/district";
 import { listDetection } from "@/api/cigarette/detection/detection";
 import { listUser, } from "@/api/system/user";
+import { listStaff } from "@/api/cigarette/personnel/staff"; // 导入工作人员列表接口
+
 export default {
   name: "DutyLog",
   dicts: ['tob_clock_correct'],
@@ -222,6 +224,7 @@ export default {
         label: 'label'
       },
       treeData : [],
+      
       // 查询参数
       queryParams: {
         pageNum: 1,
