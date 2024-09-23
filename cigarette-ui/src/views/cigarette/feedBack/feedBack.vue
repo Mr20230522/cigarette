@@ -1,6 +1,6 @@
 <template>
   <div>
-    反馈建议
+    反馈建议(测试)
   </div>
 </template>
 
@@ -10,7 +10,7 @@
 export default {
   name: "feedBack",
   data() {
-    return { 
+    return {
       }
   },
   methods: {
