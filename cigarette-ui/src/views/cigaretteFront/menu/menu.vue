@@ -1,86 +1,79 @@
-  <template >
-    <el-container class="fathercontainer">
-      <!-- 顶部导航栏 -->
-      <el-header :class="{ hidden: isNavHidden }" style="height: 70px; border-bottom: 0px solid;">
- 
-        <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect"
-           style="width: 100%;">
-          <el-menu-item index="1" @click="goto('cigaretteIndex')">首页</el-menu-item>
-          <el-submenu index="2">
-            <template slot="title"> 智慧监控 </template>
-            <el-menu-item index="2-1" @click="goto('carema')">查看监控</el-menu-item>
-            <el-menu-item index="2-2" @click="goto('personelInformation')">人车信息案底一览</el-menu-item>
-            <el-menu-item index="2-3" @click="goto('vehicleInformation')">车辆行踪预测一览</el-menu-item>
-          </el-submenu>
-          <el-submenu index="3">
-            <template slot="title">
-              预警中心
-            </template>
-            <el-menu-item index="3-1" @click="goto('uploadCaution')">上报预警效果</el-menu-item>
-            <el-menu-item index="3-2" @click="goto('uploadVehicle')">上报车辆信息</el-menu-item>
-            <el-menu-item index="3-3" @click="goto('uploadPersonnel')">上报人员信息</el-menu-item>
-            <el-menu-item index="3-4" @click="goto('uploadCase')">上报案例信息</el-menu-item>
-          </el-submenu>
-          <el-submenu index="4">
-            <template slot="title"> 人员文档 </template>
-            <el-menu-item index="4-1" @click="goto('notice')">通知公告</el-menu-item>
-            <el-menu-item index="4-2" @click="goto('document')">执行文档</el-menu-item>
-            <el-menu-item index="4-3" @click="goto('clockLog')">出勤信息</el-menu-item>
-            <el-menu-item index="4-4" @click="goto('dutyLog')">执勤信息</el-menu-item>
-            <el-menu-item index="4-5" @click="goto('feedBack')">反馈信息</el-menu-item>
-          </el-submenu>
-          <div class="right-menu">
-            <el-menu-item index="8" class="centered-login">
-              登录信息
-            </el-menu-item>
-            <el-menu-item index="9" class="centered-login" @click="goToLogin">
-              进入后台
-            </el-menu-item>
-          </div>
-        </el-menu>
-      </el-header>
-      <!-- 左侧边栏区域 -->
-      <el-container class="childrencontainer">
-
-        <!-- 内容主体区域 -->
-        <el-main style="width: 100%;min-height: 100%;margin: 0PX;padding: 0PX;">
-          <!-- 路由占位符 -->
-          <router-view></router-view>
-        </el-main>
-      </el-container>
-      <!-- 底部区域 -->
-      <el-footer style="height: 100px; ">
-        <!-- 第一行 -->
-        <!-- 第二行 -->
-        <div class="tworow">
-
-          <div>
-            占位
-          </div>
-          <div>
-            隐私
-          </div>
-          <div>备案</div>
-          <div>法律</div>
+<template>
+  <el-container class="fathercontainer">
+    <!-- 顶部导航栏 -->
+    <el-header :class="{ hidden: isNavHidden }" style="height: 70px; border-bottom: 0px solid;">
+      <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect"
+        style="width: 100%;">
+        <el-menu-item index="1" @click="goto('cigaretteIndex')">首页</el-menu-item>
+        <el-submenu index="2">
+          <template slot="title"> 智慧监控 </template>
+          <el-menu-item index="2-1" @click="goto('carema')">查看监控</el-menu-item>
+          <el-menu-item index="2-2" @click="goto('personelInformation')">人车信息案底一览</el-menu-item>
+          <el-menu-item index="2-3" @click="goto('vehicleInformation')">车辆行踪预测一览</el-menu-item>
+        </el-submenu>
+        <el-submenu index="3">
+          <template slot="title"> 预警中心 </template>
+          <el-menu-item index="3-1" @click="goto('uploadCaution')">上报预警效果</el-menu-item>
+          <el-menu-item index="3-2" @click="goto('uploadVehicle')">上报车辆信息</el-menu-item>
+          <el-menu-item index="3-3" @click="goto('uploadPersonnel')">上报人员信息</el-menu-item>
+          <el-menu-item index="3-4" @click="goto('uploadCase')">上报案例信息</el-menu-item>
+        </el-submenu>
+        <el-submenu index="4">
+          <template slot="title"> 人员文档 </template>
+          <el-menu-item index="4-1" @click="goto('notice')">通知公告</el-menu-item>
+          <el-menu-item index="4-2" @click="goto('document')">执行文档</el-menu-item>
+          <el-menu-item index="4-3" @click="goto('clockLog')">出勤信息</el-menu-item>
+          <el-menu-item index="4-4" @click="goto('dutyLog')">执勤信息</el-menu-item>
+          <el-menu-item index="4-5" @click="goto('feedBack')">反馈信息</el-menu-item>
+        </el-submenu>
+        <div class="right-menu">
+          <el-menu-item index="8" class="centered-login">
+            登录信息
+          </el-menu-item>
+          <el-menu-item index="9" class="centered-login" @click="goToLogin">
+            进入后台
+          </el-menu-item>
         </div>
-        <!-- 第三行 -->
-        <div class="threerow">
-          （版权号）
-        </div>
-      </el-footer>
-
+      </el-menu>
+    </el-header>
+    <!-- 左侧边栏区域 -->
+    <el-container class="childrencontainer">
+      <!-- 内容主体区域 -->
+      <el-main style="width: 100%; min-height: 100%; margin: 0; padding: 0; padding-top: 70px;">
+        <!-- 路由占位符 -->
+        <router-view></router-view>
+      </el-main>
     </el-container>
-  </template>
+    <!-- 底部区域 -->
+    <el-footer style="height: 100px;">
+      <!-- 第一行 -->
+      <!-- 第二行 -->
+      <div class="tworow">
+        <div>
+          占位
+        </div>
+        <div>
+          隐私
+        </div>
+        <div>备案</div>
+        <div>法律</div>
+      </div>
+      <!-- 第三行 -->
+      <div class="threerow">
+        （版权号）
+      </div>
+    </el-footer>
+  </el-container>
+</template>
 
 <script>
-// import { listNotice } from "@/api/system/notice";
 export default {
   name: 'Menu',
   data() {
     return {
       activeIndex: sessionStorage.getItem("activeIndex") || '4', // 假设默认选中第一个菜单项
       isNavHidden: false, // 初始状态为导航栏显示
-      lastScrollTop: 0,// 上次滚动位置
+      lastScrollTop: 0, // 上次滚动位置
       timeDifference: 0, // 初始时间差值为 0
       specifiedTime: new Date('2023-10-17T00:00:00').getTime(), // 指定时间
     }
@@ -119,11 +112,8 @@ export default {
       this.$router.push('/login');
     }
   },
-
-
 }
 </script>
-
 
 <style scoped>
 /* 总页布局 */
@@ -136,7 +126,6 @@ export default {
   min-height: 100%;
   background-size: 100%;
   background-attachment: fixed;
-
 }
 
 /* 顶部导航栏 */
@@ -194,9 +183,8 @@ export default {
   align-items: center;
 }
 
-
 .right-menu {
-  margin-left: 800px;
+  margin-left: auto;
 }
 
 .centered-menu .el-menu-item {
@@ -209,17 +197,15 @@ export default {
   width: 100%;
   margin: 0px;
   padding: 0PX;
-  margin-top: -50px;
-
-
+  margin-top: 0;
+  /* 移除负的 margin-top */
 }
 
 /* 展示区区域 */
 .el-main {
-
   z-index: 10;
-
-
+  padding-top: 70px;
+  /* 确保内容不会被导航栏覆盖 */
 }
 
 /* 底部区域 */
@@ -228,12 +214,10 @@ export default {
   margin: 0;
   padding: 0;
   background: #fbfbfb;
-
   color: #000;
 }
 
 .tworow {
-
   width: 100%;
   height: 70px;
   margin: 0;
@@ -261,7 +245,6 @@ export default {
 }
 
 .threerow {
-
   width: 100%;
   height: 30px;
   margin: 0;
