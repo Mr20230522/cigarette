@@ -238,6 +238,11 @@ export default {
       // 存储所选用户信息
       selectedUser: null,
       detectionOptions: [], // 初始化检测点选项
+      defaultProps: {
+        children: 'children',
+        label: 'label'
+      },
+      treeData : [],
       // 表单校验
       rules: {
         userId: [{

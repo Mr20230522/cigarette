@@ -100,29 +100,58 @@
       </el-col>
     </el-row>
     <!-- 添加或修改文档对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="原文件名" prop="fileName">
+    <el-dialog :title="title" :visible.sync="open" width="50%" append-to-body style="margin-top: 100px;">
+      <el-form ref="form" :model="form" :rules="rules" label-width="140px">
+        <el-row>
+          <el-col :sapn="12">
+            <el-form-item label="原文件名" prop="fileName">
           <el-input v-model="form.fileName" placeholder="请输入原文件名" />
         </el-form-item>
+          </el-col>
+          <el-col :sapn="12">
+            <el-form-item label="上传后文件名" prop="uploadFileName">
+          <el-input v-model="form.uploadFileName" placeholder="请输入上传后文件名" />
+        </el-form-item>
+          </el-col>
+        </el-row>
+
+
         <el-form-item label="上传后文件路径" prop="uploadPath">
           <file-upload v-model="form.uploadPath" />
         </el-form-item>
-        <el-form-item label="上传后文件名" prop="uploadFileName">
-          <el-input v-model="form.uploadFileName" placeholder="请输入上传后文件名" />
-        </el-form-item>
-        <el-form-item label="转换pdf路径" prop="pdfPath">
+
+        
+        <el-row>
+          <el-col :sapn="12">
+            <el-form-item label="转换pdf路径" prop="pdfPath">
           <el-input v-model="form.pdfPath" placeholder="请输入转换pdf路径" />
         </el-form-item>
-        <el-form-item label="转换pdf文件名" prop="pdfName">
+          </el-col>
+          <el-col :sapn="12">
+            <el-form-item label="转换pdf文件名" prop="pdfName">
           <el-input v-model="form.pdfName" placeholder="请输入转换pdf文件名" />
         </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :sapn="12">
+            <el-form-item label="预览URL" prop="previewUrl">
+          <el-input v-model="form.previewUrl" placeholder="请输入预览URL" />
+        </el-form-item>
+          </el-col>
+          <el-col :sapn="12">
+            <el-form-item label="转换pdf文件名" prop="pdfName">
+          <el-input v-model="form.pdfName" placeholder="请输入转换pdf文件名" />
+        </el-form-item>
+          </el-col>
+        </el-row>
+
+
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" placeholder="请输入备注" />
         </el-form-item>
-        <el-form-item label="预览URL" prop="previewUrl">
-          <el-input v-model="form.previewUrl" placeholder="请输入预览URL" />
-        </el-form-item>
+
         <el-form-item label="监测区域id" prop="detectionId">
           <el-input v-model="form.detectionId" placeholder="请输入监测区域id" />
         </el-form-item>
@@ -165,6 +194,11 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      defaultProps: {
+        children: 'children',
+        label: 'label'
+      },
+      treeData : [],
       // 查询参数
       queryParams: {
         pageNum: 1,

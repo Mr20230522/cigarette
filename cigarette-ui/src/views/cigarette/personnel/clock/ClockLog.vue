@@ -106,33 +106,75 @@
       </el-col>
     </el-row>
     <!-- 添加或修改出勤记录对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="50%" append-to-body style="margin-top: 100px;">
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="检测人员id" prop="inspectorId">
-          <el-input v-model="form.inspectorId" placeholder="请输入检测人员id" />
+        <el-form-item label="搜索用户">
+          <el-input v-model="searchInput" @input="filterUsers" placeholder="请输入用户名称、邮箱或电话号码" clearable
+            suffix-icon="el-icon-search"></el-input>
+          <el-scrollbar wrap-class="scrollbar-wrapper" style="max-height: auto;">
+            <el-card class="user-list">
+              <el-row v-for="(user, index) in filteredUsers" :key="index" class="user-info"
+                :class="{ 'bg-color': index % 2 === 1, 'selected': user === selectedUser }">
+                <el-col :span="24">
+                  <span @click="selectUser(user)" class="label" style="cursor:pointer;">用户名称:{{ user.username
+                    }}&nbsp;&nbsp;电话号码:{{ user.phonenumber }}&nbsp;&nbsp;邮箱:{{ user.email }}
+                  </span>
+                </el-col>
+              </el-row>
+            </el-card>
+          </el-scrollbar>
         </el-form-item>
-        <el-form-item label="值班日期" prop="dutyDate">
-          <el-date-picker clearable v-model="form.dutyDate" type="date" value-format="yyyy-MM-dd" placeholder="请选择值班日期">
-          </el-date-picker>
+        <el-row>
+          <el-col :span="12"> 
+            <el-form-item label="监测人员" prop="leader">
+          <el-input :disabled="true" v-model="form.leader" placeholder="请在上方搜索人员" />
         </el-form-item>
-        <el-form-item label="开始时间" prop="startTime">
+          </el-col>
+          <el-col :span="12"> 
+            <el-form-item label="联系电话" prop="phone">
+          <el-input :disabled="true" v-model="form.phone" placeholder="请在上方搜索人员" />
+        </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="开始时间" prop="startTime">
           <el-date-picker clearable v-model="form.startTime" type="date" value-format="yyyy-MM-dd"
             placeholder="请选择开始时间">
           </el-date-picker>
         </el-form-item>
+          </el-col>
+          <el-col :span="12">
         <el-form-item label="结束时间" prop="endTime">
           <el-date-picker clearable v-model="form.endTime" type="date" value-format="yyyy-MM-dd" placeholder="请选择结束时间">
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="删除标记" prop="delFlag">
-          <el-input v-model="form.delFlag" placeholder="请输入删除标记" />
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="值班日期" prop="dutyDate">
+          <el-date-picker clearable v-model="form.dutyDate" type="date" value-format="yyyy-MM-dd" placeholder="请选择值班日期">
+          </el-date-picker>
         </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="出勤有误" prop="flag">
+          <el-select v-model="form.flag" placeholder="请输入出勤有误">
+            <el-option v-for="dict in dict.type.tob_clock_correct" :key="dict.value" :label="dict.label"
+              :value="dict.value"></el-option>
+          </el-select>
+        </el-form-item>
+          </el-col>
+        </el-row>
+
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
-        <el-form-item label="出勤有误" prop="flag">
-          <el-input v-model="form.flag" placeholder="请输入出勤有误" />
-        </el-form-item>
+
+ 
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -146,11 +188,12 @@
 import { listLog, getLog, delLog, addLog, updateLog } from "@/api/cigarette/personnel/clockLog";
 import { listDistrict } from "@/api/cigarette/detection/district";
 import { listDetection } from "@/api/cigarette/detection/detection"; 
+import {  listUser,} from "@/api/system/user";
 
 export default {
-  name: "Log",
+  name: "ClockLog",
 
-  dicts: ['tob_clock_correct',],
+  dicts: ['tob_clock_correct'],
   data() {
     return {
       treeData:[],
@@ -172,6 +215,22 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      searchInput: '',
+      userIdList: [],
+      filteredUsers: [],
+      selectedUser: null,
+            // 表单参数
+            form: {
+        // 搜索人
+        // 存储搜索信息
+        searchInput: '',
+        // 存储用户信息
+        userIdList: [],
+        // 存储根据搜索条件过滤后的用户列表数据
+        filteredUsers: [],
+        // 存储所选用户信息
+        selectedUser: null,
+      },
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -221,8 +280,39 @@ export default {
     this.getList();
     this.loadDetectionOptions(); // 加载检测点选项
     this.loadDistrictOptions(); // 加载地区选项
+        this.getUserList();
+  },
+  mounted() {
+    this.filteredUsers = [];
   },
   methods: {
+    getUserList() {
+      this.loading = true;
+      listUser({
+        pageNum: null,
+        pageSize: 100000
+      }).then(response => {
+        // 获取到用户信息后，保存原始用户列表数据
+        this.userIdList = response.rows.map(user => {
+          return {
+            username: user.nickName,
+            phonenumber: user.phonenumber,
+            email: user.email,
+          };
+        });
+      }).catch(error => {
+        console.error('Failed to fetch user list:', error);
+      })
+        .finally(() => {
+          this.loading = false;
+        });
+
+      listStaff(this.queryParams).then(response => {
+        this.staffList = response.rows;
+        this.total = response.total;
+        this.loading = false;
+      });
+    },
     //加载地区选项
     loadDistrictOptions() {
       listDistrict().then(response => {
@@ -434,7 +524,36 @@ export default {
       this.download('cigarette/personnel/clockLog/export', {
         ...this.queryParams
       }, `log_${new Date().getTime()}.xlsx`)
-    }
+    },
+     // 选择数据化进行数据填充
+     filterUsers() {
+      const searchInput = this.searchInput.toLowerCase().trim();
+      if (!searchInput) {
+        // 如果搜索条件为空，不显示任何用户
+        this.filteredUsers = [];
+        return;
+      }
+      this.filteredUsers = this.userIdList.filter(user => {
+        // 在用户名 邮箱和电话号码中进行搜索匹配
+        return (
+          user.username.toLowerCase().includes(searchInput) ||
+          user.email.toString().includes(searchInput) ||
+          user.phonenumber.toString().includes(searchInput)
+        );
+      }).slice(0, 10);
+    },
+    // 搜索用户并筛选数据
+    selectUser(user) {
+      // 将所选用户信息存储到 selectedUser 变量中
+      this.selectedUser = user;
+      // 更新表单数据
+      this.$set(this.form, "email", user.email);
+      this.$set(this.form, "leader", user.username);
+      this.$set(this.form, "phone", user.phonenumber);
+      // 清空搜索输入框和搜索结果
+      this.searchInput = '';
+      this.filteredUsers = [];
+    },
   }
 };
 </script>
