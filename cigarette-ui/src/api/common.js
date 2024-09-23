@@ -1,10 +1,10 @@
 import request from '@/utils/request'
 
-
-// 删除
-export function deleteImage(fileName) {
+// 删除图片
+export function deleteImage(data) {
   return request({
-    url: '/common/common/' + fileName,
-    method: 'delete'
+    url: '/common/delete',
+    method: 'post',
+    data: data
   })
 }
