@@ -45,6 +45,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="status != null  and status != ''"> and status = #{status}</if>
             <if test="casesInvolved != null "> and cases_Involved = #{casesInvolved}</if>
             <if test="picture != null  and picture != ''"> and picture = #{picture}</if>
+            and del_flag = '0'
         </where>
     </select>
 
@@ -122,8 +123,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteTobPersonBySuspectIds" parameterType="String">
-        delete from tob_person where suspect_id in
-        <foreach item="suspectId" collection="array" open="(" separator="," close=")">
+        update tob_person set del_flag = '1' where suspect_id in
+        <foreach collection="array" item="suspectId" open="(" separator="," close=")">
             #{suspectId}
         </foreach>
     </delete>

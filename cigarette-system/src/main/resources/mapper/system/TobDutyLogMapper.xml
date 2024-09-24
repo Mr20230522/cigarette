@@ -35,8 +35,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="videoId != null "> and video_id = #{videoId}</if>
             <if test="behavior != null  and behavior != ''"> and behavior = #{behavior}</if>
             <if test="workFlag != null  and workFlag != ''"> and work_flag = #{workFlag}</if>
-             <if test="detectionId != null "> and detection_id = #{detectionId}</if>
-              <if test="districtId != null "> and district_id = #{districtId}</if>
+            <if test="detectionId != null "> and detection_id = #{detectionId}</if>
+            <if test="districtId != null "> and district_id = #{districtId}</if>
+            and del_flag = '0'
         </where>
     </select>
     
@@ -103,7 +104,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteTobDutyLogByDutyIds" parameterType="String">
-        delete from tob_duty_log where duty_id in 
+        update tob_duty_log set del_flag = '1' where duty_id in
         <foreach item="dutyId" collection="array" open="(" separator="," close=")">
             #{dutyId}
         </foreach>

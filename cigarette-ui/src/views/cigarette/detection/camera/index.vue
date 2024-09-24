@@ -139,11 +139,6 @@
                             <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.status" />
                         </template>
                     </el-table-column>
-                    <el-table-column label="删除标记" align="center" prop="delFlag">
-                        <template slot-scope="scope">
-                            <dict-tag :options="dict.type.tob_del_flag" :value="scope.row.delFlag" />
-                        </template>
-                    </el-table-column>
                     <el-table-column label="备注" align="center" prop="remark" />
                     <el-table-column label="所属地区" align="center" prop="districtId">
                         <template slot-scope="scope">
@@ -151,7 +146,7 @@
                             {{ getDistrictName(scope.row.districtId) }}
                         </template>
                     </el-table-column>
-                    <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+                    <el-table-column label="操作" align="center" class-name="small-padding fixed-width"  width="100px">
                         <template slot-scope="scope">
                             <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                                 v-hasPermi="['camera:camera:edit']">修改</el-button>
@@ -375,7 +370,6 @@ export default {
                 status: null,
                 detectionName: null,
                 districtId: null,
-                delFlag: null,
             },
             // 表单参数
             form: {
@@ -431,9 +425,6 @@ export default {
                 ],
                 status: [
                     { required: true, message: "状态不能为空", trigger: "change" }
-                ],
-                delFlag: [
-                    { required: true, message: "删除标记不能为空", trigger: "blur" }
                 ],
                 createTime: [
                     { required: true, message: "创建时间不能为空", trigger: "blur" }
@@ -623,7 +614,6 @@ export default {
                 cameraGroupIndication: null,
                 cameraApplicationType: null,
                 status: null,
-                delFlag: null,
                 remark: null,
                 createTime: null,
                 updateTime: null,

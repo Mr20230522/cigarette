@@ -133,7 +133,7 @@
       <el-table-column label="联系方式" align="center" prop="contactInfo" />
       <el-table-column label="部门ID" align="center" prop="deptId" />
       <el-table-column label="值班类型" align="center" prop="dutyType" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="100">
         <template slot-scope="scope">
           <el-button
             size="mini"

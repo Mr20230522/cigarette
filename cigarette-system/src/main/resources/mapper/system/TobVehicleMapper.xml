@@ -41,6 +41,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="illegalStatus != null  and illegalStatus != ''"> and illegal_status = #{illegalStatus}</if>
             <if test="status != null  and status != ''"> and status = #{status}</if>
             <if test="picture != null  and picture != ''"> and picture = #{picture}</if>
+            and del_flag = '0'
         </where>
     </select>
 
@@ -112,7 +113,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteTobVehicleByCarIds" parameterType="String">
-        delete from tob_vehicle where car_id in
+        update tob_vehicle set del_flag = '1' where car_id in
         <foreach item="carId" collection="array" open="(" separator="," close=")">
             #{carId}
         </foreach>
