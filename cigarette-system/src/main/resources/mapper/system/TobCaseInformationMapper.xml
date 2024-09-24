@@ -59,7 +59,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectTobCaseInformationVo">
-        select case_id, case_code, case_name, case_start_date, case_end_date, case_value, incident_location, behavior_id, case_source, case_type, case_status, main_charge, secondary_charge, main_case_details, entry_date, del_flag, remark, case_user_id, staff_id, degree_of_case,detection_id,district_id from tob_case_information
+        select case_id, case_code, case_name, case_start_date, case_end_date, case_value, incident_location, behavior_id, case_source, case_type, case_status, main_charge, secondary_charge, main_case_details, entry_date, remark, case_user_id, staff_id, degree_of_case,detection_id,district_id from tob_case_information
     </sql>
 
     <select id="selectTobCaseInformationList" parameterType="TobCaseInformation" resultMap="TobCaseInformationResult">
@@ -82,6 +82,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="caseUserId != null "> and case_user_id = #{caseUserId}</if>
             <if test="StaffId != null "> and staff_id = #{staffId}</if>
             <if test="degreeOfCase != null "> and degree_of_case = #{degreeOfCase}</if>
+            and del_flag = '0'
             <if test="detectionId != null "> and detection_id = #{detectionId}</if>
             <if test="districtId != null "> and district_id = #{districtId}</if>
         </where>
@@ -132,7 +133,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="degreeOfCase != null "> and a.degree_of_case = #{degreeOfCase}</if>
             <if test="caseUserName != null "> and b.user_name LIKE CONCAT('%', #{caseUserName}, '%') </if>
             <if test="licensePlate != null "> and g.license_plate LIKE CONCAT('%', #{licensePlate}, '%')</if>
-
+            and a.del_flag = '0'
             <if test="detectionId != null "> and a.detection_id = #{detectionId}</if>
             <if test="districtId != null "> and a.district_id = #{districtId}</if>
         </where>
@@ -185,7 +186,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="caseUserId != null">#{caseUserId},</if>
             <if test="staffId != null">#{staffId},</if>
             <if test="degreeOfCase != null">#{degreeOfCase},</if>
-            <if test="detectionId != null ">#{detectionId}</if>
+            <if test="detectionId != null ">#{detectionId},</if>
             <if test="districtId != null ">#{districtId}</if>
          </trim>
     </insert>
@@ -223,8 +224,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteTobCaseInformationByCaseIds" parameterType="String">
-        delete from tob_case_information where case_id in 
-        <foreach item="caseId" collection="array" open="(" separator="," close=")">
+        update tob_case_information set del_flag = '1' where case_id in
+        <foreach item="caseId" collection="caseIds" open="(" separator="," close=")">
             #{caseId}
         </foreach>
     </delete>
