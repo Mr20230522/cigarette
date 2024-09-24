@@ -1,165 +1,186 @@
 <template>
-    <div class="feedback" @mouseenter="showText = true" @mouseleave="showText = false">
-      <el-popover :visible="visible" trigger="click" placement="left" :width="510">
+  <div class="feedback" @mouseenter="showText = true" @mouseleave="showText = false">
+    <el-popover :visible="visible" trigger="click" placement="left" :width="510" @hide="resetForm">
 
-        <div class="feedback-content" @dragover="handleDragOver" @drop="handleDrop">
-          <header class="flex">
-            <strong>反馈中心</strong>
-            <el-link type="primary" @click="toJiraPage"><strong>我的反馈</strong></el-link>
-          </header>
-          <hr style="margin: 10px 0 0 -13px; border-top: 1px solid #dbdbdb" />
-          <section style="height: 639px; overflow-y: auto;">
-            <p style="margin-top: 10px; letter-spacing: 1px"><strong>尊敬的用户：</strong></p>
-            <p style="letter-spacing: 1px; text-indent: 4ch">感谢您提供诚挚的建议，我们将尽快帮您处理解决。</p>
-            <el-form
-                ref="refForm"
-                :model="fromData"
-                :rules="fromRules"
-                label-position="top"
-                size="large"
-                style="margin-top: 20px"
-                class="from-content"
+      <div class="feedback-content" @dragover="handleDragOver" @drop="handleDrop">
+        <header class="flex">
+          <strong>反馈中心</strong>
+          <el-link type="primary" v-if="!isMyFeed" @click="toJiraPage"><strong>我的反馈</strong></el-link>
+          <el-link type="primary" v-else @click="toJiraPage"><strong>去反馈</strong></el-link>
+        </header>
+        <hr style="margin: 10px 0 0 -13px; border-top: 1px solid #dbdbdb"/>
+        <section v-if="!isMyFeed" style="height: 80%; overflow-y: auto;">
+          <p style="margin-top: 10px; letter-spacing: 1px"><strong>尊敬的用户：</strong></p>
+          <p style="letter-spacing: 1px; text-indent: 4ch">感谢您提供诚挚的建议，我们将尽快帮您处理解决。</p>
+          <el-form
+            ref="refForm"
+            :model="fromData"
+            :rules="fromRules"
+            label-position="top"
+            size="large"
+            style="margin-top: 20px"
+            class="from-content"
+          >
+            <el-form-item
+              label="问题类型"
+              prop="question_type"
+              :rules="[{ required: true, message: '请选择问题类型', trigger: 'change' }]"
             >
+              <el-radio-group v-model="fromData.question_type">
+                <el-radio-button label="1" value="1">功能异常</el-radio-button>
+                <el-radio-button label="2" value="2">安全问题</el-radio-button>
+                <el-radio-button label="3" value="3">体验问题</el-radio-button>
+                <el-radio-button label="4" value="4">功能建议</el-radio-button>
+                <el-radio-button label="5" value="5">其它</el-radio-button>
+              </el-radio-group>
+            </el-form-item>
 
+            <el-form-item
+              label="问题描述"
+              prop="question_content"
+              :rules="[{ required: true, message: '请填写问题描述', trigger: 'blur' }]"
+            >
+              <el-input v-model="fromData.question_content" type="textarea" :rows="3"></el-input>
+            </el-form-item>
 
-              <!--<el-form-item-->
-              <!--    label="问题类型"-->
-              <!--    prop="issueType"-->
-              <!--    :rules="{ required: true, message: '请选择问题类型', trigger: ['blur', 'change'] }"-->
-              <!--&gt;-->
-              <!--  <el-radio-group v-model="fromData.issueType">-->
-              <!--    <el-radio-button-->
-              <!--        v-for="dict in dict.type.question_type"-->
-              <!--        :key="dict.value"-->
-              <!--        :label="dict.value"-->
-              <!--    >-->
-              <!--      {{ dict.label }}-->
-              <!--    </el-radio-button>-->
-              <!--  </el-radio-group>-->
-              <!--</el-form-item>-->
+            <el-form-item
+              label="问题所在页面和截图"
+              prop="in_page"
+              :rules="[{ required: true, message: '请填写问题所在页面', trigger: 'blur' }]"
+            >
+              <el-input v-model="fromData.in_page"></el-input>
+            </el-form-item>
 
+            <el-upload
+              action="#"
+              list-type="picture-card"
+              :auto-upload="false"
+              :on-remove="handleRemove"
+              :file-list="fromData.file_paths"
+            >
+              <i class="el-icon-plus"></i>
+            </el-upload>
 
-              <el-form-item
-                  label="问题类型"
-                  prop="issueType"
-                  :rules="{ required: true, message: '请选择问题类型', trigger: ['blur', 'change'] }"
+            <el-form-item
+              label="问题优先级"
+              prop="priority"
+              :rules="[{ required: true, message: '请选择问题优先级', trigger: 'change' }]"
+            >
+              <el-radio-group size="small" v-model="fromData.priority">
+                <el-radio label="低" class="priority-low">低</el-radio>
+                <el-radio label="中" class="priority-medium">中</el-radio>
+                <el-radio label="高" class="priority-high">高</el-radio>
+              </el-radio-group>
+            </el-form-item>
+
+            <el-form-item
+              label="联系方式"
+              prop="creator_phone_number"
+              :rules="[
+        { required: true, message: '请填写联系方式', trigger: 'blur' },
+        { validator: validatePhone, trigger: 'blur' }
+      ]"
+            >
+              <el-input v-model="fromData.creator_phone_number"></el-input>
+            </el-form-item>
+
+            <div class="btn-row">
+              <el-button class="btn-row-left" type="default" size="small" round @click="reset">重 置</el-button>
+              <!--<el-button class="btn-row-left" type="default" size="small" round @click="close">暂 存</el-button>-->
+              <el-button
+                class="btn-row-right"
+                size="small"
+                type="primary"
+                round
+                :disabled="loading"
+                @click="handleSubmit(refForm)"
               >
-                <el-radio-group v-model="fromData.question_type">
-                  <el-radio-button label="1">功能异常</el-radio-button>
-                  <el-radio-button label="2">安全问题</el-radio-button>
-                  <el-radio-button label="3">体验问题</el-radio-button>
-                  <el-radio-button label="4">功能建议</el-radio-button>
-                  <el-radio-button label="5">其它</el-radio-button>
-                </el-radio-group>
-              </el-form-item>
+                提 交
+              </el-button>
+            </div>
+          </el-form>
+        </section>
+        <section v-else style="height: 80%; overflow-y: auto;">
+          <p style="margin-top: 10px; letter-spacing: 1px"><strong>尊敬的用户：</strong></p>
+          <p style="letter-spacing: 1px; text-indent: 4ch">感谢您提供诚挚的建议，我们将尽快帮您处理解决。</p>
 
+        </section>
+        <div class="dot"></div>
+      </div>
 
-              <el-form-item label="问题描述" prop="description">
-                <el-input v-model="fromData.question_content" type="textarea" :rows="4"></el-input>
-              </el-form-item>
-
-              <el-form-item label="问题所在页面" prop="summary">
-                <el-input v-model="fromData.in_page"></el-input>
-              </el-form-item>
-
-              <el-upload
-                  action="none"
-                  list-type="picture-card"
-                  :auto-upload="false"
-                  :before-upload="beforeAvatarUpload"
-                  :on-exceed="handleExceed"
-                  :file-list="fromData.file_paths"
-                  :on-preview="handlePictureCardPreview"
-              >
-                <i class="el-icon-plus"></i>
-                <template slot-scope="{ file }">
-                  <div>
-                    <img class="el-upload-list__item-thumbnail" :src="file.url" alt="" />
-                    <span class="el-upload-list__item-actions">
-                    <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(file)">
-                      <i class="el-icon-zoom-in"></i>
-                    </span>
-                    <span v-if="!disabled" class="el-upload-list__item-delete" @click="handleRemove(file)">
-                      <i class="el-icon-delete"></i>
-                    </span>
-                  </span>
-                  </div>
-                </template>
-              </el-upload>
-
-              <el-form-item label="问题优先级" prop="summary">
-                <el-input v-model="fromData.priority"></el-input>
-              </el-form-item>
-
-              <el-form-item label="联系方式" prop="summary">
-                <el-input v-model="fromData.creator_phone_number"></el-input>
-              </el-form-item>
-
-              <div class="btn-row">
-                <el-button class="btn-row-left" type="default" size="small" round @click="close">取 消</el-button>
-                <el-button
-                    class="btn-row-right"
-                    size="small"
-                    type="primary"
-                    round
-                    :disabled="loading"
-                    @click="handleSubmit(refForm)"
-                >
-                  提 交
-                </el-button>
-              </div>
-            </el-form>
-          </section>
-          <div class="dot"></div>
+      <div slot="reference">
+        <div v-if="visible" class="line"></div>
+        <div v-else class="slot-content" @click="this.visible = true">
+          <!--<i class="el-icon-chat-line-square feedback-icon"></i>-->
+          <!--<div v-if="showText" class="feedback-text">意见反馈</div>-->
+          <div class="feedback-text">意见反馈</div>
         </div>
+      </div>
+    </el-popover>
 
-        <div slot="reference">
-          <div v-if="visible" class="line"></div>
-          <div v-else class="slot-content" @click="this.visible = true">
-            <!--<i class="el-icon-chat-line-square feedback-icon"></i>-->
-            <!--<div v-if="showText" class="feedback-text">意见反馈</div>-->
-            <div class="feedback-text">意见反馈</div>
-          </div>
-        </div>
-      </el-popover>
-
-      <el-dialog v-model="dialogVisible">
-        <img :src="dialogImageUrl" alt="Preview Image" style="width: 100%" />
-      </el-dialog>
-    </div>
-
+    <!--<el-dialog :visible.sync="dialogVisible">-->
+    <!--  <img :src="dialogImageUrl" width="100%" />-->
+    <!--</el-dialog>-->
+  </div>
 </template>
 
 <script>
 
 export default {
-  dicts:['question_type'],
+  dicts: ['question_type'],
   data() {
     return {
+      isMyFeed: false,
       showText: false,
       visible: false,
-      loading: false,
       dialogImageUrl: '',
       dialogVisible: false,
       feedbackType: [], // 模拟问题类型
+      disabled: false,
       fromData: {
-        issueType: '', // 问题类型
-        summary: '', // 概要
-        description: '', // 描述
-        imgs: [] // 图片
+        question_type: '',
+        question_content: '',
+        in_page: '',
+        file_paths: [],
+        priority: '',
+        creator_phone_number: ''
       },
       fromRules: {
-        issueType: [{ required: true, message: '请选择问题类型', trigger: 'blur' }],
-        summary: [{ required: true, message: '请输入概要', trigger: 'blur' }],
-        description: [{ required: true, message: '请输入描述', trigger: 'blur' }]
+        question_type: [
+          {required: true, message: '请选择问题类型', trigger: 'change'}
+        ],
+        question_content: [
+          {required: true, message: '请填写问题描述', trigger: 'blur'}
+        ],
+        in_page: [
+          {required: true, message: '请填写问题所在页面', trigger: 'blur'}
+        ],
+        priority: [
+          {required: true, message: '请选择问题优先级', trigger: 'change'}
+        ],
+        creator_phone_number: [
+          {required: true, message: '请填写联系方式', trigger: 'blur'},
+          {validator: this.validatePhone, trigger: 'blur'}
+        ]
       },
-      disabled: false
+      loading: false
     };
   },
   created() {
-    this.feedbackType = ['功能异常','安全问题']
+    this.feedbackType = ['功能异常', '安全问题']
   },
   methods: {
+    // 验证电话号码
+    validatePhone(rule, value, callback) {
+      const phoneRegex = /^(?:\d{3,4}-)?\d{7,8}$|^(1[3-9]\d{9})$/; // 手机或座机的正则表达式
+      if (!value) {
+        callback(new Error('请输入电话号码'));
+      } else if (!phoneRegex.test(value)) {
+        callback(new Error('请输入有效的电话号码'));
+      } else {
+        callback();
+      }
+    },
     handleDragOver(event) {
       event.preventDefault();
     },
@@ -194,6 +215,7 @@ export default {
     },
     toJiraPage() {
       // 跳转到反馈页面
+      this.isMyFeed = !this.isMyFeed
     },
     handleSubmit(formEl) {
       if (!formEl) return;
@@ -209,17 +231,17 @@ export default {
 
           // 调用 API 提交反馈
           submitFeedback(fd)
-              .then((res) => {
-                if (res.code === 200) {
-                  this.$message.success('反馈成功，感谢您的关注！');
-                  this.visible = false;
-                  this.resetForm();
-                } else {
-                  this.$message.error('反馈失败:' + res.message);
-                }
-              })
-              .catch((e) => this.$message.error('反馈失败:' + e))
-              .finally(() => (this.loading = false));
+            .then((res) => {
+              if (res.code === 200) {
+                this.$message.success('反馈成功，感谢您的关注！');
+                this.visible = false;
+                this.resetForm();
+              } else {
+                this.$message.error('反馈失败:' + res.message);
+              }
+            })
+            .catch((e) => this.$message.error('反馈失败:' + e))
+            .finally(() => (this.loading = false));
         } else {
           return false;
         }
@@ -227,20 +249,24 @@ export default {
     },
     resetForm() {
       this.fromData = {
-        issueType: '',
-        summary: '',
-        description: '',
-        imgs: []
+        question_type: '',
+        question_content: '',
+        in_page: '',
+        file_paths: [],
+        priority: '',
+        creator_phone_number: ''
       };
     },
-    close() {
-      this.visible = false;
-      this.showText = false;
+    reset() {
+      // this.visible = false;
+      // this.showText = false;
       this.resetForm();
     },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
+      console.log("图片出来了");
+      console.log(this.dialogImageUrl);
     },
     handleRemove(file) {
       const index = this.fromData.imgs.findIndex((f) => f.uid === file.uid);
@@ -271,7 +297,7 @@ export default {
 }
 
 .feedback-content {
-  height: 699px;
+  height: 82%;
   position: relative;
 }
 
@@ -398,4 +424,16 @@ export default {
   color: #4c7cee;
 }
 
+/* 使用深度选择器修改字体颜色 */
+::v-deep .priority-low .el-radio__label {
+  color: green;
+}
+
+::v-deep .priority-medium .el-radio__label {
+  color: orange;
+}
+
+::v-deep .priority-high .el-radio__label {
+  color: red;
+}
 </style>
