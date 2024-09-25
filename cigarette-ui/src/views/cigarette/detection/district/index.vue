@@ -36,7 +36,7 @@
 
     <el-table v-if="refreshTable" v-loading="loading" :data="districtList" row-key="districtId"
       :default-expand-all="isExpandAll" :tree-props="{ children: 'children', hasChildren: 'hasChildren' }">
-      <el-table-column label="地区名称" align="center" prop="districtName" />
+      <el-table-column label="地区名称" align="center" prop="districtName" min-width="120px"  />
       <el-table-column label="显示顺序" align="center" prop="orderNum" />
       <el-table-column label="负责人" align="center" prop="leader" />
       <el-table-column label="联系电话" align="center" prop="phone" />
@@ -47,7 +47,7 @@
         </template>
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="150px" >
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
             v-hasPermi="['cigarette:district:edit']">修改</el-button>

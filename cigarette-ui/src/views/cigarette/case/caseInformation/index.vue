@@ -13,7 +13,7 @@
           </el-tree>
         </div>
       </el-col>
-      <!-- 摄像头数据 -->
+      <!-- 案件数据 -->
       <el-col :span="20" :xs="24">
         <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch"
           label-width="68px">
@@ -34,8 +34,8 @@
             <el-input v-model="queryParams.incidentLocation" placeholder="请输入案发地点" clearable
               @keyup.enter.native="handleQuery" />
           </el-form-item>
-          <el-form-item label="检查人员姓名" prop="inspectorName">
-            <el-input v-model="queryParams.inspectorName" placeholder="请输入案件检查人员姓名" clearable
+          <el-form-item label="检查人员姓名" prop="staffName">
+            <el-input v-model="queryParams.staffrName" placeholder="请输入案件检查人员姓名" clearable
               @keyup.enter.native="handleQuery" />
           </el-form-item>
           <el-form-item label="录入人员姓名" prop="caseUserName">
@@ -156,12 +156,17 @@
               <span>{{ parseTime(scope.row.entryDate, '{y}-{m}-{d}') }}</span>
             </template>
           </el-table-column>
+          <el-table-column label="监测点" align="center" prop="detectionId">
+            <template slot-scope="scope">
+              {{ getDetectionName(scope.row.detectionId) }}
+            </template>
+          </el-table-column>
           <el-table-column label="备注" align="center" prop="remark" width="100" />
-          <el-table-column label="检查人员编号" align="center" prop="inspectorId" width="100" />
-          <el-table-column label="检查人员姓名" align="center" prop="inspectorName" width="100" />
+          <el-table-column label="检查人员编号" align="center" prop="staffId" width="100" />
+          <el-table-column label="检查人员姓名" align="center" prop="staffName" width="100" />
           <el-table-column label="录入人员编号" align="center" prop="caseUserId" width="100" />
           <el-table-column label="录入人员姓名" align="center" prop="caseUserName" width="100" />
-          <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+          <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="100">
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                 v-hasPermi="['case:caseInformation:edit']">修改</el-button>
@@ -191,9 +196,9 @@
                         :class="{ 'bg-color': index % 2 === 1, 'selected': behavior === selectedBehavior }">
                         <el-col :span="24">
                           <span @click="selectBehavior(behavior)" class="label" style="cursor:pointer;">行为ID:{{
-      behavior.behaviorId }}&nbsp;&nbsp;车辆编号:{{ behavior.carId }}&nbsp;&nbsp;车牌编号:{{
-      behavior.licensePlate }}&nbsp;&nbsp;驾驶员ID:{{ behavior.driverId }}&nbsp;&nbsp;驾驶员姓名:{{
-      behavior.driverName }}
+                            behavior.behaviorId }}&nbsp;&nbsp;车辆编号:{{ behavior.carId }}&nbsp;&nbsp;车牌编号:{{
+                            behavior.licensePlate }}&nbsp;&nbsp;驾驶员ID:{{ behavior.driverId }}&nbsp;&nbsp;驾驶员姓名:{{
+                            behavior.driverName }}
                           </span>
                         </el-col>
                       </el-row>
@@ -248,9 +253,6 @@
           </el-col>
         </el-card>
       </el-row>
-
-
-
       <el-row>
         <el-card>
           <el-col :span="16">
@@ -274,8 +276,8 @@
                 </el-form-item>
                 <el-row>
                   <el-col :span="12">
-                    <el-form-item label="检测人员编号" prop="inspectorId">
-                      <el-input :disabled="true" v-model="form.inspectorId" placeholder="案件检测人员编号" />
+                    <el-form-item label="检测人员编号" prop="staffId">
+                      <el-input :disabled="true" v-model="form.staffId" placeholder="案件检测人员编号" />
                     </el-form-item>
                   </el-col>
                   <el-col :span="12">
@@ -373,6 +375,13 @@
                   <el-input clearable v-model="form.incidentLocation" type="textarea"
                     :autosize="{ minRows: 3, maxRows: 5}" placeholder="请输入案发地点" />
                 </el-form-item> -->
+                <el-form-item label="检测点" prop="detectionId">
+                  <el-select v-model="form.detectionId" placeholder="请选择所管理的监测点" filterable
+                    @change="handleDetectionChange">
+                    <el-option v-for="item in detectionOptions" :key="item.detectionId"
+                      :label="getDetectionName(item.detectionId)" :value="item.detectionId"></el-option>
+                  </el-select>
+                </el-form-item>
                 <el-form-item label="案发地点" prop="incidentLocation">
                   <el-cascader v-model="selectedRegion" :options="pcaTextArr" placeholder="请选择地区" clearable
                     @change="handleRegionChange" />
@@ -387,9 +396,6 @@
           </el-col>
         </el-card>
       </el-row>
-
-
-
       <el-row>
         <el-card>
           <el-form ref="form" :model="form" :rules="rules" label-width="110px">
@@ -414,7 +420,7 @@
             </el-row>
 
             <el-form-item label="案情描述" prop="mainCaseDetails">
-              <el-input v-model="form.mainCaseDetails" type="textarea" :autosize="{ minRows: 3, maxRows: 6}"
+              <el-input v-model="form.mainCaseDetails" type="textarea" :autosize="{ minRows: 3, maxRows: 6 }"
                 placeholder="请输入内容" />
             </el-form-item>
           </el-form>
@@ -443,7 +449,6 @@ import {
 import {
   listVehicleBehaviorVo
 } from "@/api/cigarette/vehicle/vehicleBehavior";
-
 import { listDistrict } from "@/api/cigarette/detection/district";
 import { listDetection } from "@/api/cigarette/detection/detection";
 import { pcaTextArr } from "element-china-area-data";
@@ -520,7 +525,10 @@ export default {
       filteredBehaviors: [],
       // 存储所选用户信息
       selectedBehavior: null,
-      treeData:[],
+      districts: [],
+      detections: [],
+      detectionOptions: [],    //json数组，用于存储检测点选项
+      treeData: [],
       defaultProps: {
         children: "children",
         label: "label"
@@ -634,6 +642,24 @@ export default {
         console.error("Failed to load detection options:", error);
       });
     },
+    // 当检测点变更时触发，自动填充地区ID
+    handleDetectionChange(newValue) {
+      // 通过检测点ID找到对应的地区ID
+      const selectedDetection = this.detectionOptions.find(item => item.detectionId === newValue);
+      if (selectedDetection) {
+        // 将地区ID填充到表单的districtId字段
+        this.form.districtId = selectedDetection.districtId;
+      }
+    },
+    getDistrictName(districtId) {
+      const district = this.districtOptions.find(item => item.districtId === districtId);
+      return district ? district.districtName : '未知地区';
+    },
+    // 根据 detectionId 获取监测点名字
+    getDetectionName(detectionId) {
+      const detection = this.detectionOptions.find(item => item.detectionId === detectionId)
+      return detection ? detection.detectionName : '未知监测点';
+    },
     async getList() {
       try {
         const districtsResponse = await listDistrict();
@@ -706,11 +732,11 @@ export default {
 
       // 如果有多个 detectionId，循环发送请求并合并结果
       if (detectionIds.length > 1) {
-        this.cameraList = [];
+        this.caseInformationList = [];
         detectionIds.forEach(async (id) => {
           this.queryParams.detectionId = id;
-          const response = await listCamera(this.queryParams);
-          this.cameraList.push(...response.rows);
+          const response = await listCaseInformationVo(this.queryParams);
+          this.caseInformationList.push(...response.rows);
         });
       } else {
         // 只有一个 detectionId，直接发送请求
@@ -759,7 +785,7 @@ export default {
         delFlag: null,
         remark: null,
         caseUserId: null,
-        inspectorId: null,
+        staffId: null,
         degreeOfCase: null,
       };
       this.resetForm("form");
@@ -834,6 +860,8 @@ export default {
         if (valid) {
           // 再次确保在提交前合并地区和详细地址
           this.form.incidentLocation = `${this.selectedRegion.join(' ')} ${this.form.incidentDetail}`;
+          console.log("this.form");
+          console.log(this.form);
           if (this.form.caseId != null) {
             updateCaseInformation(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");
@@ -931,7 +959,7 @@ export default {
       // 将所选用户信息存储到 selectedUser1变量中
       this.selectedUser1 = user1;
       // 更新表单数据
-      this.$set(this.form, "inspectorId", user1.id);
+      this.$set(this.form, "staffId", user1.id);
       this.$set(this.form, "name1", user1.username);
       this.$set(this.form, "phone1", user1.phonenumber);
     },

@@ -131,7 +131,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="车型" prop="carTypeId">
-              <el-select v-model="queryParams.carTypeId" placeholder="请选择车型" clearable>
+              <el-select v-model="form.carTypeId" placeholder="请选择车型" clearable>
           <el-option v-for="dict in dict.type.tob_vehicle_type" :key="dict.value" :label="dict.label"
             :value="dict.value" />
         </el-select>
@@ -282,7 +282,7 @@
           carTypeId: [{
             required: true,
             message: "车型不能为空",
-            trigger: "blur"
+            trigger: "change"
           }],
           carColor: [{
             required: true,

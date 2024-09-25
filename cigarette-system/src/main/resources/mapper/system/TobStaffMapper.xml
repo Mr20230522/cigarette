@@ -42,6 +42,7 @@
             <if test="detectionId != null ">and detection_id = #{detectionId}</if>
             <if test="districtId != null ">and district_id = #{districtId}</if>
             <if test="picture != null  and picture != ''">and picture = #{picture}</if>
+            and del_flag = '0'
         </where>
     </select>
 
@@ -95,13 +96,12 @@
     </update>
 
     <delete id="deleteTobStaffByStaffId" parameterType="Long">
-        delete
-        from tob_staff
-        where staff_id = #{staffId}
+        update tob_staff set del_flag = '1' where staff_id = #{staffId}
     </delete>
 
     <delete id="deleteTobStaffByStaffIds" parameterType="String">
-        delete from tob_staff where staff_id in
+        update tob_staff set del_flag = '1'
+        where staff_id in
         <foreach item="staffId" collection="array" open="(" separator="," close=")">
             #{staffId}
         </foreach>

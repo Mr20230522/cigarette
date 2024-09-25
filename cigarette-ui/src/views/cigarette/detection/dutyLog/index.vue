@@ -17,8 +17,8 @@
       <el-col :span="20" :xs="24">
         <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch"
           label-width="68px">
-          <el-form-item label="监测人员id" prop="inspectorId">
-            <el-input v-model="queryParams.inspectorId" placeholder="请输入监测人员id" clearable
+          <el-form-item label="监测人员id" prop="staffId">
+            <el-input v-model="queryParams.staffId" placeholder="请输入监测人员id" clearable
               @keyup.enter.native="handleQuery" />
           </el-form-item>
           <el-form-item label="执勤有误" prop="flag">
@@ -61,7 +61,7 @@
         <el-table v-loading="loading" :data="dutyLogList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="55" align="center" />
           <el-table-column label="执勤ID" align="center" prop="dutyId" />
-          <el-table-column label="监测人员id" align="center" prop="inspectorId" />
+          <el-table-column label="监测人员id" align="center" prop="staffId" />
           <el-table-column label="执勤时间" align="center" prop="dutyTime" width="180">
             <template slot-scope="scope">
               <span>{{ parseTime(scope.row.dutyTime, '{y}-{m}-{d}') }}</span>
@@ -73,11 +73,16 @@
               <dict-tag :options="dict.type.tob_clock_correct" :value="scope.row.flag" />
             </template>
           </el-table-column>
+          <el-table-column label="监测点" align="center" prop="detectionId">
+            <template slot-scope="scope">
+              {{ getDetectionName(scope.row.detectionId) }}
+            </template>
+          </el-table-column>
           <el-table-column label="图片id" align="center" prop="keyPictureId" />
           <el-table-column label="视频id" align="center" prop="videoId" />
           <el-table-column label="行为" align="center" prop="behavior" />
           <el-table-column label="是否工作" align="center" prop="workFlag" />
-          <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+          <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="120px" >
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                 v-hasPermi="['detection:dutyLog:edit']">修改</el-button>
@@ -112,8 +117,8 @@
         </el-form-item>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="监测人员ID" prop="leader">
-              <el-input :disabled="true" v-model="form.leader" placeholder="请在上方搜索人员" />
+            <el-form-item label="执勤人员" prop="username">
+              <el-input :disabled="true" v-model="form.username" placeholder="请在上方搜索人员" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -151,9 +156,24 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="行为编号" prop="behavior">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="行为编号" prop="behavior">
           <el-input v-model="form.behavior" placeholder="请输入行为编号" />
         </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="检测点" prop="detectionId">
+                  <el-select v-model="form.detectionId" placeholder="请选择所管理的监测点" filterable
+                    @change="handleDetectionChange">
+                    <el-option v-for="item in detectionOptions" :key="item.detectionId"
+                      :label="getDetectionName(item.detectionId)" :value="item.detectionId"></el-option>
+                  </el-select>
+                </el-form-item>
+          </el-col>
+        </el-row>
+
+
 
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
@@ -174,7 +194,7 @@ import { listDutyLog, getDutyLog, delDutyLog, addDutyLog, updateDutyLog } from "
 import { listDistrict } from "@/api/cigarette/detection/district";
 import { listDetection } from "@/api/cigarette/detection/detection";
 import { listUser, } from "@/api/system/user";
-import { listStaff } from "@/api/cigarette/personnel/staff"; // 导入工作人员列表接口
+
 
 export default {
   name: "DutyLog",
@@ -199,37 +219,31 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      searchInput: '',
-      userIdList: [],
-      filteredUsers: [],
-      selectedUser: null,
-      defaultProps: {
-        children: 'children',
-        label: 'label'
-      },
       // 表单参数
-      form: {
-        // 搜索人
-        // 存储搜索信息
-        searchInput: '',
-        // 存储用户信息
-        userIdList: [],
-        // 存储根据搜索条件过滤后的用户列表数据
-        filteredUsers: [],
-        // 存储所选用户信息
-        selectedUser: null,
-      },
+      form: {},
+      // 搜索人
+      // 存储搜索信息
+      searchInput: '',
+      // 存储用户信息
+      userIdList: [],
+      // 存储根据搜索条件过滤后的用户列表数据
+      filteredUsers: [],
+      // 存储所选用户信息
+      selectedUser: null,
+      districts: [],
+      detections: [],
+      detectionOptions: [],    //json数组，用于存储检测点选项
       defaultProps: {
         children: 'children',
         label: 'label'
       },
-      treeData : [],
-      
+      treeData: [],
+
       // 查询参数
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        inspectorId: null,
+        staffId: null,
         dutyTime: null,
         flag: null,
         keyPictureId: null,
@@ -241,14 +255,11 @@ export default {
       form: {},
       // 表单校验
       rules: {
-        inspectorId: [
+        staffId: [
           { required: true, message: "监测人员id不能为空", trigger: "blur" }
         ],
         dutyTime: [
           { required: true, message: "执勤时间不能为空", trigger: "blur" }
-        ],
-        delFlag: [
-          { required: true, message: "删除标记不能为空", trigger: "change" }
         ],
         createTime: [
           { required: true, message: "创建时间不能为空", trigger: "blur" }
@@ -284,6 +295,7 @@ export default {
             username: user.nickName,
             phonenumber: user.phonenumber,
             email: user.email,
+            staffId:user.userId,
           };
         });
       }).catch(error => {
@@ -292,12 +304,6 @@ export default {
         .finally(() => {
           this.loading = false;
         });
-
-      listStaff(this.queryParams).then(response => {
-        this.staffList = response.rows;
-        this.total = response.total;
-        this.loading = false;
-      });
     },
     //加载地区选项
     loadDistrictOptions() {
@@ -321,6 +327,24 @@ export default {
       }).catch(error => {
         console.error("Failed to load detection options:", error);
       });
+    },   
+     // 当检测点变更时触发，自动填充地区ID
+    handleDetectionChange(newValue) {
+      // 通过检测点ID找到对应的地区ID
+      const selectedDetection = this.detectionOptions.find(item => item.detectionId === newValue);
+      if (selectedDetection) {
+        // 将地区ID填充到表单的districtId字段
+        this.form.districtId = selectedDetection.districtId;
+      }
+    },
+    getDistrictName(districtId) {
+      const district = this.districtOptions.find(item => item.districtId === districtId);
+      return district ? district.districtName : '未知地区';
+    },
+    // 根据 detectionId 获取监测点名字
+    getDetectionName(detectionId) {
+      const detection = this.detectionOptions.find(item => item.detectionId === detectionId)
+      return detection ? detection.detectionName : '未知监测点';
     },
     async getList() {
       try {
@@ -394,11 +418,11 @@ export default {
 
       // 如果有多个 detectionId，循环发送请求并合并结果
       if (detectionIds.length > 1) {
-        this.cameraList = [];
+        this.dutyLogList = [];
         detectionIds.forEach(async (id) => {
           this.queryParams.detectionId = id;
-          const response = await listCamera(this.queryParams);
-          this.cameraList.push(...response.rows);
+          const response = await listDutyLog(this.queryParams);
+          this.dutyLogList.push(...response.rows);
         });
       } else {
         // 只有一个 detectionId，直接发送请求
@@ -430,9 +454,9 @@ export default {
     reset() {
       this.form = {
         dutyId: null,
-        inspectorId: null,
+        staffId: null,
         dutyTime: null,
-        delFlag: null,
+
         remark: null,
         createTime: null,
         updateTime: null,
@@ -526,6 +550,7 @@ export default {
           user.username.toLowerCase().includes(searchInput) ||
           user.email.toString().includes(searchInput) ||
           user.phonenumber.toString().includes(searchInput)
+          
         );
       }).slice(0, 10);
     },
@@ -535,8 +560,9 @@ export default {
       this.selectedUser = user;
       // 更新表单数据
       this.$set(this.form, "email", user.email);
-      this.$set(this.form, "leader", user.username);
+      this.$set(this.form, "username", user.username);
       this.$set(this.form, "phone", user.phonenumber);
+      this.form.staffId = user.staffId;
       // 清空搜索输入框和搜索结果
       this.searchInput = '';
       this.filteredUsers = [];
@@ -544,3 +570,14 @@ export default {
   }
 };
 </script>
+
+<style>
+.bg-color {
+  background-color: #f0f0f0;
+}
+
+.selected {
+  background-color: #d0e8f2;
+  /* 天蓝色背景 */
+}
+</style>
