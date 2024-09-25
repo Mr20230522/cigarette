@@ -12,6 +12,10 @@
         <section v-if="!isMyFeed" style="height: 80%; overflow-y: auto;">
           <p style="margin-top: 10px; letter-spacing: 1px"><strong>尊敬的用户：</strong></p>
           <p style="letter-spacing: 1px; text-indent: 4ch">感谢您提供诚挚的建议，我们将尽快帮您处理解决。</p>
+
+
+
+
           <el-form
             ref="refForm"
             :model="fromData"
@@ -44,13 +48,14 @@
             </el-form-item>
 
             <el-form-item
-              label="问题所在页面和截图"
+              label="问题所在页面(如:预警中控、执勤记录)和截图"
               prop="in_page"
               :rules="[{ required: true, message: '请填写问题所在页面', trigger: 'blur' }]"
             >
               <el-input v-model="fromData.in_page"></el-input>
             </el-form-item>
 
+            <!--<image-upload v-model="fromData.file_paths" />-->
             <el-upload
               action="#"
               list-type="picture-card"
@@ -99,6 +104,9 @@
               </el-button>
             </div>
           </el-form>
+
+
+
         </section>
         <section v-else style="height: 80%; overflow-y: auto;">
           <p style="margin-top: 10px; letter-spacing: 1px"><strong>尊敬的用户：</strong></p>
