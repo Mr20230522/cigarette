@@ -139,11 +139,6 @@
                             <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.status" />
                         </template>
                     </el-table-column>
-                    <el-table-column label="删除标记" align="center" prop="delFlag">
-                        <template slot-scope="scope">
-                            <dict-tag :options="dict.type.tob_del_flag" :value="scope.row.delFlag" />
-                        </template>
-                    </el-table-column>
                     <el-table-column label="备注" align="center" prop="remark" />
                     <el-table-column label="所属地区" align="center" prop="districtId">
                         <template slot-scope="scope">
@@ -151,7 +146,7 @@
                             {{ getDistrictName(scope.row.districtId) }}
                         </template>
                     </el-table-column>
-                    <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+                    <el-table-column label="操作" align="center" class-name="small-padding fixed-width"  width="100px">
                         <template slot-scope="scope">
                             <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                                 v-hasPermi="['camera:camera:edit']">修改</el-button>
@@ -165,8 +160,8 @@
             </el-col>
         </el-row>
         <!-- 表单 -->
-        <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
-            <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-dialog :title="title" :visible.sync="open" width="60%" append-to-body>
+            <el-form ref="form" :model="form" :rules="rules" label-width="120px">
                 <el-row :gutter="20">
                     <el-col :span="12">
                         <el-form-item label="摄像头ip" prop="cameraIp">
@@ -245,23 +240,7 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-row :gutter="20">
-                    <el-col :span="7">
-                        <el-form-item label="经度" prop="longitude">
-                            <el-input v-model="form.longitude" placeholder="请输入经度" />
-                        </el-form-item>
-                    </el-col>
-                    <el-col :span="7">
-                        <el-form-item label="纬度" prop="latitude">
-                            <el-input v-model="form.latitude" placeholder="请输入纬度" />
-                        </el-form-item>
-                    </el-col>
-                    <el-col :span="2">
-                        <el-form-item>
-                            <el-button type="primary" plain @click="getLocation">获取经纬度</el-button>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
+
                 <el-row :gutter="20">
                     <el-col :span="12">
                         <el-form-item label="摄像头类型" prop="cameraType">
@@ -296,25 +275,27 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-row :gutter="20">
-                    <el-col :span="12">
-                        <el-form-item label="删除标记" prop="delFlag">
-                            <el-select v-model="form.delFlag" placeholder="请选择删除标记">
-                                <el-option v-for="dict in dict.type.tob_del_flag" :key="dict.value" :label="dict.label"
-                                    :value="dict.value">
-                                </el-option>
-                            </el-select>
+ 
+                <el-row  >
+                    <el-col :span="4">
+                        <el-form-item>
+                            <el-button type="primary" plain @click="getLocation">获取经纬度</el-button>
                         </el-form-item>
                     </el-col>
-                    <el-col :span="12">
-                        <!-- <el-form-item label="监测点所属地区ID" prop="districtId">
-              <el-input v-model="form.districtId" :disabled="true" placeholder="选择监测点以填入所属地区ID" />
-            </el-form-item> -->
-                        <el-form-item label="备注" prop="remark">
-                            <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+                    <el-col :span="9">
+                        <el-form-item label="经度" prop="longitude">
+                            <el-input v-model="form.longitude" placeholder="请输入经度" />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="9">
+                        <el-form-item label="纬度" prop="latitude">
+                            <el-input v-model="form.latitude" placeholder="请输入纬度" />
                         </el-form-item>
                     </el-col>
                 </el-row>
+                        <el-form-item label="备注" prop="remark">
+                            <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+                        </el-form-item>
 
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -365,6 +346,7 @@ export default {
                 children: 'children',
                 label: 'label'
             },
+            detectionOptions:[],    //json数组，用于存储检测点选项
             loading: true,
             // 查询参数
             queryParams: {
@@ -388,7 +370,6 @@ export default {
                 status: null,
                 detectionName: null,
                 districtId: null,
-                delFlag: null,
             },
             // 表单参数
             form: {
@@ -444,9 +425,6 @@ export default {
                 ],
                 status: [
                     { required: true, message: "状态不能为空", trigger: "change" }
-                ],
-                delFlag: [
-                    { required: true, message: "删除标记不能为空", trigger: "blur" }
                 ],
                 createTime: [
                     { required: true, message: "创建时间不能为空", trigger: "blur" }
@@ -636,7 +614,6 @@ export default {
                 cameraGroupIndication: null,
                 cameraApplicationType: null,
                 status: null,
-                delFlag: null,
                 remark: null,
                 createTime: null,
                 updateTime: null,

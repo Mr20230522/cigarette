@@ -7,7 +7,7 @@ function resolve(dir) {
 
 const CompressionPlugin = require('compression-webpack-plugin')
 
-const name = process.env.VUE_APP_TITLE || '若依管理系统' // 网页标题
+const name = process.env.VUE_APP_TITLE || '无证运输烟叶违法行为监管有效性研究与应用管理系统' // 网页标题
 
 const port = process.env.port || process.env.npm_config_port || 80 // 端口
 
@@ -57,6 +57,9 @@ module.exports = {
       alias: {
         '@': resolve('src')
       }
+    },
+    externals: {
+      'AMap': 'AMap'
     },
     plugins: [
       // http://doc.ruoyi.vip/ruoyi-vue/other/faq.html#使用gzip解压缩静态文件

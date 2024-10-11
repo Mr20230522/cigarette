@@ -105,6 +105,11 @@
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="涉案数" align="center" prop="casesInvolved" />
+      <el-table-column label="车员图片" align="center" prop="picture" width="100">
+        <template slot-scope="scope">
+          <image-preview :src="scope.row.picture" :width="50" :height="50" />
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="120px">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
@@ -115,7 +120,7 @@
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize"
+    <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize"
       @pagination="getList" />
 
     <!-- 添加或修改驾驶人员对话框 -->
@@ -174,6 +179,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
+
             <el-form-item label="涉案数" prop="casesInvolved">
               <el-input v-model="form.casesInvolved" placeholder="请输入涉案数" />
             </el-form-item>
@@ -205,6 +211,9 @@
           <el-input v-model="form.faceFeature" placeholder="请输入人脸特征编码" />
         </el-form-item>
 
+        <el-form-item label="车员图片" prop="picture">
+          <image-upload v-model="form.picture" />
+        </el-form-item>
 
         <el-form-item label="地址" prop="address">
           <el-input v-model="form.address" placeholder="请输入地址" />
@@ -226,200 +235,202 @@
 </template>
 
 <script>
-  import {
-    listPerson,
-    getPerson,
-    delPerson,
-    addPerson,
-    updatePerson
-  } from "@/api/cigarette/personnel/person";
+import {
+  listPerson,
+  getPerson,
+  delPerson,
+  addPerson,
+  updatePerson
+} from "@/api/cigarette/personnel/person";
 
-  export default {
-    name: "Person",
-    dicts: ['tob_illegal_status', 'sys_show_hide', 'sys_normal_disable', 'sys_user_sex'],
-    data() {
-      return {
-        // 遮罩层
-        loading: true,
-        // 选中数组
-        ids: [],
-        // 非单个禁用
-        single: true,
-        // 非多个禁用
-        multiple: true,
-        // 显示搜索条件
-        showSearch: true,
-        // 总条数
-        total: 0,
-        // 驾驶人员表格数据
-        personList: [],
-        // 弹出层标题
-        title: "",
-        // 是否显示弹出层
-        open: false,
-        // 查询参数
-        queryParams: {
-          pageNum: 1,
-          pageSize: 10,
-          identityCard: null,
-          faceFeature: null,
-          phone: null,
-          suspectLicenseNumber: null,
-          name: null,
-          age: null,
-          gender: null,
-          address: null,
-          occurrenceNumber: null,
-          illegalStatus: null,
-          status: null,
-          casesInvolved: null
-        },
-        // 表单参数
-        form: {},
-        // 表单校验
-        rules: {
-          identityCard: [{
-            required: true,
-            message: "身份证ID不能为空",
-            trigger: "blur"
-          }],
-          name: [{
-            required: true,
-            message: "姓名不能为空",
-            trigger: "blur"
-          }],
-          status: [{
-            required: true,
-            message: "状态不能为空",
-            trigger: "change"
-          }],
-          delFlag: [{
-            required: true,
-            message: "删除标记不能为空",
-            trigger: "blur"
-          }],
-          createTime: [{
-            required: true,
-            message: "创建时间不能为空",
-            trigger: "blur"
-          }],
-          updateTime: [{
-            required: true,
-            message: "更新时间不能为空",
-            trigger: "blur"
-          }],
-        }
-      };
+export default {
+  name: "Person",
+  dicts: ['tob_illegal_status', 'sys_show_hide', 'sys_normal_disable', 'sys_user_sex'],
+  data() {
+    return {
+      // 遮罩层
+      loading: true,
+      // 选中数组
+      ids: [],
+      // 非单个禁用
+      single: true,
+      // 非多个禁用
+      multiple: true,
+      // 显示搜索条件
+      showSearch: true,
+      // 总条数
+      total: 0,
+      // 驾驶人员表格数据
+      personList: [],
+      // 弹出层标题
+      title: "",
+      // 是否显示弹出层
+      open: false,
+      // 查询参数
+      queryParams: {
+        pageNum: 1,
+        pageSize: 10,
+        identityCard: null,
+        faceFeature: null,
+        phone: null,
+        suspectLicenseNumber: null,
+        name: null,
+        age: null,
+        gender: null,
+        address: null,
+        occurrenceNumber: null,
+        illegalStatus: null,
+        status: null,
+        casesInvolved: null,
+        picture: null
+      },
+      // 表单参数
+      form: {},
+      // 表单校验
+      rules: {
+        identityCard: [{
+          required: true,
+          message: "身份证ID不能为空",
+          trigger: "blur"
+        }],
+        name: [{
+          required: true,
+          message: "姓名不能为空",
+          trigger: "blur"
+        }],
+        status: [{
+          required: true,
+          message: "状态不能为空",
+          trigger: "change"
+        }],
+        delFlag: [{
+          required: true,
+          message: "删除标记不能为空",
+          trigger: "blur"
+        }],
+        createTime: [{
+          required: true,
+          message: "创建时间不能为空",
+          trigger: "blur"
+        }],
+        updateTime: [{
+          required: true,
+          message: "更新时间不能为空",
+          trigger: "blur"
+        }],
+      }
+    };
+  },
+  created() {
+    this.getList();
+  },
+  methods: {
+    /** 查询驾驶人员列表 */
+    getList() {
+      this.loading = true;
+      listPerson(this.queryParams).then(response => {
+        this.personList = response.rows;
+        this.total = response.total;
+        this.loading = false;
+      });
     },
-    created() {
+    // 取消按钮
+    cancel() {
+      this.open = false;
+      this.reset();
+    },
+    // 表单重置
+    reset() {
+      this.form = {
+        suspectId: null,
+        identityCard: null,
+        faceFeature: null,
+        phone: null,
+        suspectLicenseNumber: null,
+        name: null,
+        age: null,
+        gender: null,
+        address: null,
+        occurrenceNumber: null,
+        illegalStatus: null,
+        status: null,
+        delFlag: null,
+        remark: null,
+        createTime: null,
+        updateTime: null,
+        casesInvolved: null,
+        picture: null
+      };
+      this.resetForm("form");
+    },
+    /** 搜索按钮操作 */
+    handleQuery() {
+      this.queryParams.pageNum = 1;
       this.getList();
     },
-    methods: {
-      /** 查询驾驶人员列表 */
-      getList() {
-        this.loading = true;
-        listPerson(this.queryParams).then(response => {
-          this.personList = response.rows;
-          this.total = response.total;
-          this.loading = false;
-        });
-      },
-      // 取消按钮
-      cancel() {
-        this.open = false;
-        this.reset();
-      },
-      // 表单重置
-      reset() {
-        this.form = {
-          suspectId: null,
-          identityCard: null,
-          faceFeature: null,
-          phone: null,
-          suspectLicenseNumber: null,
-          name: null,
-          age: null,
-          gender: null,
-          address: null,
-          occurrenceNumber: null,
-          illegalStatus: null,
-          status: null,
-          delFlag: null,
-          remark: null,
-          createTime: null,
-          updateTime: null,
-          casesInvolved: null
-        };
-        this.resetForm("form");
-      },
-      /** 搜索按钮操作 */
-      handleQuery() {
-        this.queryParams.pageNum = 1;
-        this.getList();
-      },
-      /** 重置按钮操作 */
-      resetQuery() {
-        this.resetForm("queryForm");
-        this.handleQuery();
-      },
-      // 多选框选中数据
-      handleSelectionChange(selection) {
-        this.ids = selection.map(item => item.suspectId)
-        this.single = selection.length !== 1
-        this.multiple = !selection.length
-      },
-      /** 新增按钮操作 */
-      handleAdd() {
-        this.reset();
+    /** 重置按钮操作 */
+    resetQuery() {
+      this.resetForm("queryForm");
+      this.handleQuery();
+    },
+    // 多选框选中数据
+    handleSelectionChange(selection) {
+      this.ids = selection.map(item => item.suspectId)
+      this.single = selection.length !== 1
+      this.multiple = !selection.length
+    },
+    /** 新增按钮操作 */
+    handleAdd() {
+      this.reset();
+      this.open = true;
+      this.title = "添加驾驶人员";
+    },
+    /** 修改按钮操作 */
+    handleUpdate(row) {
+      this.reset();
+      const suspectId = row.suspectId || this.ids
+      getPerson(suspectId).then(response => {
+        this.form = response.data;
         this.open = true;
-        this.title = "添加驾驶人员";
-      },
-      /** 修改按钮操作 */
-      handleUpdate(row) {
-        this.reset();
-        const suspectId = row.suspectId || this.ids
-        getPerson(suspectId).then(response => {
-          this.form = response.data;
-          this.open = true;
-          this.title = "修改驾驶人员";
-        });
-      },
-      /** 提交按钮 */
-      submitForm() {
-        this.$refs["form"].validate(valid => {
-          if (valid) {
-            if (this.form.suspectId != null) {
-              updatePerson(this.form).then(response => {
-                this.$modal.msgSuccess("修改成功");
-                this.open = false;
-                this.getList();
-              });
-            } else {
-              addPerson(this.form).then(response => {
-                this.$modal.msgSuccess("新增成功");
-                this.open = false;
-                this.getList();
-              });
-            }
+        this.title = "修改驾驶人员";
+      });
+    },
+    /** 提交按钮 */
+    submitForm() {
+      this.$refs["form"].validate(valid => {
+        if (valid) {
+          if (this.form.suspectId != null) {
+            updatePerson(this.form).then(response => {
+              this.$modal.msgSuccess("修改成功");
+              this.open = false;
+              this.getList();
+            });
+          } else {
+            addPerson(this.form).then(response => {
+              this.$modal.msgSuccess("新增成功");
+              this.open = false;
+              this.getList();
+            });
           }
-        });
-      },
-      /** 删除按钮操作 */
-      handleDelete(row) {
-        const suspectIds = row.suspectId || this.ids;
-        this.$modal.confirm('是否确认删除驾驶人员编号为"' + suspectIds + '"的数据项？').then(function() {
-          return delPerson(suspectIds);
-        }).then(() => {
-          this.getList();
-          this.$modal.msgSuccess("删除成功");
-        }).catch(() => {});
-      },
-      /** 导出按钮操作 */
-      handleExport() {
-        this.download('cigarette/personnel/person/export', {
-          ...this.queryParams
-        }, `person_${new Date().getTime()}.xlsx`)
-      }
+        }
+      });
+    },
+    /** 删除按钮操作 */
+    handleDelete(row) {
+      const suspectIds = row.suspectId || this.ids;
+      this.$modal.confirm('是否确认删除驾驶人员编号为"' + suspectIds + '"的数据项？').then(function () {
+        return delPerson(suspectIds);
+      }).then(() => {
+        this.getList();
+        this.$modal.msgSuccess("删除成功");
+      }).catch(() => { });
+    },
+    /** 导出按钮操作 */
+    handleExport() {
+      this.download('cigarette/personnel/person/export', {
+        ...this.queryParams
+      }, `person_${new Date().getTime()}.xlsx`)
     }
-  };
+  }
+};
 </script>

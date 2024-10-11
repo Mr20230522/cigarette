@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobFeedbackMapper">
+
+    <resultMap type="TobFeedback" id="TobFeedbackResult">
+        <result property="id"    column="id"    />
+        <result property="creatorId"    column="creator_id"    />
+        <result property="creatorNickName"    column="creator_nick_name"    />
+        <result property="creatorUserName"    column="creator_user_name"    />
+        <result property="creatorPhoneNumber"    column="creator_phone_number"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="questionType"    column="question_type"    />
+        <result property="questionContent"    column="question_content"    />
+        <result property="inPage"    column="in_page"    />
+        <result property="filePaths"    column="file_paths"    />
+        <result property="priority"    column="priority"    />
+        <result property="status"    column="status"    />
+        <result property="solverId"    column="solver_id"    />
+        <result property="solverNickName"    column="solver_nick_name"    />
+        <result property="solverUserName"    column="solver_user_name"    />
+        <result property="solverPhoneNumber"    column="solver_phone_number"    />
+        <result property="solveTime"    column="solve_time"    />
+    </resultMap>
+
+    <sql id="selectTobFeedbackVo">
+        select id, creator_id, creator_nick_name, creator_user_name, creator_phone_number, create_time, question_type, question_content, in_page, file_paths, priority, status, solver_id, solver_nick_name, solver_user_name, solver_phone_number, solve_time from tob_feedback
+    </sql>
+
+    <select id="selectTobFeedbackList" parameterType="TobFeedback" resultMap="TobFeedbackResult">
+        <include refid="selectTobFeedbackVo"/>
+        <where>
+            <if test="creatorId != null "> and creator_id = #{creatorId}</if>
+            <if test="creatorNickName != null  and creatorNickName != ''"> and creator_nick_name like concat('%', #{creatorNickName}, '%')</if>
+            <if test="creatorUserName != null  and creatorUserName != ''"> and creator_user_name like concat('%', #{creatorUserName}, '%')</if>
+            <if test="creatorPhoneNumber != null  and creatorPhoneNumber != ''"> and creator_phone_number = #{creatorPhoneNumber}</if>
+            <if test="questionType != null "> and question_type = #{questionType}</if>
+            <if test="questionContent != null  and questionContent != ''"> and question_content = #{questionContent}</if>
+            <if test="inPage != null  and inPage != ''"> and in_page = #{inPage}</if>
+            <if test="filePaths != null  and filePaths != ''"> and file_paths = #{filePaths}</if>
+            <if test="priority != null "> and priority = #{priority}</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="solverId != null "> and solver_id = #{solverId}</if>
+            <if test="solverNickName != null  and solverNickName != ''"> and solver_nick_name like concat('%', #{solverNickName}, '%')</if>
+            <if test="solverUserName != null  and solverUserName != ''"> and solver_user_name like concat('%', #{solverUserName}, '%')</if>
+            <if test="solverPhoneNumber != null  and solverPhoneNumber != ''"> and solver_phone_number = #{solverPhoneNumber}</if>
+            <if test="solveTime != null "> and solve_time = #{solveTime}</if>
+        </where>
+    </select>
+
+    <select id="selectTobFeedbackById" parameterType="Long" resultMap="TobFeedbackResult">
+        <include refid="selectTobFeedbackVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertTobFeedback" parameterType="TobFeedback" useGeneratedKeys="true" keyProperty="id">
+        insert into tob_feedback
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="creatorId != null">creator_id,</if>
+            <if test="creatorNickName != null">creator_nick_name,</if>
+            <if test="creatorUserName != null and creatorUserName != ''">creator_user_name,</if>
+            <if test="creatorPhoneNumber != null">creator_phone_number,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="questionType != null">question_type,</if>
+            <if test="questionContent != null">question_content,</if>
+            <if test="inPage != null">in_page,</if>
+            <if test="filePaths != null">file_paths,</if>
+            <if test="priority != null">priority,</if>
+            <if test="status != null">status,</if>
+            <if test="solverId != null">solver_id,</if>
+            <if test="solverNickName != null">solver_nick_name,</if>
+            <if test="solverUserName != null">solver_user_name,</if>
+            <if test="solverPhoneNumber != null">solver_phone_number,</if>
+            <if test="solveTime != null">solve_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="creatorId != null">#{creatorId},</if>
+            <if test="creatorNickName != null">#{creatorNickName},</if>
+            <if test="creatorUserName != null and creatorUserName != ''">#{creatorUserName},</if>
+            <if test="creatorPhoneNumber != null">#{creatorPhoneNumber},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="questionType != null">#{questionType},</if>
+            <if test="questionContent != null">#{questionContent},</if>
+            <if test="inPage != null">#{inPage},</if>
+            <if test="filePaths != null">#{filePaths},</if>
+            <if test="priority != null">#{priority},</if>
+            <if test="status != null">#{status},</if>
+            <if test="solverId != null">#{solverId},</if>
+            <if test="solverNickName != null">#{solverNickName},</if>
+            <if test="solverUserName != null">#{solverUserName},</if>
+            <if test="solverPhoneNumber != null">#{solverPhoneNumber},</if>
+            <if test="solveTime != null">#{solveTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateTobFeedback" parameterType="TobFeedback">
+        update tob_feedback
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="creatorId != null">creator_id = #{creatorId},</if>
+            <if test="creatorNickName != null">creator_nick_name = #{creatorNickName},</if>
+            <if test="creatorUserName != null and creatorUserName != ''">creator_user_name = #{creatorUserName},</if>
+            <if test="creatorPhoneNumber != null">creator_phone_number = #{creatorPhoneNumber},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="questionType != null">question_type = #{questionType},</if>
+            <if test="questionContent != null">question_content = #{questionContent},</if>
+            <if test="inPage != null">in_page = #{inPage},</if>
+            <if test="filePaths != null">file_paths = #{filePaths},</if>
+            <if test="priority != null">priority = #{priority},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="solverId != null">solver_id = #{solverId},</if>
+            <if test="solverNickName != null">solver_nick_name = #{solverNickName},</if>
+            <if test="solverUserName != null">solver_user_name = #{solverUserName},</if>
+            <if test="solverPhoneNumber != null">solver_phone_number = #{solverPhoneNumber},</if>
+            <if test="solveTime != null">solve_time = #{solveTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTobFeedbackById" parameterType="Long">
+        delete from tob_feedback where id = #{id}
+    </delete>
+
+    <delete id="deleteTobFeedbackByIds" parameterType="String">
+        delete from tob_feedback where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

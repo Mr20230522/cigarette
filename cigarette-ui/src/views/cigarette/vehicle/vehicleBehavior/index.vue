@@ -113,6 +113,11 @@
               <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.status" />
             </template>
           </el-table-column>
+          <el-table-column label="监测点" align="center" prop="detectionId">
+            <template slot-scope="scope">
+              {{ getDetectionName(scope.row.detectionId) }}
+            </template>
+          </el-table-column>
           <el-table-column label="备注" align="center" prop="remark" />
           <el-table-column label="同伙id" align="center" prop="accompliceId" />
           <el-table-column label="同伙姓名" align="center" prop="name" min-width="120px" />
@@ -167,7 +172,7 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="车型" prop="carTypeId">
-              <el-select v-model="queryParams.carTypeId" placeholder="请选择车型" clearable>
+              <el-select v-model="form.carTypeId" placeholder="请选择车型" clearable>
                 <el-option v-for="dict in dict.type.tob_vehicle_type" :key="dict.value" :label="dict.label"
                   :value="dict.value" />
               </el-select>
@@ -180,10 +185,9 @@
           </el-col>
         </el-row>
 
-
-
+        <el-row>
+          <el-col :span="12">
         <el-form-item label="嫌疑程度" prop="degreeSuspicion">
-
           <template>
             <div class="block">
               <el-slider v-model="form.degreeSuspicion" show-input>
@@ -191,6 +195,17 @@
             </div>
           </template>
         </el-form-item>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item label="检测点" prop="detectionId">
+                    <el-select v-model="form.detectionId" placeholder="请选择所管理的监测点" filterable
+                        @change="handleDetectionChange">
+                        <el-option v-for="item in detectionOptions" :key="item.detectionId"
+                            :label="getDetectionName(item.detectionId)" :value="item.detectionId"></el-option>
+                    </el-select>
+                </el-form-item>
+              </el-col>
+            </el-row>
         <el-form-item label="搜索">
           <el-input v-model="searchInput" @input="filterUsers" placeholder="请输入驾驶员名称、ID 或电话号码" clearable
             suffix-icon="el-icon-search"></el-input>
@@ -343,6 +358,14 @@ export default {
       filteredCar: [],
       // 存储所选用户信息
       selectedCar: null,
+      defaultProps: {
+        children: 'children',
+        label: 'label'
+      },
+      districts: [],
+      detections: [],
+      detectionOptions: [],    //json数组，用于存储检测点选项
+      treeData : [],
       // 表单校验
       rules: {
         carId: [{
@@ -427,6 +450,24 @@ export default {
         console.error("Failed to load detection options:", error);
       });
     },
+        // 当检测点变更时触发，自动填充地区ID
+        handleDetectionChange(newValue) {
+      // 通过检测点ID找到对应的地区ID
+      const selectedDetection = this.detectionOptions.find(item => item.detectionId === newValue);
+      if (selectedDetection) {
+        // 将地区ID填充到表单的districtId字段
+        this.form.districtId = selectedDetection.districtId;
+      }
+    },
+    getDistrictName(districtId) {
+        const district = this.districtOptions.find(item => item.districtId === districtId);
+        return district ? district.districtName : '未知地区';
+    },
+      // 根据 detectionId 获取监测点名字
+      getDetectionName(detectionId) {
+        const detection = this.detectionOptions.find(item => item.detectionId === detectionId)
+        return detection ? detection.detectionName : '未知监测点';
+    },
     async getList() {
       try {
         const districtsResponse = await listDistrict();
@@ -499,11 +540,11 @@ export default {
 
       // 如果有多个 detectionId，循环发送请求并合并结果
       if (detectionIds.length > 1) {
-        this.cameraList = [];
+        this.vehicleBehaviorList = [];
         detectionIds.forEach(async (id) => {
           this.queryParams.detectionId = id;
-          const response = await listCamera(this.queryParams);
-          this.cameraList.push(...response.rows);
+          const response = await listVehicleBehaviorVo(this.queryParams);
+          this.vehicleBehaviorList.push(...response.rows);
         });
       } else {
         // 只有一个 detectionId，直接发送请求

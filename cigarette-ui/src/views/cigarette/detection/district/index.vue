@@ -36,7 +36,7 @@
 
     <el-table v-if="refreshTable" v-loading="loading" :data="districtList" row-key="districtId"
       :default-expand-all="isExpandAll" :tree-props="{ children: 'children', hasChildren: 'hasChildren' }">
-      <el-table-column label="地区名称" align="center" prop="districtName" />
+      <el-table-column label="地区名称" align="center" prop="districtName" min-width="120px"  />
       <el-table-column label="显示顺序" align="center" prop="orderNum" />
       <el-table-column label="负责人" align="center" prop="leader" />
       <el-table-column label="联系电话" align="center" prop="phone" />
@@ -47,7 +47,7 @@
         </template>
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="150px" >
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
             v-hasPermi="['cigarette:district:edit']">修改</el-button>
@@ -60,12 +60,21 @@
     </el-table>
 
     <!-- 添加或修改地区管理对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="50%" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="50%" append-to-body style="margin-top: 100px;">
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="地区名称" prop="districtName">
+        <el-row>
+          <el-col :span="12"> 
+            <el-form-item label="地区名称" prop="districtName">
           <el-input v-model="form.districtName" placeholder="请输入地区名称" />
         </el-form-item>
-        <el-form-item label="搜索">
+          </el-col>
+          <el-col :span="12"> 
+            <el-form-item label="显示顺序" prop="orderNum">
+          <el-input-number v-model="form.orderNum" controls-position="right" :min="0" />
+        </el-form-item>
+          </el-col>
+        </el-row>
+            <el-form-item label="搜索用户">
           <el-input v-model="searchInput" @input="filterUsers" placeholder="请输入用户名称、邮箱或电话号码" clearable
             suffix-icon="el-icon-search"></el-input>
           <el-scrollbar wrap-class="scrollbar-wrapper" style="max-height: auto;">
@@ -82,25 +91,36 @@
           </el-scrollbar>
         </el-form-item>
 
-        <el-form-item label="负责人" prop="leader">
+        <el-row>
+          <el-col :span="12"> 
+            <el-form-item label="负责人" prop="leader">
           <el-input :disabled="true" v-model="form.leader" placeholder="请在上方搜索人员" />
         </el-form-item>
-        <el-form-item label="联系电话" prop="phone">
+          </el-col>
+          <el-col :span="12"> 
+            <el-form-item label="联系电话" prop="phone">
           <el-input :disabled="true" v-model="form.phone" placeholder="请在上方搜索人员" />
         </el-form-item>
-        <el-form-item label="邮箱" prop="email">
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="12"> 
+            <el-form-item label="邮箱" prop="email">
           <el-input :disabled="true" v-model="form.email" placeholder="请在上方搜索人员" />
         </el-form-item>
-        <el-form-item label="显示顺序" prop="orderNum">
-          <el-input-number v-model="form.orderNum" controls-position="right" :min="0" />
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
+          </el-col>
+          <el-col :span="12"> 
+            <el-form-item label="状态" prop="status">
           <el-select v-model="form.status">
             <el-option v-for="dict in dict.type.tob_dd_status" :key="dict.value" :label="dict.label"
               :value="dict.value">
             </el-option>
           </el-select>
         </el-form-item>
+          </el-col>
+        </el-row>
+
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
@@ -117,9 +137,8 @@
 import { listDistrict, getDistrict, delDistrict, addDistrict, updateDistrict } from "@/api/cigarette/detection/district";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
-import {
-  listUser,
-} from "@/api/system/user";
+import {  listUser,} from "@/api/system/user";
+import { listStaff } from "@/api/cigarette/personnel/staff"; // 导入工作人员列表接口
 
 export default {
   name: "District",

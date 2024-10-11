@@ -77,6 +77,7 @@
             <if test="cameraApplicationType != null  and cameraApplicationType != ''">and camera_application_type =
                 #{cameraApplicationType}
             </if>
+            and del_flag = '0'
             <if test="status != null  and status != ''">and status = #{status}</if>
             <if test="districtId != null ">and district_id = #{districtId}</if>
         </where>
@@ -117,15 +118,13 @@
             <if test="status != null and status != ''">
                 AND status = #{status}
             </if>
-            <if test="delFlag != null and delFlag != ''">
-                AND del_flag = #{delFlag}
-            </if>
+                AND del_flag = '0'
         </where>
     </select>
 
     <select id="selectTobCameraByCameraId" parameterType="Long" resultMap="TobCameraResult">
         <include refid="selectTobCameraVo"/>
-        where camera_id = #{cameraId}
+        where camera_id = #{cameraId} and del_flag = '0'
     </select>
 
 
@@ -149,10 +148,10 @@
             <if test="cameraGroupIndication != null">camera_group_indication,</if>
             <if test="cameraApplicationType != null and cameraApplicationType != ''">camera_application_type,</if>
             <if test="status != null and status != ''">status,</if>
-            <if test="delFlag != null and delFlag != ''">del_flag,</if>
+            del_flag,
             <if test="remark != null">remark,</if>
             <if test="createTime != null">create_time,</if>
-            <if test="updateTime != null">update_time,</if>
+            update_time,
             <if test="districtId != null">district_id,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -172,10 +171,10 @@
             <if test="cameraGroupIndication != null">#{cameraGroupIndication},</if>
             <if test="cameraApplicationType != null and cameraApplicationType != ''">#{cameraApplicationType},</if>
             <if test="status != null and status != ''">#{status},</if>
-            <if test="delFlag != null and delFlag != ''">#{delFlag},</if>
+            0,
             <if test="remark != null">#{remark},</if>
             <if test="createTime != null">#{createTime},</if>
-            <if test="updateTime != null">#{updateTime},</if>
+            sysdate(),
             <if test="districtId != null">#{districtId},</if>
         </trim>
     </insert>
@@ -213,14 +212,12 @@
     </update>
 
     <delete id="deleteTobCameraByCameraId" parameterType="Long">
-        delete
-        from tob_camera
-        where camera_id = #{cameraId}
+        update tob_camera set del_flag = '1' where camera_id = #{cameraId}
     </delete>
 
     <delete id="deleteTobCameraByCameraIds" parameterType="String">
-        delete from tob_camera where camera_id in
-        <foreach item="cameraId" collection="array" open="(" separator="," close=")">
+        update tob_camera set del_flag = '1' where camera_id in
+        <foreach collection="array" item="cameraId" open="(" separator="," close=")">
             #{cameraId}
         </foreach>
     </delete>

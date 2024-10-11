@@ -35,6 +35,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="flag != null  and flag != ''"> and flag = #{flag}</if>
             <if test="detectionId != null "> and detection_id = #{detectionId}</if>
             <if test="districtId != null "> and district_id = #{districtId}</if>
+             and del_flag = '0'
         </where>
     </select>
     
@@ -51,13 +52,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="startTime != null">start_time,</if>
             <if test="endTime != null">end_time,</if>
             <if test="dutyType != null and dutyType != ''">duty_type,</if>
-            <if test="detectionId != null "> detection_id </if>
-            <if test="districtId != null "> district_id </if>
+            <if test="detectionId != null "> detection_id,</if>
+            <if test="districtId != null "> district_id,</if>
             del_flag,
             <if test="remark != null">remark,</if>
             create_time,
             update_time,
-            <if test="delFlag != null and delFlag != ''">flag,</if>
+            <if test="flag != null and flag != ''">flag,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="staffId != null">#{staffId},</if>
@@ -65,8 +66,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="startTime != null">#{startTime},</if>
             <if test="endTime != null">#{endTime},</if>
             <if test="dutyType != null and dutyType != ''">#{dutyType},</if>
-            <if test="detectionId != null "> #{detectionId}</if>
-            <if test="districtId != null "> #{districtId}</if>
+            <if test="detectionId != null "> #{detectionId},</if>
+            <if test="districtId != null "> #{districtId},</if>
             0,
             <if test="remark != null">#{remark},</if>
             sysdate(),
@@ -85,8 +86,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="dutyType != null and dutyType != ''">duty_type = #{dutyType},</if>
             <if test="delFlag != null and delFlag != ''">del_flag = #{delFlag},</if>
             <if test="remark != null">remark = #{remark},</if>
-            <if test="detectionId != null "> detection_id = #{detectionId}</if>
-            <if test="districtId != null ">district_id = #{districtId}</if>
+            <if test="detectionId != null "> detection_id = #{detectionId},</if>
+            <if test="districtId != null ">district_id = #{districtId},</if>
             update_time = sysdate(),
             <if test="flag != null and flag != ''">flag = #{flag},</if>
         </trim>
@@ -98,7 +99,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteTobClockLogByCommutingIds" parameterType="String">
-        delete from tob_clock_log where commuting_id in 
+        update tob_clock_log set del_flag = '1' where commuting_id in
         <foreach item="commutingId" collection="array" open="(" separator="," close=")">
             #{commutingId}
         </foreach>
