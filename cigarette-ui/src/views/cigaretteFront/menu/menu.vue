@@ -26,6 +26,7 @@
           <el-menu-item index="4-4" @click="goto('dutyLog')">执勤信息</el-menu-item>
           <el-menu-item index="4-5" @click="goto('feedBack')">反馈信息</el-menu-item>
         </el-submenu>
+        <el-menu-item index="5" @click="goto('dataVisualization')">数据可视化</el-menu-item>
         <div class="right-menu">
           <el-menu-item index="8" class="centered-login">
             登录信息
