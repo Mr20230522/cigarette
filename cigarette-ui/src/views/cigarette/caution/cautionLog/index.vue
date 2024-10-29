@@ -25,6 +25,12 @@
             <el-input v-model="queryParams.behaviorId" placeholder="请输入车行为id" clearable
               @keyup.enter.native="handleQuery" />
           </el-form-item>
+          <el-form-item label="预警程度" prop="status">
+            <el-select v-model="queryParams.status" placeholder="请选择预警程度" clearable>
+              <el-option v-for="dict in dict.type.tob_caution_status" :key="dict.value" :label="dict.label"
+                :value="dict.value" />
+            </el-select>
+          </el-form-item>
           <el-form-item>
             <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
             <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
