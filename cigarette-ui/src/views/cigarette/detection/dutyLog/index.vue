@@ -67,7 +67,6 @@
               <span>{{ parseTime(scope.row.dutyTime, '{y}-{m}-{d}') }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="备注" align="center" prop="remark" />
           <el-table-column label="执勤有误" align="center" prop="flag">
             <template slot-scope="scope">
               <dict-tag :options="dict.type.tob_clock_correct" :value="scope.row.flag" />
@@ -82,6 +81,7 @@
           <el-table-column label="视频id" align="center" prop="videoId" />
           <el-table-column label="行为" align="center" prop="behavior" />
           <el-table-column label="是否工作" align="center" prop="workFlag" />
+          <el-table-column label="备注" align="center" prop="remark" />
           <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="120px" >
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"

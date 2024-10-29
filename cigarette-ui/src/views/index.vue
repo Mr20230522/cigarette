@@ -5,6 +5,11 @@
       style="width: 100%;  "
       src="../assets/projectImages/gnmk2.png"></img>
      <el-divider />
+     
+     <img
+      style="width: 100%;  "
+      src="../assets/projectImages/系统泳道图分析.drawio.png"></img>
+     <el-divider />
 
   </div>
 </template>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobKeyVideoMapper">
+    
+    <resultMap type="TobKeyVideo" id="TobKeyVideoResult">
+        <result property="videoId"    column="video_id"    />
+        <result property="videoPath"    column="video_path"    />
+        <result property="videoName"    column="video_name"    />
+        <result property="cameraId"    column="camera_id"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="videoSize"    column="video_size"    />
+        <result property="detectionId"    column="detection_id"    />
+        <result property="districtId"    column="district_id"    />
+        <result property="remark"    column="remark"    />
+        <result property="status"    column="status"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectTobKeyVideoVo">
+        select video_id, video_path, video_name, camera_id, start_time, end_time, video_size, detection_id, district_id, remark, status, create_time from tob_key_video
+    </sql>
+
+    <select id="selectTobKeyVideoList" parameterType="TobKeyVideo" resultMap="TobKeyVideoResult">
+        <include refid="selectTobKeyVideoVo"/>
+        <where>  
+            <if test="videoName != null  and videoName != ''"> and video_name like concat('%', #{videoName}, '%')</if>
+            <if test="cameraId != null "> and camera_id = #{cameraId}</if>
+            <if test="detectionId != null "> and detection_id = #{detectionId}</if>
+            <if test="districtId != null "> and district_id = #{districtId}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="createTime != null "> and create_time = #{createTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectTobKeyVideoByVideoId" parameterType="Long" resultMap="TobKeyVideoResult">
+        <include refid="selectTobKeyVideoVo"/>
+        where video_id = #{videoId}
+    </select>
+
+    <insert id="insertTobKeyVideo" parameterType="TobKeyVideo" useGeneratedKeys="true" keyProperty="videoId">
+        insert into tob_key_video
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="videoPath != null and videoPath != ''">video_path,</if>
+            <if test="videoName != null and videoName != ''">video_name,</if>
+            <if test="cameraId != null">camera_id,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="videoSize != null">video_size,</if>
+            <if test="detectionId != null">detection_id,</if>
+            <if test="districtId != null">district_id,</if>
+            <if test="remark != null">remark,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="videoPath != null and videoPath != ''">#{videoPath},</if>
+            <if test="videoName != null and videoName != ''">#{videoName},</if>
+            <if test="cameraId != null">#{cameraId},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="videoSize != null">#{videoSize},</if>
+            <if test="detectionId != null">#{detectionId},</if>
+            <if test="districtId != null">#{districtId},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTobKeyVideo" parameterType="TobKeyVideo">
+        update tob_key_video
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="videoPath != null and videoPath != ''">video_path = #{videoPath},</if>
+            <if test="videoName != null and videoName != ''">video_name = #{videoName},</if>
+            <if test="cameraId != null">camera_id = #{cameraId},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="videoSize != null">video_size = #{videoSize},</if>
+            <if test="detectionId != null">detection_id = #{detectionId},</if>
+            <if test="districtId != null">district_id = #{districtId},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where video_id = #{videoId}
+    </update>
+
+    <delete id="deleteTobKeyVideoByVideoId" parameterType="Long">
+        delete from tob_key_video where video_id = #{videoId}
+    </delete>
+
+    <delete id="deleteTobKeyVideoByVideoIds" parameterType="String">
+        delete from tob_key_video where video_id in 
+        <foreach item="videoId" collection="array" open="(" separator="," close=")">
+            #{videoId}
+        </foreach>
+    </delete>
+</mapper>
