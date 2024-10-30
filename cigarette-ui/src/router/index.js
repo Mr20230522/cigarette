@@ -92,7 +92,7 @@ export const constantRoutes = [
     path: '/dataVisualization',
     name: 'dataVisualization',
     component: () => import('@/views/cigaretteFront/dataVisualization')
-  },    
+  }, 
   {
     path: '/cigaretteFront',
     component: () => import('@/views/cigaretteFront/menu/menu'),
@@ -148,7 +148,12 @@ export const constantRoutes = [
         path: '/notice',
         name: 'notice',
         component: () => import('@/views/cigaretteFront/document/notice')
-      }
+      },
+      {
+        path: '/profile',
+        name: 'profile',
+        component: () => import('@/views/cigaretteFront/menu/profile/profile'),    
+      },   
     ]
   }
 ]
