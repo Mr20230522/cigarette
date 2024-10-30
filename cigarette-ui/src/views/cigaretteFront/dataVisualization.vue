@@ -1,88 +1,134 @@
 <template>
-    <div style="margin: 0;
-      padding: 0;
-      height: 100%;">
-   
-      <div id="container" style="position: relative;width: 100%; min-height:100%;"></div>
- 
+  <div id="map" class="map">
+    <div class="demo-title">
+      <h1>北京公交线路行驶路线分类</h1>
+      <h3>北京全市范围内各公交线路运行情况</h3>
+    </div>
   </div>
-  </template>
-  
-  <script>
-  import MapLoader from '@/assets/map/map'
-  
-  export default {
-    name: 'dataVisualization',
-    data() {
-      return {
-        map: '',
-      };
-    },
-    methods: {
-      initAMap() {
-              let that = this
-              MapLoader().then(AMap => {
-                  that.map = new AMap.Map('container', {
-                      zoom: 11, // 级别
-                      center: [116.397428, 39.90923], // 中心点坐标
-                      viewMode: '3D' // 使用3D视图
-                  })
-                  // 异步加载插件
-                  // AMap.ToolBar: 滑动工具条， AMap.Scale: 比例尺
-                  // 一次加载多个
-                  AMap.plugin(['AMap.ToolBar', 'AMap.Scale'], function () {
-                      that.map.addControl(new AMap.ToolBar())
-                      that.map.addControl(new AMap.Scale())
-                  })
-                  // AMap.Geolocation: 定位
-                  AMap.plugin('AMap.Geolocation', function () {
-                      let geolocation = new AMap.Geolocation({
-                          enableHighAccuracy: true, //是否使用高精度定位，默认:true
-                          timeout: 10000,           //超过10秒后停止定位，默认：无穷大
-                          maximumAge: 0,            //定位结果缓存0毫秒，默认：0
-                          convert: true,            //自动偏移坐标，偏移后的坐标为高德坐标，默认：true
-                          showButton: true,         //显示定位按钮，默认：true
-                          buttonPosition: 'LB',     //定位按钮停靠位置，默认：'LB'，左下角
-                          buttonOffset: new AMap.Pixel(10, 20), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
-                          showMarker: true,         //定位成功后在定位到的位置显示点标记，默认：true
-                          showCircle: true,         //定位成功后用圆圈表示定位精度范围，默认：true
-                          panToLocation: true,      //定位成功后将定位到的位置作为地图中心点，默认：true
-                          zoomToAccuracy: true       //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
-                      })
-                      that.map.addControl(geolocation)
-  
-                      // 获取当前定位的信息
-                      geolocation.getCurrentPosition((status, result) => {
-                          console.log(result.addressComponent)
-                      })
-                      // AMap.event.addListener(geolocation, 'complete', onComplete);//返回定位信息
-                      // AMap.event.addListener(geolocation, 'error', onError);      //返回定位出错信息
-                  })
-              })
-            }
-    },
-    computed: {
-      currentContent() {
-        const tab = this.tabs.find(tab => tab.id === this.currentTab);
-        return tab || {};
-      }
-    },
-    mounted() {
-        this.initAMap()
-    },
-  };
-  </script>
-  
-  <style scoped>
+</template>
 
-  
-  /*隐藏高德地图logo，版本号*/
-  .amap-logo {
-      visibility: hidden;
+<script>
+export default {
+  name: 'BusMap',
+  mounted() {
+    this.initMap();
+  },
+  methods: {
+    initMap() {
+      // 请确保你已经替换为你的高德地图开发者Key
+      var script = document.createElement('script');
+      script.src = 'https://webapi.amap.com/maps?v=2.0&key=4cb4e39b657f9849e3b39e14fc41c2b6&plugin=AMap.Scale,AMap.ToolBar';
+      document.head.appendChild(script);
+
+      script.onload = () => {
+        var map = new AMap.Map('map', {
+          zoom: 11.2,
+          center: [116.352734, 39.8447],
+          showLabel: false,
+          viewMode: '3D',
+          mapStyle: 'amap://styles/dark',
+          pitch: 50,
+        });
+
+        var locaScript = document.createElement('script');
+        locaScript.src = 'https://webapi.amap.com/loca?v=2.0.0&key=4cb4e39b657f9849e3b39e14fc41c2b6';
+        document.head.appendChild(locaScript);
+
+        locaScript.onload = () => {
+          var loca = new Loca.Container({
+            map,
+          });
+          window._loca = loca;
+
+          var geo = new Loca.GeoJSONSource({
+            url: 'https://a.amap.com/Loca/static/loca-v2/demos/mock_data/bj_bus.json',
+          });
+
+          var layer = new Loca.PulseLineLayer({
+            zIndex: 10,
+            opacity: 1,
+            visible: true,
+            zooms: [2, 22],
+          });
+
+          var headColors = ['#EFBB51', '#7F3CFF', '#4CC19B', '#0B5D74', '#E06AC4', '#223F9B', '#F15C1A', '#7A0FA6'];
+
+          layer.setSource(geo);
+          layer.setStyle({
+            altitude: 0,
+            lineWidth: 2,
+            headColor: (_, feature) => {
+              return headColors[feature.properties.type - 1];
+            },
+            trailColor: 'rgba(128, 128, 128, 0.5)',
+            interval: 0.25,
+            duration: 5000,
+          });
+          loca.add(layer);
+          loca.animate.start();
+
+          var legend = new Loca.Legend({
+            loca: loca,
+            title: {
+              label: '公交类型',
+              fontColor: 'rgba(255,255,255,0.4)',
+              fontSize: '16px'
+            },
+            style: {
+              backgroundColor: 'rgba(255,255,255,0.1)',
+              left: '20px',
+              bottom: '40px',
+              fontSize: '12px'
+            },
+            dataMap: [
+              { label: 'A类型', color: headColors[7] },
+              { label: 'B类型', color: headColors[6] },
+              { label: 'C类型', color: headColors[5] },
+              { label: 'D类型', color: headColors[4] },
+              { label: 'E类型', color: headColors[3] },
+              { label: 'F类型', color: headColors[2] },
+              { label: 'G类型', color: headColors[1] },
+              { label: 'H类型', color: headColors[0] },
+            ],
+          });
+
+          // loca.animate.start();
+          // var dat = new Loca.Dat();
+          // dat.addLayer(layer, '公交');
+        };
+      };
+    }
   }
-  
-  .amap-copyright {
-      visibility: hidden;
-  }
-  </style>
-  
+};
+</script>
+
+<style scoped>
+html,
+body,
+#map {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.demo-title {
+  position: absolute;
+  top: 25px;
+  left: 25px;
+  z-index: 1;
+}
+
+h1 {
+  font-size: 18px;
+  margin: 0;
+  color: rgb(180, 180, 190);
+}
+
+h3 {
+  font-size: 12px;
+  font-weight: normal;
+  margin-top: 5px;
+  color: rgb(150, 150, 150);
+}
+</style>

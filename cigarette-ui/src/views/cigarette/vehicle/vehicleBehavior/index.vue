@@ -126,7 +126,7 @@
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="addCautionFrom(scope.row)"
                 v-hasPermi="['vehicle:vehicleBehavior:edit']" style="color: red;">一键预警</el-button>
-                <el-button size="mini" type="text" icon="el-icon-edit" @click="addCaseFrom(scope.row)"
+              <el-button size="mini" type="text" icon="el-icon-edit" @click="addCaseFrom(scope.row)"
                 v-hasPermi="['vehicle:vehicleBehavior:edit']">一键入案</el-button>
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                 v-hasPermi="['vehicle:vehicleBehavior:edit']">修改</el-button>
@@ -290,22 +290,22 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
-        <!-- 添加或修改预警记录对话框 -->
-        <el-dialog title="一键预警" :visible.sync="submitCautionOpen" width="500px" append-to-body>
+    <!-- 添加或修改预警记录对话框 -->
+    <el-dialog title="一键预警" :visible.sync="submitCautionOpen" width="500px" append-to-body>
       <el-form ref="cautionForm" :model="cautionForm" :rules="rules" label-width="80px">
         <el-form-item label="检测点" prop="detectionId">
-                    <el-select v-model="cautionForm.detectionId" placeholder="请选择所管理的监测点" filterable
-                        @change="handleDetectionChange">
-                        <el-option v-for="item in detectionOptions" :key="item.detectionId"
-                            :label="getDetectionName(item.detectionId)" :value="item.detectionId"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="预警程度" prop="status">
-              <el-select v-model="cautionForm.status" placeholder="请选择预警程度">
-                <el-option v-for="dict in dict.type.tob_caution_status" :key="dict.value" :label="dict.label"
-                  :value="dict.value"></el-option>
-              </el-select>
-            </el-form-item>
+          <el-select v-model="cautionForm.detectionId" placeholder="请选择所管理的监测点" filterable
+            @change="handleDetectionChange">
+            <el-option v-for="item in detectionOptions" :key="item.detectionId"
+              :label="getDetectionName(item.detectionId)" :value="item.detectionId"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="预警程度" prop="status">
+          <el-select v-model="cautionForm.status" placeholder="请选择预警程度">
+            <el-option v-for="dict in dict.type.tob_caution_status" :key="dict.value" :label="dict.label"
+              :value="dict.value"></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="车行为id" prop="behaviorId">
           <el-input v-model="cautionForm.behaviorId" placeholder="请输入车行为id" />
         </el-form-item>
@@ -339,11 +339,11 @@ import {
 
 import { listDistrict } from "@/api/cigarette/detection/district";
 import { listDetection } from "@/api/cigarette/detection/detection";
-import {  addCaution } from "@/api/cigarette/caution/caution";
+import { addCaution } from "@/api/cigarette/caution/caution";
 
 export default {
   name: "VehicleBehavior",
-  dicts: ['tob_illegal_status', 'sys_normal_disable', 'tob_driving_irection', 'tob_vehicle_type','tob_caution_status'],
+  dicts: ['tob_illegal_status', 'sys_normal_disable', 'tob_driving_irection', 'tob_vehicle_type', 'tob_caution_status'],
   data() {
 
     return {
@@ -393,7 +393,7 @@ export default {
       form: {
         accompliceId: []
       },
-      cautionForm:{},
+      cautionForm: {},
       // 存储搜索信息
       searchInput: '',
       // 存储用户信息
@@ -626,6 +626,7 @@ export default {
     // 取消按钮
     cancel() {
       this.open = false;
+      this.submitCautionOpen = false;
       this.reset();
     },
     // 表单重置
@@ -820,29 +821,29 @@ export default {
       this.form.accompliceId = value.join(',');
       console.log(value, direction, movedKeys);
     },
-    addCautionFrom(row){
+    addCautionFrom(row) {
       this.submitCautionOpen = true;
       this.cautionForm.detectionId = row.detectionId;
       this.cautionForm.districtId = row.districtId;
       this.cautionForm.behaviorId = row.behaviorId;
 
     },
-     /** 提交按钮 */
-     submitCautionForm() {
-      
+    /** 提交按钮 */
+    submitCautionForm() {
+
       this.$refs["cautionForm"].validate(valid => {
         if (valid) {
-            addCaution(this.cautionForm).then(response => {
-              this.$modal.msgSuccess("新增成功");
-              this.submitCautionOpen = false;
-            });
+          addCaution(this.cautionForm).then(response => {
+            this.$modal.msgSuccess("新增成功");
+            this.submitCautionOpen = false;
+          });
         }
       });
     },
-    addCaseFrom(row){
+    addCaseFrom(row) {
       this.$router.push({
         path: '/cigarette/personnel/caseInformation',
-           
+
       });
     }
   }
