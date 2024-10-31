@@ -1,64 +1,85 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.TobVehicleMapper">
 
     <resultMap type="TobVehicle" id="TobVehicleResult">
-        <result property="carId"    column="car_id"    />
-        <result property="licensePlate"    column="license_plate"    />
-        <result property="licensePlateType"    column="license_plate_type"    />
-        <result property="carTypeId"    column="car_type_id"    />
-        <result property="carColor"    column="car_color"    />
-        <result property="occurrenceNumber"    column="occurrence_number"    />
-        <result property="casesInvolved"    column="cases_involved"    />
-        <result property="carOwnerId"    column="car_owner_id"    />
-        <result property="vehiclePurchaseDate"    column="vehicle_purchase_date"    />
-        <result property="illegalStatus"    column="illegal_status"    />
-        <result property="status"    column="status"    />
-        <result property="delFlag"    column="del_flag"    />
-        <result property="remark"    column="remark"    />
-        <result property="createTime"    column="create_time"    />
-        <result property="updateTime"    column="update_time"    />
-        <result property="picture"    column="picture"    />
+        <result property="carId" column="car_id"/>
+        <result property="licensePlate" column="license_plate"/>
+        <result property="licensePlateType" column="license_plate_type"/>
+        <result property="carTypeId" column="car_type_id"/>
+        <result property="carColor" column="car_color"/>
+        <result property="occurrenceNumber" column="occurrence_number"/>
+        <result property="casesInvolved" column="cases_involved"/> <!-- 确保这里是 Long 类型 -->
+        <result property="carOwnerId" column="car_owner_id"/>
+        <result property="vehiclePurchaseDate" column="vehicle_purchase_date"/>
+        <result property="illegalStatus" column="illegal_status"/>
+        <result property="status" column="status"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="picture" column="picture"/>
     </resultMap>
 
     <sql id="selectTobVehicleVo">
-        select car_id, license_plate, license_plate_type, car_type_id, car_color, occurrence_number, cases_involved, car_owner_id, vehicle_purchase_date, illegal_status, status, del_flag, remark, create_time, update_time, picture from tob_vehicle
+        SELECT car_id, license_plate, license_plate_type, car_type_id, car_color,
+               occurrence_number, cases_involved, car_owner_id, vehicle_purchase_date,
+               illegal_status, status, del_flag, remark, create_time, update_time, picture
+        FROM tob_vehicle
     </sql>
 
     <select id="selectTobVehicleList" parameterType="TobVehicle" resultMap="TobVehicleResult">
         <include refid="selectTobVehicleVo"/>
         <where>
-            <if test="licensePlate != null  and licensePlate != ''"> and license_plate = #{licensePlate}</if>
-            <if test="licensePlateType != null "> and license_plate_type = #{licensePlateType}</if>
-            <if test="carTypeId != null "> and car_type_id = #{carTypeId}</if>
-            <if test="carColor != null  and carColor != ''"> and car_color = #{carColor}</if>
-            <if test="occurrenceNumber != null "> and occurrence_number = #{occurrenceNumber}</if>
-            <if test="casesInvolved != null "> and cases_involved = #{casesInvolved}</if>
-            <if test="carOwnerId != null "> and car_owner_id = #{carOwnerId}</if>
-            <if test="vehiclePurchaseDate != null "> and vehicle_purchase_date = #{vehiclePurchaseDate}</if>
-            <if test="illegalStatus != null  and illegalStatus != ''"> and illegal_status = #{illegalStatus}</if>
-            <if test="status != null  and status != ''"> and status = #{status}</if>
-            <if test="picture != null  and picture != ''"> and picture = #{picture}</if>
-            and del_flag = '0'
+            <if test="licensePlate != null and licensePlate != ''"> AND license_plate = #{licensePlate}</if>
+            <if test="licensePlateType != null"> AND license_plate_type = #{licensePlateType}</if>
+            <if test="carTypeId != null"> AND car_type_id = #{carTypeId}</if>
+            <if test="carColor != null and carColor != ''"> AND car_color = #{carColor}</if>
+            <if test="occurrenceNumber != null"> AND occurrence_number = #{occurrenceNumber}</if>
+            <if test="casesInvolved != null"> AND cases_involved = #{casesInvolved}</if> <!-- 确保这里的类型为 Long -->
+            <if test="carOwnerId != null"> AND car_owner_id = #{carOwnerId}</if>
+            <if test="vehiclePurchaseDate != null"> AND vehicle_purchase_date = #{vehiclePurchaseDate}</if>
+            <if test="illegalStatus != null and illegalStatus != ''"> AND illegal_status = #{illegalStatus}</if>
+            <if test="status != null and status != ''"> AND status = #{status}</if>
+            <if test="picture != null and picture != ''"> AND picture = #{picture}</if>
+            AND del_flag = '0'
+        </where>
+    </select>
+
+    <select id="selectTobVehicleInsertList" parameterType="TobVehicle" resultMap="TobVehicleResult">
+        SELECT * FROM tob_vehicle_insert <!-- 修改为获取 tob_vehicle_insert 表的数据 -->
+        <where>
+            <if test="licensePlate != null and licensePlate != ''"> AND license_plate = #{licensePlate}</if>
+            <if test="licensePlateType != null"> AND license_plate_type = #{licensePlateType}</if>
+            <if test="carTypeId != null"> AND car_type_id = #{carTypeId}</if>
+            <if test="carColor != null and carColor != ''"> AND car_color = #{carColor}</if>
+            <if test="occurrenceNumber != null"> AND occurrence_number = #{occurrenceNumber}</if>
+            <if test="casesInvolved != null"> AND cases_involved = #{casesInvolved}</if> <!-- 确保这里的类型为 Long -->
+            <if test="carOwnerId != null"> AND car_owner_id = #{carOwnerId}</if>
+            <if test="vehiclePurchaseDate != null"> AND vehicle_purchase_date = #{vehiclePurchaseDate}</if>
+            <if test="illegalStatus != null and illegalStatus != ''"> AND illegal_status = #{illegalStatus}</if>
+            <if test="status != null and status != ''"> AND status = #{status}</if>
+            <if test="picture != null and picture != ''"> AND picture = #{picture}</if>
+            AND del_flag = '0'
         </where>
     </select>
 
     <select id="selectTobVehicleByCarId" parameterType="Long" resultMap="TobVehicleResult">
         <include refid="selectTobVehicleVo"/>
-        where car_id = #{carId}
+        WHERE car_id = #{carId}
     </select>
 
     <insert id="insertTobVehicle" parameterType="TobVehicle" useGeneratedKeys="true" keyProperty="carId">
-        insert into tob_vehicle
+        INSERT INTO tob_vehicle
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="licensePlate != null and licensePlate != ''">license_plate,</if>
             <if test="licensePlateType != null">license_plate_type,</if>
             <if test="carTypeId != null">car_type_id,</if>
             <if test="carColor != null and carColor != ''">car_color,</if>
-            <if test="occurrenceNumber != null">occurrence_number,</if>
-            <if test="casesInvolved != null">cases_involved,</if>
+            <if test="occurrenceNumber != null">occurrence_number,</if> <!-- 确保这里的类型为 Long -->
+            <if test="casesInvolved != null">cases_involved,</if> <!-- 确保这里的类型为 Long -->
             <if test="carOwnerId != null">car_owner_id,</if>
             <if test="vehiclePurchaseDate != null">vehicle_purchase_date,</if>
             <if test="illegalStatus != null and illegalStatus != ''">illegal_status,</if>
@@ -68,14 +89,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="picture != null">picture,</if>
             create_time,
             update_time,
-         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
             <if test="licensePlate != null and licensePlate != ''">#{licensePlate},</if>
             <if test="licensePlateType != null">#{licensePlateType},</if>
             <if test="carTypeId != null">#{carTypeId},</if>
             <if test="carColor != null and carColor != ''">#{carColor},</if>
-            <if test="occurrenceNumber != null">#{occurrenceNumber},</if>
-            <if test="casesInvolved != null">#{casesInvolved},</if>
+            <if test="occurrenceNumber != null">#{occurrenceNumber},</if> <!-- 确保这里的类型为 Long -->
+            <if test="casesInvolved != null">#{casesInvolved},</if> <!-- 确保这里的类型为 Long -->
             <if test="carOwnerId != null">#{carOwnerId},</if>
             <if test="vehiclePurchaseDate != null">#{vehiclePurchaseDate},</if>
             <if test="illegalStatus != null and illegalStatus != ''">#{illegalStatus},</if>
@@ -85,18 +106,58 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="picture != null">#{picture},</if>
             sysdate(),
             sysdate(),
-         </trim>
+        </trim>
+    </insert>
+<!--
+    这里是未录入表的插入
+-->
+    <insert id="insertTobVehicleInsert" parameterType="TobVehicle" useGeneratedKeys="true" keyProperty="carId">
+        INSERT INTO tob_vehicle_insert
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="licensePlate != null and licensePlate != ''">license_plate,</if>
+            <if test="licensePlateType != null">license_plate_type,</if>
+            <if test="carTypeId != null">car_type_id,</if>
+            <if test="carColor != null and carColor != ''">car_color,</if>
+            <if test="occurrenceNumber != null">occurrence_number,</if> <!-- 确保这里的类型为 Long -->
+            <if test="casesInvolved != null">cases_involved,</if> <!-- 确保这里的类型为 Long -->
+            <if test="carOwnerId != null">car_owner_id,</if>
+            <if test="vehiclePurchaseDate != null">vehicle_purchase_date,</if>
+            <if test="illegalStatus != null and illegalStatus != ''">illegal_status,</if>
+            <if test="status != null and status != ''">status,</if>
+            del_flag,
+            <if test="remark != null">remark,</if>
+            <if test="picture != null">picture,</if>
+            create_time,
+            update_time,
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="licensePlate != null and licensePlate != ''">#{licensePlate},</if>
+            <if test="licensePlateType != null">#{licensePlateType},</if>
+            <if test="carTypeId != null">#{carTypeId},</if>
+            <if test="carColor != null and carColor != ''">#{carColor},</if>
+            <if test="occurrenceNumber != null">#{occurrenceNumber},</if> <!-- 确保这里的类型为 Long -->
+            <if test="casesInvolved != null">#{casesInvolved},</if> <!-- 确保这里的类型为 Long -->
+            <if test="carOwnerId != null">#{carOwnerId},</if>
+            <if test="vehiclePurchaseDate != null">#{vehiclePurchaseDate},</if>
+            <if test="illegalStatus != null and illegalStatus != ''">#{illegalStatus},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            0,
+            <if test="remark != null">#{remark},</if>
+            <if test="picture != null">#{picture},</if>
+            sysdate(),
+            sysdate(),
+        </trim>
     </insert>
 
     <update id="updateTobVehicle" parameterType="TobVehicle">
-        update tob_vehicle
+        UPDATE tob_vehicle
         <trim prefix="SET" suffixOverrides=",">
             <if test="licensePlate != null and licensePlate != ''">license_plate = #{licensePlate},</if>
             <if test="licensePlateType != null">license_plate_type = #{licensePlateType},</if>
             <if test="carTypeId != null">car_type_id = #{carTypeId},</if>
             <if test="carColor != null and carColor != ''">car_color = #{carColor},</if>
-            <if test="occurrenceNumber != null">occurrence_number = #{occurrenceNumber},</if>
-            <if test="casesInvolved != null">cases_involved = #{casesInvolved},</if>
+            <if test="occurrenceNumber != null">occurrence_number = #{occurrenceNumber},</if> <!-- 确保这里的类型为 Long -->
+            <if test="casesInvolved != null">cases_involved = #{casesInvolved},</if> <!-- 确保这里的类型为 Long -->
             <if test="carOwnerId != null">car_owner_id = #{carOwnerId},</if>
             <if test="vehiclePurchaseDate != null">vehicle_purchase_date = #{vehiclePurchaseDate},</if>
             <if test="illegalStatus != null and illegalStatus != ''">illegal_status = #{illegalStatus},</if>
@@ -105,15 +166,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="picture != null">picture = #{picture},</if>
             update_time = sysdate(),
         </trim>
-        where car_id = #{carId}
+        WHERE car_id = #{carId}
     </update>
 
     <delete id="deleteTobVehicleByCarId" parameterType="Long">
-        update tob_vehicle set del_flag = '1' where car_id = #{carId}
+        UPDATE tob_vehicle SET del_flag = '1' WHERE car_id = #{carId}
     </delete>
 
     <delete id="deleteTobVehicleByCarIds" parameterType="String">
-        update tob_vehicle set del_flag = '1' where car_id in
+        UPDATE tob_vehicle SET del_flag = '1' WHERE car_id IN
         <foreach item="carId" collection="array" open="(" separator="," close=")">
             #{carId}
         </foreach>
