@@ -122,8 +122,12 @@
           <el-table-column label="同伙id" align="center" prop="accompliceId" />
           <el-table-column label="同伙姓名" align="center" prop="name" min-width="120px" />
           <el-table-column label="记录时间" align="center" prop="createTime" min-width="160px" />
-          <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="120px">
+          <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="280px">
             <template slot-scope="scope">
+              <el-button size="mini" type="text" icon="el-icon-edit" @click="addCautionFrom(scope.row)"
+                v-hasPermi="['vehicle:vehicleBehavior:edit']" style="color: red;">一键预警</el-button>
+              <el-button size="mini" type="text" icon="el-icon-edit" @click="addCaseFrom(scope.row)"
+                v-hasPermi="['vehicle:vehicleBehavior:edit']">一键入案</el-button>
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                 v-hasPermi="['vehicle:vehicleBehavior:edit']">修改</el-button>
               <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
@@ -187,25 +191,24 @@
 
         <el-row>
           <el-col :span="12">
-        <el-form-item label="嫌疑程度" prop="degreeSuspicion">
-          <template>
-            <div class="block">
-              <el-slider v-model="form.degreeSuspicion" show-input>
-              </el-slider>
-            </div>
-          </template>
-        </el-form-item>
-      </el-col>
-      <el-col :span="12">
-        <el-form-item label="检测点" prop="detectionId">
-                    <el-select v-model="form.detectionId" placeholder="请选择所管理的监测点" filterable
-                        @change="handleDetectionChange">
-                        <el-option v-for="item in detectionOptions" :key="item.detectionId"
-                            :label="getDetectionName(item.detectionId)" :value="item.detectionId"></el-option>
-                    </el-select>
-                </el-form-item>
-              </el-col>
-            </el-row>
+            <el-form-item label="嫌疑程度" prop="degreeSuspicion">
+              <template>
+                <div class="block">
+                  <el-slider v-model="form.degreeSuspicion" show-input>
+                  </el-slider>
+                </div>
+              </template>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="检测点" prop="detectionId">
+              <el-select v-model="form.detectionId" placeholder="请选择所管理的监测点" filterable @change="handleDetectionChange">
+                <el-option v-for="item in detectionOptions" :key="item.detectionId"
+                  :label="getDetectionName(item.detectionId)" :value="item.detectionId"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-form-item label="搜索">
           <el-input v-model="searchInput" @input="filterUsers" placeholder="请输入驾驶员名称、ID 或电话号码" clearable
             suffix-icon="el-icon-search"></el-input>
@@ -271,11 +274,47 @@
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
         <el-form-item label="同伙人" prop="accompliceId">
-          <el-input v-model="form.accompliceId" placeholder="请输入同伙id" />
+          <div style="text-align: center">
+            <el-transfer style="text-align: left; display: inline-block;width: 100%; " v-model="value" filterable
+              :left-default-checked="[2, 3]" :right-default-checked="[1]" :render-content="renderFunc"
+              :titles="['人员库', '同伙人']" :button-texts="['到左边', '到右边']" :format="{
+                noChecked: '${total}',
+                hasChecked: '${checked}/${total}'
+              }" @change="handleChange" :data="transferData">
+            </el-transfer>
+          </div>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
+    <!-- 添加或修改预警记录对话框 -->
+    <el-dialog title="一键预警" :visible.sync="submitCautionOpen" width="500px" append-to-body>
+      <el-form ref="cautionForm" :model="cautionForm" :rules="rules" label-width="80px">
+        <el-form-item label="检测点" prop="detectionId">
+          <el-select v-model="cautionForm.detectionId" placeholder="请选择所管理的监测点" filterable
+            @change="handleDetectionChange">
+            <el-option v-for="item in detectionOptions" :key="item.detectionId"
+              :label="getDetectionName(item.detectionId)" :value="item.detectionId"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="预警程度" prop="status">
+          <el-select v-model="cautionForm.status" placeholder="请选择预警程度">
+            <el-option v-for="dict in dict.type.tob_caution_status" :key="dict.value" :label="dict.label"
+              :value="dict.value"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="车行为id" prop="behaviorId">
+          <el-input v-model="cautionForm.behaviorId" placeholder="请输入车行为id" />
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="cautionForm.remark" type="textarea" placeholder="请输入内容" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitCautionForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -300,12 +339,21 @@ import {
 
 import { listDistrict } from "@/api/cigarette/detection/district";
 import { listDetection } from "@/api/cigarette/detection/detection";
+import { addCaution } from "@/api/cigarette/caution/caution";
 
 export default {
   name: "VehicleBehavior",
-  dicts: ['tob_illegal_status', 'sys_normal_disable', 'tob_driving_irection', 'tob_vehicle_type'],
+  dicts: ['tob_illegal_status', 'sys_normal_disable', 'tob_driving_irection', 'tob_vehicle_type', 'tob_caution_status'],
   data() {
+
     return {
+      transferData: [], // 这里将被动态数据填充
+      value: [], // 这里存储已选择的key
+      leftCheckedKeys: [2, 3], // 根据实际情况设置
+      rightCheckedKeys: [1], // 根据实际情况设置
+      renderFunc(h, option) {
+        return h('span', option.key + ' - ' + option.label);
+      },
       // 遮罩层
       loading: true,
       // 选中数组
@@ -325,6 +373,7 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      submitCautionOpen: false,
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -341,7 +390,10 @@ export default {
       },
 
       // 表单参数
-      form: {},
+      form: {
+        accompliceId: []
+      },
+      cautionForm: {},
       // 存储搜索信息
       searchInput: '',
       // 存储用户信息
@@ -365,7 +417,7 @@ export default {
       districts: [],
       detections: [],
       detectionOptions: [],    //json数组，用于存储检测点选项
-      treeData : [],
+      treeData: [],
       // 表单校验
       rules: {
         carId: [{
@@ -450,8 +502,8 @@ export default {
         console.error("Failed to load detection options:", error);
       });
     },
-        // 当检测点变更时触发，自动填充地区ID
-        handleDetectionChange(newValue) {
+    // 当检测点变更时触发，自动填充地区ID
+    handleDetectionChange(newValue) {
       // 通过检测点ID找到对应的地区ID
       const selectedDetection = this.detectionOptions.find(item => item.detectionId === newValue);
       if (selectedDetection) {
@@ -460,13 +512,13 @@ export default {
       }
     },
     getDistrictName(districtId) {
-        const district = this.districtOptions.find(item => item.districtId === districtId);
-        return district ? district.districtName : '未知地区';
+      const district = this.districtOptions.find(item => item.districtId === districtId);
+      return district ? district.districtName : '未知地区';
     },
-      // 根据 detectionId 获取监测点名字
-      getDetectionName(detectionId) {
-        const detection = this.detectionOptions.find(item => item.detectionId === detectionId)
-        return detection ? detection.detectionName : '未知监测点';
+    // 根据 detectionId 获取监测点名字
+    getDetectionName(detectionId) {
+      const detection = this.detectionOptions.find(item => item.detectionId === detectionId)
+      return detection ? detection.detectionName : '未知监测点';
     },
     async getList() {
       try {
@@ -574,6 +626,7 @@ export default {
     // 取消按钮
     cancel() {
       this.open = false;
+      this.submitCautionOpen = false;
       this.reset();
     },
     // 表单重置
@@ -619,6 +672,7 @@ export default {
         pageNum: null,
         pageSize: 100000
       }).then(response => {
+        console.log(response.rows);
         // 获取到用户信息后，保存原始用户列表数据
         this.userIdList = response.rows.map(user => {
           return {
@@ -627,6 +681,13 @@ export default {
             phonenumber: user.phone
           };
         });
+        this.transferData = response.rows.map(item => ({
+          key: item.suspectId, // 确保这里的id是唯一的
+          label: item.name + item.phone, // 假设你的数据有一个name属性
+          disabled: item.disabled // 如果有disabled属性
+        }));
+
+
       }).catch(error => {
         console.error('Failed to fetch user list:', error);
       });
@@ -756,6 +817,35 @@ export default {
       this.$set(this.form, "carId", car.carId);
       this.$set(this.form, "licensePlate", car.licensePlate);
     },
+    handleChange(value, direction, movedKeys) {
+      this.form.accompliceId = value.join(',');
+      console.log(value, direction, movedKeys);
+    },
+    addCautionFrom(row) {
+      this.submitCautionOpen = true;
+      this.cautionForm.detectionId = row.detectionId;
+      this.cautionForm.districtId = row.districtId;
+      this.cautionForm.behaviorId = row.behaviorId;
+
+    },
+    /** 提交按钮 */
+    submitCautionForm() {
+
+      this.$refs["cautionForm"].validate(valid => {
+        if (valid) {
+          addCaution(this.cautionForm).then(response => {
+            this.$modal.msgSuccess("新增成功");
+            this.submitCautionOpen = false;
+          });
+        }
+      });
+    },
+    addCaseFrom(row) {
+      this.$router.push({
+        path: '/cigarette/personnel/caseInformation',
+
+      });
+    }
   }
 };
 </script>

@@ -89,6 +89,11 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/dataVisualization',
+    name: 'dataVisualization',
+    component: () => import('@/views/cigaretteFront/dataVisualization')
+  }, 
+  {
     path: '/cigaretteFront',
     component: () => import('@/views/cigaretteFront/menu/menu'),
     hidden: true,
@@ -98,7 +103,8 @@ export const constantRoutes = [
         path: '/cigaretteIndex',
         name: 'cigaretteIndex',
         component: () => import('@/views/cigaretteFront/menu/cigaretteIndex')
-      },{
+      },        
+      {
         path: '/uploadCase',
         name: 'uploadCase',
         component: () => import('@/views/cigaretteFront/caution/uploadCase')
@@ -146,7 +152,12 @@ export const constantRoutes = [
         path: '/notice',
         name: 'notice',
         component: () => import('@/views/cigaretteFront/document/notice')
-      }
+      },
+      {
+        path: '/profile',
+        name: 'profile',
+        component: () => import('@/views/cigaretteFront/menu/profile/profile'),    
+      },   
     ]
   }
 ]
