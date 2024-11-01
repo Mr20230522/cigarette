@@ -9,15 +9,6 @@ export function listVehicle(query) {
   })
 }
 
-// 查询新增（未录入）车辆列表
-export function insertlistVehicle(query) {
-  return request({
-    url: '/cigarette/vehicle/vehicle/insertlist',
-    method: 'get',
-    params: query
-  })
-}
-
 // 查询车辆详细
 export function getVehicle(carId) {
   return request({

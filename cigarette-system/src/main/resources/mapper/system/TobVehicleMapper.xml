@@ -48,23 +48,6 @@
         </where>
     </select>
 
-    <select id="selectTobVehicleInsertList" parameterType="TobVehicle" resultMap="TobVehicleResult">
-        SELECT * FROM tob_vehicle_insert <!-- 修改为获取 tob_vehicle_insert 表的数据 -->
-        <where>
-            <if test="licensePlate != null and licensePlate != ''"> AND license_plate = #{licensePlate}</if>
-            <if test="licensePlateType != null"> AND license_plate_type = #{licensePlateType}</if>
-            <if test="carTypeId != null"> AND car_type_id = #{carTypeId}</if>
-            <if test="carColor != null and carColor != ''"> AND car_color = #{carColor}</if>
-            <if test="occurrenceNumber != null"> AND occurrence_number = #{occurrenceNumber}</if>
-            <if test="casesInvolved != null"> AND cases_involved = #{casesInvolved}</if> <!-- 确保这里的类型为 Long -->
-            <if test="carOwnerId != null"> AND car_owner_id = #{carOwnerId}</if>
-            <if test="vehiclePurchaseDate != null"> AND vehicle_purchase_date = #{vehiclePurchaseDate}</if>
-            <if test="illegalStatus != null and illegalStatus != ''"> AND illegal_status = #{illegalStatus}</if>
-            <if test="status != null and status != ''"> AND status = #{status}</if>
-            <if test="picture != null and picture != ''"> AND picture = #{picture}</if>
-            AND del_flag = '0'
-        </where>
-    </select>
 
     <select id="selectTobVehicleByCarId" parameterType="Long" resultMap="TobVehicleResult">
         <include refid="selectTobVehicleVo"/>

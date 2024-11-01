@@ -21,11 +21,7 @@
         <el-submenu index="3">
           <template slot="title">预警中心</template>
           <el-menu-item index="3-1" @click="goto('uploadCaution')">上报预警效果</el-menu-item>
-          <el-submenu index="3-2">
-            <template slot="title"><el-menu-item index="3-2">上报车辆信息</el-menu-item></template>
-            <el-menu-item index="3-2-1" @click="goto('uploadDeclareVehicle')">已申报车辆</el-menu-item>
-            <el-menu-item index="3-2-2" @click="goto('uploadUndeclareVehicle')">未申报车辆</el-menu-item>
-          </el-submenu>
+          <el-menu-item index="3-2" @click="goto('uploadVehicle')">上报车辆信息</el-menu-item>
           <el-menu-item index="3-3" @click="goto('uploadPersonnel')">上报人员信息</el-menu-item>
           <el-menu-item index="3-4" @click="goto('uploadCase')">上报案例信息</el-menu-item>
         </el-submenu>

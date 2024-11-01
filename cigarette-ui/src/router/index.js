@@ -92,7 +92,7 @@ export const constantRoutes = [
     path: '/dataVisualization',
     name: 'dataVisualization',
     component: () => import('@/views/cigaretteFront/dataVisualization')
-  }, 
+  },
   {
     path: '/cigaretteFront',
     component: () => import('@/views/cigaretteFront/menu/menu'),
@@ -103,7 +103,7 @@ export const constantRoutes = [
         path: '/cigaretteIndex',
         name: 'cigaretteIndex',
         component: () => import('@/views/cigaretteFront/menu/cigaretteIndex')
-      },        
+      },
       {
         path: '/uploadCase',
         name: 'uploadCase',
@@ -117,13 +117,10 @@ export const constantRoutes = [
         name: 'uploadPersonnel',
         component: () => import('@/views/cigaretteFront/caution/uploadPersonnel')
       },{
-        path: '/uploadDeclareVehicle',
-        name: 'uploadDeclareVehicle',
-        component: () => import('@/views/cigaretteFront/caution/uploadVehicle/uploadDeclareVehicle.vue')
-      },{
-        path: '/uploadUndeclareVehicle',
-        name: 'uploadUndeclareVehicle',
-        component: () => import('@/views/cigaretteFront/caution/uploadVehicle/uploadUndeclareVehicle.vue')
+      //这里是我要删除的路由
+        path: '/uploadVehicle',
+        name: 'uploadVehicle',
+        component: () => import('@/views/cigaretteFront/caution/uploadVehicle')
       },{
         path: '/carema',
         name: 'carema',
@@ -156,8 +153,8 @@ export const constantRoutes = [
       {
         path: '/profile',
         name: 'profile',
-        component: () => import('@/views/cigaretteFront/menu/profile/profile'),    
-      },   
+        component: () => import('@/views/cigaretteFront/menu/profile/profile'),
+      },
     ]
   }
 ]

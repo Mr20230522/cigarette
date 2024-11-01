@@ -44,17 +44,6 @@ public class TobVehicleServiceImpl implements ITobVehicleService
         return tobVehicleMapper.selectTobVehicleList(tobVehicle);
     }
 
-    /**
-     * 查询车辆列表
-     *
-     * @param tobVehicle 新增车辆
-     * @return 车辆
-     */
-    @Override
-    public List<TobVehicle> selectTobVehicleInsertList(TobVehicle tobVehicle)
-    {
-        return tobVehicleMapper.selectTobVehicleInsertList(tobVehicle);
-    }
 
     /**
      * 新增车辆

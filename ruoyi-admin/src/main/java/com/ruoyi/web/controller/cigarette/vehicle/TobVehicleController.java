@@ -47,18 +47,6 @@ public class TobVehicleController extends BaseController
     }
 
     /**
-     * 查询新增车辆列表
-     */
-    @PreAuthorize("@ss.hasPermi('vehicle:vehicle:list')")
-    @GetMapping("/insertlist")
-    public TableDataInfo insertlist(TobVehicle tobVehicle)
-    {
-        startPage();
-        List<TobVehicle> list = tobVehicleService.selectTobVehicleInsertList(tobVehicle);
-        return getDataTable(list);
-    }
-
-    /**
      * 导出车辆列表
      */
     @PreAuthorize("@ss.hasPermi('vehicle:vehicle:export')")
