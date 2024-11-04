@@ -25,6 +25,12 @@
             <el-input v-model="queryParams.behaviorId" placeholder="请输入车行为id" clearable
               @keyup.enter.native="handleQuery" />
           </el-form-item>
+          <el-form-item label="预警程度" prop="status">
+            <el-select v-model="queryParams.status" placeholder="请选择预警程度" clearable>
+              <el-option v-for="dict in dict.type.tob_caution_status" :key="dict.value" :label="dict.label"
+                :value="dict.value" />
+            </el-select>
+          </el-form-item>
           <el-form-item>
             <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
             <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -54,10 +60,18 @@
         <el-table v-loading="loading" :data="cautionList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="55" align="center" />
           <el-table-column label="警示记录id" align="center" prop="cautionId" />
-          <el-table-column label="监测点id" align="center" prop="detectionId" />
+          <el-table-column label="检测点" align="center" prop="detectionId">
+            <template slot-scope="scope">
+              {{ getDetectionName(scope.row.detectionId) }}
+            </template>
+          </el-table-column>
           <el-table-column label="车行为id" align="center" prop="behaviorId" />
           <el-table-column label="警示效果" align="center" prop="warningEffect" />
-          <el-table-column label="状态" align="center" prop="status" />
+          <el-table-column label="状态" align="center" prop="status">
+            <template slot-scope="scope">
+              <dict-tag :options="dict.type.tob_caution_status" :value="scope.row.status" />
+            </template>
+          </el-table-column>
           <el-table-column label="备注" align="center" prop="remark" />
           <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
             <template slot-scope="scope">
@@ -76,14 +90,21 @@
     <!-- 添加或修改预警记录对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="监测点id" prop="detectionId">
-          <el-input v-model="form.detectionId" placeholder="请输入监测点id" />
-        </el-form-item>
+        <el-form-item label="检测点" prop="detectionId">
+                    <el-select v-model="form.detectionId" placeholder="请选择所管理的监测点" filterable
+                        @change="handleDetectionChange">
+                        <el-option v-for="item in detectionOptions" :key="item.detectionId"
+                            :label="getDetectionName(item.detectionId)" :value="item.detectionId"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="预警程度" prop="status">
+              <el-select v-model="form.status" placeholder="请选择预警程度">
+                <el-option v-for="dict in dict.type.tob_caution_status" :key="dict.value" :label="dict.label"
+                  :value="dict.value"></el-option>
+              </el-select>
+            </el-form-item>
         <el-form-item label="车行为id" prop="behaviorId">
           <el-input v-model="form.behaviorId" placeholder="请输入车行为id" />
-        </el-form-item>
-        <el-form-item label="删除标记" prop="delFlag">
-          <el-input v-model="form.delFlag" placeholder="请输入删除标记" />
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
@@ -104,6 +125,7 @@ import { listDetection } from "@/api/cigarette/detection/detection";
 
 export default {
   name: "Caution",
+  dicts: ['tob_caution_status'],
   data() {
     return {
       // 遮罩层
@@ -124,6 +146,14 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      defaultProps: {
+        children: 'children',
+        label: 'label'
+      },
+      treeData : [],
+      districts: [],
+      detections: [],
+      detectionOptions: [],    //json数组，用于存储检测点选项
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -148,9 +178,6 @@ export default {
         ],
         status: [
           { required: true, message: "状态不能为空", trigger: "change" }
-        ],
-        delFlag: [
-          { required: true, message: "删除标记不能为空", trigger: "blur" }
         ],
         createTime: [
           { required: true, message: "创建时间不能为空", trigger: "blur" }
@@ -189,6 +216,24 @@ export default {
       }).catch(error => {
         console.error("Failed to load detection options:", error);
       });
+    },
+    
+        // 当检测点变更时触发，自动填充地区ID
+        handleDetectionChange(newValue) {
+      // 通过检测点ID找到对应的地区ID
+      const selectedDetection = this.detectionOptions.find(item => item.detectionId === newValue);
+      if (selectedDetection) {
+        // 将地区ID填充到表单的districtId字段
+        this.form.districtId = selectedDetection.districtId;
+      }
+    },    getDistrictName(districtId) {
+        const district = this.districtOptions.find(item => item.districtId === districtId);
+        return district ? district.districtName : '未知地区';
+    },
+      // 根据 detectionId 获取监测点名字
+      getDetectionName(detectionId) {
+        const detection = this.detectionOptions.find(item => item.detectionId === detectionId)
+        return detection ? detection.detectionName : '未知监测点';
     },
 
     async getList() {
@@ -263,11 +308,11 @@ export default {
 
       // 如果有多个 detectionId，循环发送请求并合并结果
       if (detectionIds.length > 1) {
-        this.cameraList = [];
+        this.cautionList = [];
         detectionIds.forEach(async (id) => {
           this.queryParams.detectionId = id;
-          const response = await listCamera(this.queryParams);
-          this.cameraList.push(...response.rows);
+          const response = await listCaution(this.queryParams);
+          this.cautionList.push(...response.rows);
         });
       } else {
         // 只有一个 detectionId，直接发送请求
@@ -303,7 +348,6 @@ export default {
         behaviorId: null,
         warningEffect: null,
         status: null,
-        delFlag: null,
         remark: null,
         createTime: null,
         updateTime: null

@@ -125,14 +125,12 @@
     </update>
 
     <delete id="deleteTobDetectionByDetectionId" parameterType="Long">
-        delete
-        from tob_detection
-        where detection_id = #{detectionId}
+        update tob_detection set del_flag = '1' where detection_id = #{detectionId}
     </delete>
 
     <delete id="deleteTobDetectionByDetectionIds" parameterType="String">
-        delete from tob_detection where detection_id in
-        <foreach item="detectionId" collection="array" open="(" separator="," close=")">
+        update tob_detection set del_flag = '1' where detection_id in
+        <foreach collection="array" item="detectionId" open="(" separator="," close=")">
             #{detectionId}
         </foreach>
     </delete>

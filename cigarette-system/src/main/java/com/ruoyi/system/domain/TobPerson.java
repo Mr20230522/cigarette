@@ -7,9 +7,9 @@ import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
  * 驾驶人员对象 tob_person
- * 
+ *
  * @author cigarette
- * @date 2024-07-27
+ * @date 2024-09-14
  */
 public class TobPerson extends BaseEntity
 {
@@ -69,153 +69,167 @@ public class TobPerson extends BaseEntity
     @Excel(name = "涉案数")
     private Long casesInvolved;
 
-    public void setSuspectId(Long suspectId) 
+    /** 车员图片 */
+    @Excel(name = "车员图片")
+    private String picture;
+
+    public void setSuspectId(Long suspectId)
     {
         this.suspectId = suspectId;
     }
 
-    public Long getSuspectId() 
+    public Long getSuspectId()
     {
         return suspectId;
     }
-    public void setIdentityCard(Long identityCard) 
+    public void setIdentityCard(Long identityCard)
     {
         this.identityCard = identityCard;
     }
 
-    public Long getIdentityCard() 
+    public Long getIdentityCard()
     {
         return identityCard;
     }
-    public void setFaceFeature(String faceFeature) 
+    public void setFaceFeature(String faceFeature)
     {
         this.faceFeature = faceFeature;
     }
 
-    public String getFaceFeature() 
+    public String getFaceFeature()
     {
         return faceFeature;
     }
-    public void setPhone(String phone) 
+    public void setPhone(String phone)
     {
         this.phone = phone;
     }
 
-    public String getPhone() 
+    public String getPhone()
     {
         return phone;
     }
-    public void setSuspectLicenseNumber(String suspectLicenseNumber) 
+    public void setSuspectLicenseNumber(String suspectLicenseNumber)
     {
         this.suspectLicenseNumber = suspectLicenseNumber;
     }
 
-    public String getSuspectLicenseNumber() 
+    public String getSuspectLicenseNumber()
     {
         return suspectLicenseNumber;
     }
-    public void setName(String name) 
+    public void setName(String name)
     {
         this.name = name;
     }
 
-    public String getName() 
+    public String getName()
     {
         return name;
     }
-    public void setAge(Long age) 
+    public void setAge(Long age)
     {
         this.age = age;
     }
 
-    public Long getAge() 
+    public Long getAge()
     {
         return age;
     }
-    public void setGender(String gender) 
+    public void setGender(String gender)
     {
         this.gender = gender;
     }
 
-    public String getGender() 
+    public String getGender()
     {
         return gender;
     }
-    public void setAddress(String address) 
+    public void setAddress(String address)
     {
         this.address = address;
     }
 
-    public String getAddress() 
+    public String getAddress()
     {
         return address;
     }
-    public void setOccurrenceNumber(Long occurrenceNumber) 
+    public void setOccurrenceNumber(Long occurrenceNumber)
     {
         this.occurrenceNumber = occurrenceNumber;
     }
 
-    public Long getOccurrenceNumber() 
+    public Long getOccurrenceNumber()
     {
         return occurrenceNumber;
     }
-    public void setIllegalStatus(String illegalStatus) 
+    public void setIllegalStatus(String illegalStatus)
     {
         this.illegalStatus = illegalStatus;
     }
 
-    public String getIllegalStatus() 
+    public String getIllegalStatus()
     {
         return illegalStatus;
     }
-    public void setStatus(String status) 
+    public void setStatus(String status)
     {
         this.status = status;
     }
 
-    public String getStatus() 
+    public String getStatus()
     {
         return status;
     }
-    public void setDelFlag(String delFlag) 
+    public void setDelFlag(String delFlag)
     {
         this.delFlag = delFlag;
     }
 
-    public String getDelFlag() 
+    public String getDelFlag()
     {
         return delFlag;
     }
-    public void setCasesInvolved(Long casesInvolved) 
+    public void setCasesInvolved(Long casesInvolved)
     {
         this.casesInvolved = casesInvolved;
     }
 
-    public Long getCasesInvolved() 
+    public Long getCasesInvolved()
     {
         return casesInvolved;
+    }
+    public void setPicture(String picture)
+    {
+        this.picture = picture;
+    }
+
+    public String getPicture()
+    {
+        return picture;
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("suspectId", getSuspectId())
-            .append("identityCard", getIdentityCard())
-            .append("faceFeature", getFaceFeature())
-            .append("phone", getPhone())
-            .append("suspectLicenseNumber", getSuspectLicenseNumber())
-            .append("name", getName())
-            .append("age", getAge())
-            .append("gender", getGender())
-            .append("address", getAddress())
-            .append("occurrenceNumber", getOccurrenceNumber())
-            .append("illegalStatus", getIllegalStatus())
-            .append("status", getStatus())
-            .append("delFlag", getDelFlag())
-            .append("remark", getRemark())
-            .append("createTime", getCreateTime())
-            .append("updateTime", getUpdateTime())
-            .append("casesInvolved", getCasesInvolved())
-            .toString();
+                .append("suspectId", getSuspectId())
+                .append("identityCard", getIdentityCard())
+                .append("faceFeature", getFaceFeature())
+                .append("phone", getPhone())
+                .append("suspectLicenseNumber", getSuspectLicenseNumber())
+                .append("name", getName())
+                .append("age", getAge())
+                .append("gender", getGender())
+                .append("address", getAddress())
+                .append("occurrenceNumber", getOccurrenceNumber())
+                .append("illegalStatus", getIllegalStatus())
+                .append("status", getStatus())
+                .append("delFlag", getDelFlag())
+                .append("remark", getRemark())
+                .append("createTime", getCreateTime())
+                .append("updateTime", getUpdateTime())
+                .append("casesInvolved", getCasesInvolved())
+                .append("picture", getPicture())
+                .toString();
     }
 }

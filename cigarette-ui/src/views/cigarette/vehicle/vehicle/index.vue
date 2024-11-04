@@ -86,6 +86,11 @@
         </template>
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
+      <el-table-column label="车辆图片" align="center" prop="picture" width="100">
+        <template slot-scope="scope">
+          <image-preview :src="scope.row.picture" :width="50" :height="50"/>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="120px">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
@@ -126,7 +131,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="车型" prop="carTypeId">
-              <el-select v-model="queryParams.carTypeId" placeholder="请选择车型" clearable>
+              <el-select v-model="form.carTypeId" placeholder="请选择车型" clearable>
           <el-option v-for="dict in dict.type.tob_vehicle_type" :key="dict.value" :label="dict.label"
             :value="dict.value" />
         </el-select>
@@ -189,6 +194,9 @@
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
+        <el-form-item label="车辆图片" prop="picture">
+          <image-upload v-model="form.picture"/>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -247,6 +255,7 @@
           vehiclePurchaseDate: null,
           illegalStatus: null,
           status: null,
+          picture: null,
         },
         // 表单参数
         form: {},
@@ -273,7 +282,7 @@
           carTypeId: [{
             required: true,
             message: "车型不能为空",
-            trigger: "blur"
+            trigger: "change"
           }],
           carColor: [{
             required: true,
@@ -329,7 +338,8 @@
           delFlag: null,
           remark: null,
           createTime: null,
-          updateTime: null
+          updateTime: null,
+          picture: null,
         };
         this.resetForm("form");
       },

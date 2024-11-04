@@ -133,7 +133,7 @@
       <el-table-column label="联系方式" align="center" prop="contactInfo" />
       <el-table-column label="部门ID" align="center" prop="deptId" />
       <el-table-column label="值班类型" align="center" prop="dutyType" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="100">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -162,7 +162,7 @@
     />
 
     <!-- 添加或修改值班对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="50%" append-to-body style="margin-top: 100px;">
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="值班表名称" prop="scheduleName">
           <el-input v-model="form.scheduleName" placeholder="请输入值班表名称" />

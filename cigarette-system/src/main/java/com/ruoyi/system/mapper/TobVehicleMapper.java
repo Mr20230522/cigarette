@@ -35,6 +35,16 @@ public interface TobVehicleMapper
      */
     public int insertTobVehicle(TobVehicle tobVehicle);
 
+
+    /**
+     * 未录入车辆（也就是新增车辆）
+     * 只不过这里要插入另一张表里面
+     *
+     * @param tobVehicle 车辆
+     * @return 结果
+     */
+    public int insertTobVehicleInsert(TobVehicle tobVehicle);
+
     /**
      * 修改车辆
      * 

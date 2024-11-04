@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobKeyPictureMapper">
+    
+    <resultMap type="TobKeyPicture" id="TobKeyPictureResult">
+        <result property="keyPictureId"    column="key_picture_id"    />
+        <result property="image"    column="image"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="imageName"    column="image_name"    />
+        <result property="cameraId"    column="camera_id"    />
+        <result property="coordinate"    column="coordinate"    />
+        <result property="remark"    column="remark"    />
+        <result property="status"    column="status"    />
+        <result property="detectionId"    column="detection_id"    />
+        <result property="districtId"    column="district_id"    />
+    </resultMap>
+
+    <sql id="selectTobKeyPictureVo">
+        select key_picture_id, image, create_time, image_name, camera_id, coordinate, remark, status, detection_id, district_id from tob_key_picture
+    </sql>
+
+    <select id="selectTobKeyPictureList" parameterType="TobKeyPicture" resultMap="TobKeyPictureResult">
+        <include refid="selectTobKeyPictureVo"/>
+        <where>  
+            <if test="imageName != null  and imageName != ''"> and image_name like concat('%', #{imageName}, '%')</if>
+            <if test="cameraId != null "> and camera_id = #{cameraId}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="detectionId != null "> and detection_id = #{detectionId}</if>
+            <if test="districtId != null "> and district_id = #{districtId}</if>
+        </where>
+    </select>
+    
+    <select id="selectTobKeyPictureByKeyPictureId" parameterType="Long" resultMap="TobKeyPictureResult">
+        <include refid="selectTobKeyPictureVo"/>
+        where key_picture_id = #{keyPictureId}
+    </select>
+
+    <insert id="insertTobKeyPicture" parameterType="TobKeyPicture" useGeneratedKeys="true" keyProperty="keyPictureId">
+        insert into tob_key_picture
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="image != null and image != ''">image,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="imageName != null and imageName != ''">image_name,</if>
+            <if test="cameraId != null">camera_id,</if>
+            <if test="coordinate != null">coordinate,</if>
+            <if test="remark != null">remark,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="detectionId != null">detection_id,</if>
+            <if test="districtId != null">district_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="image != null and image != ''">#{image},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="imageName != null and imageName != ''">#{imageName},</if>
+            <if test="cameraId != null">#{cameraId},</if>
+            <if test="coordinate != null">#{coordinate},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="detectionId != null">#{detectionId},</if>
+            <if test="districtId != null">#{districtId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTobKeyPicture" parameterType="TobKeyPicture">
+        update tob_key_picture
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="image != null and image != ''">image = #{image},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="imageName != null and imageName != ''">image_name = #{imageName},</if>
+            <if test="cameraId != null">camera_id = #{cameraId},</if>
+            <if test="coordinate != null">coordinate = #{coordinate},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="detectionId != null">detection_id = #{detectionId},</if>
+            <if test="districtId != null">district_id = #{districtId},</if>
+        </trim>
+        where key_picture_id = #{keyPictureId}
+    </update>
+
+    <delete id="deleteTobKeyPictureByKeyPictureId" parameterType="Long">
+        delete from tob_key_picture where key_picture_id = #{keyPictureId}
+    </delete>
+
+    <delete id="deleteTobKeyPictureByKeyPictureIds" parameterType="String">
+        delete from tob_key_picture where key_picture_id in 
+        <foreach item="keyPictureId" collection="array" open="(" separator="," close=")">
+            #{keyPictureId}
+        </foreach>
+    </delete>
+</mapper>
