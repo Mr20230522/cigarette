@@ -28,12 +28,30 @@ public interface TobVehicleMapper
     public List<TobVehicle> selectTobVehicleList(TobVehicle tobVehicle);
 
     /**
+     * 查询车辆列表
+     *
+     * @param tobVehicle 新增车辆
+     * @return 车辆集合
+     */
+    public List<TobVehicle> selectTobVehicleInsertList(TobVehicle tobVehicle);
+
+    /**
      * 新增车辆
      * 
      * @param tobVehicle 车辆
      * @return 结果
      */
     public int insertTobVehicle(TobVehicle tobVehicle);
+
+
+    /**
+     * 未录入车辆（也就是新增车辆）
+     * 只不过这里要插入另一张表里面
+     *
+     * @param tobVehicle 车辆
+     * @return 结果
+     */
+    public int insertTobVehicleInsert(TobVehicle tobVehicle);
 
     /**
      * 修改车辆

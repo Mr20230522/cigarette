@@ -45,6 +45,18 @@ public class TobVehicleServiceImpl implements ITobVehicleService
     }
 
     /**
+     * 查询车辆列表
+     *
+     * @param tobVehicle 新增车辆
+     * @return 车辆
+     */
+    @Override
+    public List<TobVehicle> selectTobVehicleInsertList(TobVehicle tobVehicle)
+    {
+        return tobVehicleMapper.selectTobVehicleInsertList(tobVehicle);
+    }
+
+    /**
      * 新增车辆
      * 
      * @param tobVehicle 车辆
@@ -54,6 +66,7 @@ public class TobVehicleServiceImpl implements ITobVehicleService
     public int insertTobVehicle(TobVehicle tobVehicle)
     {
         tobVehicle.setCreateTime(DateUtils.getNowDate());
+        tobVehicleMapper.insertTobVehicleInsert(tobVehicle);
         return tobVehicleMapper.insertTobVehicle(tobVehicle);
     }
 

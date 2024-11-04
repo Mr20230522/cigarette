@@ -45,13 +45,13 @@
                   <span>退出登录</span>
                 </el-dropdown-item>
               </el-dropdown-menu>
-              
+
             </el-dropdown>
         </div>
 
- 
- 
- 
+
+
+
       </el-menu>
     </el-header>
     <!-- 左侧边栏区域 -->
@@ -183,7 +183,7 @@ export default {
 
 .el-menu-demo {
   position: absolute;
- 
+
   top: 0;
   left: 0;
   right: 0;
@@ -202,7 +202,7 @@ export default {
   /* 居中文本 */
   height: 70px;
   line-height: 70px;
- 
+
   font-weight: bold;
 }
 
@@ -313,5 +313,5 @@ export default {
     }
   }
 }
- 
+
 </style>

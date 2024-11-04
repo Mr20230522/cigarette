@@ -117,9 +117,13 @@ export const constantRoutes = [
         name: 'uploadPersonnel',
         component: () => import('@/views/cigaretteFront/caution/uploadPersonnel')
       },{
-        path: '/uploadVehicle',
-        name: 'uploadVehicle',
-        component: () => import('@/views/cigaretteFront/caution/uploadVehicle')
+        path: '/uploadDeclareVehicle',
+        name: 'uploadDeclareVehicle',
+        component: () => import('@/views/cigaretteFront/caution/uploadVehicle/uploadDeclareVehicle.vue')
+      },{
+        path: '/uploadUndeclareVehicle',
+        name: 'uploadUndeclareVehicle',
+        component: () => import('@/views/cigaretteFront/caution/uploadVehicle/uploadUndeclareVehicle.vue')
       },{
         path: '/carema',
         name: 'carema',

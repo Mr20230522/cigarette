@@ -28,6 +28,14 @@ public interface ITobVehicleService
     public List<TobVehicle> selectTobVehicleList(TobVehicle tobVehicle);
 
     /**
+     * 查询车辆列表
+     *
+     * @param tobVehicle 新增车辆
+     * @return 车辆集合
+     */
+    public List<TobVehicle> selectTobVehicleInsertList(TobVehicle tobVehicle);
+
+    /**
      * 新增车辆
      * 
      * @param tobVehicle 车辆
