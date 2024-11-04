@@ -4,20 +4,14 @@
     <el-header :class="{ hidden: isNavHidden }" style="height: 70px; border-bottom: 0px solid;">
       <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect"
         style="width: 100%;">
-        <el-menu-item index="1" @click="goto('cigaretteIndex')">首页</el-menu-item>
-        <el-submenu index="2">
-          <template slot="title"> 智慧监控 </template>
-          <el-menu-item index="2-1" @click="goto('carema')">查看监控</el-menu-item>
-          <el-menu-item index="2-2" @click="goto('personelInformation')">人车信息案底一览</el-menu-item>
-          <el-menu-item index="2-3" @click="goto('vehicleInformation')">车辆行踪预测一览</el-menu-item>
+
+        <el-menu-item index="1" @click="goto('cigaretteIndex')" style="margin-left: 25%;font-size: 30px;">logo</el-menu-item>
+        <el-submenu index="2" style="margin-left: 20%;font-size: 22px;">
+          <template slot="title"  style="font-size: 22px;"> 智慧监控 </template>
+          <el-menu-item index="2-1" @click="goto('personelInformation')" >人车信息案底一览</el-menu-item>
+          <el-menu-item index="2-2" @click="goto('vehicleInformation')">车辆行踪预测一览</el-menu-item>
         </el-submenu>
-<!--        <el-submenu index="3">-->
-<!--          <template slot="title"> 预警中心 </template>-->
-<!--          <el-menu-item index="3-1" @click="goto('uploadCaution')">上报预警效果</el-menu-item>-->
-<!--          <el-menu-item index="3-2" @click="goto('uploadVehicle')">上报车辆信息</el-menu-item>-->
-<!--          <el-menu-item index="3-3" @click="goto('uploadPersonnel')">上报人员信息</el-menu-item>-->
-<!--          <el-menu-item index="3-4" @click="goto('uploadCase')">上报案例信息</el-menu-item>-->
-<!--        </el-submenu>-->
+
         <el-submenu index="3">
           <template slot="title">预警中心</template>
           <el-menu-item index="3-1" @click="goto('uploadCaution')">上报预警效果</el-menu-item>
@@ -45,6 +39,10 @@
             进入后台
           </el-menu-item>
         </div>
+
+ 
+ 
+ 
       </el-menu>
     </el-header>
     <!-- 左侧边栏区域 -->
@@ -176,7 +174,7 @@ export default {
   /* 居中文本 */
   height: 70px;
   line-height: 70px;
-  font-size: 16px;
+ 
   font-weight: bold;
 }
 
