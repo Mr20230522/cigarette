@@ -17,7 +17,6 @@
           <el-menu-item index="3-1" @click="goto('uploadCaution')">上报预警效果</el-menu-item>
           <el-menu-item index="3-2" @click="goto('uploadVehicle')">上报车辆信息</el-menu-item>
           <el-menu-item index="3-3" @click="goto('uploadPersonnel')">上报人员信息</el-menu-item>
-          <el-menu-item index="3-4" @click="goto('uploadCase')">上报案例信息</el-menu-item>
         </el-submenu>
         <el-submenu index="4">
           <template slot="title"> 人员文档 </template>
@@ -28,17 +27,31 @@
           <el-menu-item index="4-5" @click="goto('feedBack')">反馈信息</el-menu-item>
         </el-submenu>
         <div class="right-menu">
-          <el-menu-item index="8" class="centered-login">
-            登录信息
-          </el-menu-item>
-          <el-menu-item index="9" class="centered-login" @click="goToLogin">
-            进入后台
-          </el-menu-item>
+            <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
+              <div class="avatar-wrapper">
+                <img :src="avatar" class="user-avatar">
+                <i class="el-icon-caret-bottom" />
+              </div>
+              <el-dropdown-menu slot="dropdown">
+                <router-link to="/profile">
+                  <el-dropdown-item>个人中心</el-dropdown-item>
+                </router-link>
+                <el-dropdown-item divided>
+                  <router-link to="/index">
+                  进入后台
+                </router-link>
+                </el-dropdown-item>
+                <el-dropdown-item divided @click.native="logout">
+                  <span>退出登录</span>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+
+            </el-dropdown>
         </div>
 
- 
- 
- 
+
+
+
       </el-menu>
     </el-header>
     <!-- 左侧边栏区域 -->
@@ -72,6 +85,8 @@
 </template>
 
 <script>
+
+import { mapGetters } from 'vuex'
 export default {
   name: 'Menu',
   data() {
@@ -82,6 +97,11 @@ export default {
       timeDifference: 0, // 初始时间差值为 0
       specifiedTime: new Date('2023-10-17T00:00:00').getTime(), // 指定时间
     }
+  },
+  computed: {
+    ...mapGetters([
+      'avatar',
+    ]),
   },
   created() {
     window.addEventListener('scroll', this.handleScrollheader);
@@ -114,8 +134,19 @@ export default {
       this.$router.push({ path: url })
     },
     goToLogin() {
-      this.$router.push('/login');
-    }
+      this.$router.push('/index');
+    },
+    async logout() {
+      this.$confirm('确定注销并退出系统吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$store.dispatch('LogOut').then(() => {
+          location.href = '/index';
+        })
+      }).catch(() => { });
+    },
   },
 }
 </script>
@@ -152,6 +183,7 @@ export default {
 
 .el-menu-demo {
   position: absolute;
+
   top: 0;
   left: 0;
   right: 0;
@@ -170,7 +202,7 @@ export default {
   /* 居中文本 */
   height: 70px;
   line-height: 70px;
- 
+
   font-weight: bold;
 }
 
@@ -257,4 +289,29 @@ export default {
   text-align: center;
   /* 文本水平居中 */
 }
+
+.avatar-container {
+  margin-right: 30px;
+
+  .avatar-wrapper {
+    margin-top: 5px;
+    position: relative;
+
+    .user-avatar {
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+    }
+
+    .el-icon-caret-bottom {
+      cursor: pointer;
+      position: absolute;
+      right: -20px;
+      top: 25px;
+      font-size: 12px;
+    }
+  }
+}
+
 </style>
