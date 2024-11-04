@@ -8,8 +8,16 @@
     </el-table>
 
     <!-- 通知详情对话框 -->
-    <el-dialog :title="noticeDetail.noticeTitle" :visible.sync="showNoticeDetail" width="50%">
-      <div v-html="noticeDetail.noticeContent"></div>
+    <el-dialog
+      :title="noticeDetail.noticeTitle"
+      :visible.sync="showNoticeDetail"
+      width="50%"
+      :modal="false"
+      class="centered-dialog">
+      <!-- 弹窗内容居中 -->
+      <div class="notice-content-wrapper">
+        <div v-html="noticeDetail.noticeContent" class="notice-content"></div>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -54,5 +62,29 @@ export default {
 <style scoped>
 .notice-list-container {
   padding: 20px;
+}
+
+.centered-dialog {
+  display: flex; /* 使弹窗使用弹性布局 */
+  align-items: center; /* 垂直居中 */
+  justify-content: center; /* 水平居中 */
+}
+
+.centered-dialog .el-dialog {
+  margin: auto; /*弹自动居中*/
+}
+
+.notice-content-wrapper {
+  display: flex;
+  justify-content: center; /* 水平居中 */
+  align-items: center; /* 垂直居中 */
+  min-height: 200px; /* 设定最小高度，确保垂直居中时有足够的空间 */
+  text-align: center; /* 将文本内容水平居中 */
+}
+
+.notice-content {
+  max-width: 100%; /* 防止内容超出父容器 */
+  max-height: 80vh; /* 限制内容的最大高度，确保不会超出弹窗 */
+  overflow-y: auto; /* 如果内容超出高度，显示滚动条 */
 }
 </style>
