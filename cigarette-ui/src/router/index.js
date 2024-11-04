@@ -91,7 +91,7 @@ export const constantRoutes = [
   {
     path: '/dataVisualization',
     name: 'dataVisualization',
-    component: () => import('@/views/cigaretteFront/dataVisualization')
+    component: () => import('@/views/cigaretteFront/dataVisualization/dataVisualization')
   },
   {
     path: '/cigaretteFront',
