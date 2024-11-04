@@ -8,8 +8,9 @@
         <el-menu-item index="1" @click="goto('cigaretteIndex')" style="margin-left: 25%;font-size: 30px;">logo</el-menu-item>
         <el-submenu index="2" style="margin-left: 20%;font-size: 22px;">
           <template slot="title"  style="font-size: 22px;"> 智慧监控 </template>
-          <el-menu-item index="2-1" @click="goto('personelInformation')" >人车信息案底一览</el-menu-item>
-          <el-menu-item index="2-2" @click="goto('vehicleInformation')">车辆行踪预测一览</el-menu-item>
+          <el-menu-item index="2-1" @click="goto('dataVisualization')" >数据可视化</el-menu-item>
+          <el-menu-item index="2-2" @click="goto('personelInformation')" >人车信息案底一览</el-menu-item>
+          <el-menu-item index="2-3" @click="goto('vehicleInformation')">车辆行踪预测一览</el-menu-item>
         </el-submenu>
 
         <el-submenu index="3">
