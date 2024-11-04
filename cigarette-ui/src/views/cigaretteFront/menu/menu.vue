@@ -4,21 +4,22 @@
     <el-header :class="{ hidden: isNavHidden }" style="height: 70px; border-bottom: 0px solid;">
       <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect"
         style="width: 100%;">
-        <el-menu-item index="1" @click="goto('cigaretteIndex')" style="margin-left: 25%;font-size: 25px;">logo</el-menu-item>
-        <el-submenu  index="2" style="margin-left: 15%;">
-          <el-menu-item slot="title" index="2" >智慧监控</el-menu-item>
-          <el-menu-item index="2-1" @click="goto('dataVisualization')">数据可视化</el-menu-item>
-          <el-menu-item index="2-2" @click="goto('personelInformation')">人车信息案底一览</el-menu-item>
-          <el-menu-item index="2-3" @click="goto('vehicleInformation')">车辆行踪预测一览</el-menu-item>
+
+        <el-menu-item index="1" @click="goto('cigaretteIndex')" style="margin-left: 25%;font-size: 30px;">logo</el-menu-item>
+        <el-submenu index="2" style="margin-left: 20%;font-size: 22px;">
+          <template slot="title"  style="font-size: 22px;"> 智慧监控 </template>
+          <el-menu-item index="2-1" @click="goto('personelInformation')" >人车信息案底一览</el-menu-item>
+          <el-menu-item index="2-2" @click="goto('vehicleInformation')">车辆行踪预测一览</el-menu-item>
         </el-submenu>
+
         <el-submenu index="3">
-          <el-menu-item slot="title" index="3" >预警中心</el-menu-item>
+          <template slot="title">预警中心</template>
           <el-menu-item index="3-1" @click="goto('uploadCaution')">上报预警效果</el-menu-item>
           <el-menu-item index="3-2" @click="goto('uploadVehicle')">上报车辆信息</el-menu-item>
           <el-menu-item index="3-3" @click="goto('uploadPersonnel')">上报人员信息</el-menu-item>
         </el-submenu>
         <el-submenu index="4">
-          <el-menu-item slot="title" index="4" >人员文档</el-menu-item>
+          <template slot="title"> 人员文档 </template>
           <el-menu-item index="4-1" @click="goto('notice')">通知公告</el-menu-item>
           <el-menu-item index="4-2" @click="goto('document')">执行文档</el-menu-item>
           <el-menu-item index="4-3" @click="goto('clockLog')">出勤信息</el-menu-item>
@@ -46,6 +47,10 @@
               </el-dropdown-menu>
             </el-dropdown>
         </div>
+
+ 
+ 
+ 
       </el-menu>
     </el-header>
     <!-- 左侧边栏区域 -->
@@ -196,8 +201,7 @@ export default {
   /* 居中文本 */
   height: 70px;
   line-height: 70px;
-  font-size: 18px;
-
+ 
   font-weight: bold;
 }
 
