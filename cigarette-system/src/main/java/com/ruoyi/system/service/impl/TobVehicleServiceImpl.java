@@ -44,6 +44,7 @@ public class TobVehicleServiceImpl implements ITobVehicleService
         return tobVehicleMapper.selectTobVehicleList(tobVehicle);
     }
 
+
     /**
      * 新增车辆
      * 
@@ -54,6 +55,7 @@ public class TobVehicleServiceImpl implements ITobVehicleService
     public int insertTobVehicle(TobVehicle tobVehicle)
     {
         tobVehicle.setCreateTime(DateUtils.getNowDate());
+        tobVehicleMapper.insertTobVehicleInsert(tobVehicle);
         return tobVehicleMapper.insertTobVehicle(tobVehicle);
     }
 

@@ -41,7 +41,7 @@ export default {
           window._loca = loca;
 
           var geo = new Loca.GeoJSONSource({
-            url: 'https://a.amap.com/Loca/static/loca-v2/demos/mock_data/bj_bus.json',
+            url: './bj_bus.json',
           });
 
           var layer = new Loca.PulseLineLayer({

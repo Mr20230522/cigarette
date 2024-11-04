@@ -2,7 +2,13 @@ package com.ruoyi.system.service.impl;
 
 import java.util.List;
 
+import com.ruoyi.system.domain.TobPerson;
+import com.ruoyi.system.domain.TobVehicle;
+import com.ruoyi.system.domain.TobVehicleBehavior;
 import com.ruoyi.system.domain.vo.TobCaseInformationVo;
+import com.ruoyi.system.mapper.TobPersonMapper;
+import com.ruoyi.system.mapper.TobVehicleBehaviorMapper;
+import com.ruoyi.system.mapper.TobVehicleMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.system.mapper.TobCaseInformationMapper;
@@ -20,6 +26,12 @@ public class TobCaseInformationServiceImpl implements ITobCaseInformationService
 {
     @Autowired
     private TobCaseInformationMapper tobCaseInformationMapper;
+    @Autowired
+    private TobVehicleBehaviorMapper tobVehicleBehaviorMapper;
+    @Autowired
+    private TobVehicleMapper tobVehicleMapper;
+    @Autowired
+    private TobPersonMapper tobPersonMapper;
 
     /**
      * 查询案件信息
@@ -65,6 +77,18 @@ public class TobCaseInformationServiceImpl implements ITobCaseInformationService
     @Override
     public int insertTobCaseInformation(TobCaseInformation tobCaseInformation)
     {
+        System.out.println("16666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666");
+        TobVehicleBehavior vehiclebehavior =tobVehicleBehaviorMapper.selectTobVehicleBehaviorByBehaviorId(tobCaseInformation.getBehaviorId());
+
+        TobVehicle vehicle =tobVehicleMapper.selectTobVehicleByCarId(vehiclebehavior.getCarId());
+        vehicle.setCasesInvolved(vehicle.getCasesInvolved()+1);
+        System.out.println("2666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666");
+
+        tobVehicleMapper.updateTobVehicle(vehicle);
+        TobPerson person =tobPersonMapper.selectTobPersonBySuspectId(vehiclebehavior.getDriverId());
+        person.setCasesInvolved(person.getCasesInvolved()+1);
+        tobPersonMapper.updateTobPerson(person);
+        System.out.println("6666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666");
         return tobCaseInformationMapper.insertTobCaseInformation(tobCaseInformation);
     }
 
