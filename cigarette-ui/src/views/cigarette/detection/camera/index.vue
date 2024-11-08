@@ -485,10 +485,15 @@ export default {
         //获取经纬度
         getLocation() {
             if (navigator.geolocation) {
+                console.log("navigator")
+                console.log(navigator)
                 navigator.geolocation.getCurrentPosition(
+
                     position => {
                         this.form.longitude = position.coords.longitude;
                         this.form.latitude = position.coords.latitude;
+                        console.log(position.coords.longitude);
+                        console.log(position.coords.latitude);
                     },
                     error => {
                         console.error('Error getting location:', error);
