@@ -4,31 +4,6 @@
 
     <el-row :gutter="20">
 
-      <!-- 地区数据 -->
-
-      <el-col :span="4" :xs="24">
-
-        <!-- <div>
-
-                    <el-input v-model="districtName" placeholder="请输入地区名称" clearable size="small"
-
-                        prefix-icon="el-icon-search" style="margin-bottom: 20px" />
-
-                </div> -->
-
-        <div>
-
-          <el-tree :data="treeData" node-key="nodeKey" default-expand-all :props="defaultProps"
-
-                   @node-click="handleNodeClick">
-
-          </el-tree>
-
-        </div>
-
-      </el-col>
-
-      <!-- 摄像头数据 -->
 
       <el-col :span="20" :xs="24">
 
@@ -36,19 +11,12 @@
 
                  label-width="68px">
 
-          <el-form-item label="监测点id" prop="detectionId">
-
-            <el-input v-model="queryParams.detectionId" placeholder="请输入监测点id" clearable
-
-                      @keyup.enter.native="handleQuery" />
-
-          </el-form-item>
 
           <el-form-item label="车行为id" prop="behaviorId">
 
             <el-input v-model="queryParams.behaviorId" placeholder="请输入车行为id" clearable
 
-                      @keyup.enter.native="handleQuery" />
+                      @keyup.enter.native="handleQuery"/>
 
           </el-form-item>
 
@@ -62,53 +30,9 @@
 
         </el-form>
 
-
-
-        <el-row :gutter="10" class="mb8">
-
-          <el-col :span="1.5">
-
-            <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
-
-                       v-hasPermi="['caution:cautionLog:add']">新增</el-button>
-
-          </el-col>
-
-          <el-col :span="1.5">
-
-            <el-button type="success" plain icon="el-icon-edit" size="mini" :disabled="single" @click="handleUpdate"
-
-                       v-hasPermi="['caution:cautionLog:edit']">修改</el-button>
-
-          </el-col>
-
-          <el-col :span="1.5">
-
-            <el-button type="danger" plain icon="el-icon-delete" size="mini" :disabled="multiple" @click="handleDelete"
-
-                       v-hasPermi="['caution:cautionLog:remove']">删除</el-button>
-
-          </el-col>
-
-          <el-col :span="1.5">
-
-            <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport"
-
-                       v-hasPermi="['caution:cautionLog:export']">导出</el-button>
-
-          </el-col>
-
-          <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
-
-        </el-row>
-
-
-
         <el-table v-loading="loading" :data="cautionList" @selection-change="handleSelectionChange">
 
-          <el-table-column type="selection" width="55" align="center" />
-
-          <el-table-column label="警示记录id" align="center" prop="cautionId" />
+          <el-table-column label="警示记录id" align="center" prop="cautionId"/>
 
           <el-table-column label="检测点" align="center" prop="detectionId">
 
@@ -120,21 +44,21 @@
 
           </el-table-column>
 
-          <el-table-column label="车行为id" align="center" prop="behaviorId" />
+          <el-table-column label="车行为id" align="center" prop="behaviorId"/>
 
-          <el-table-column label="警示效果" align="center" prop="warningEffect" />
+          <el-table-column label="警示效果" align="center" prop="warningEffect"/>
 
           <el-table-column label="状态" align="center" prop="status">
 
             <template slot-scope="scope">
 
-              <dict-tag :options="dict.type.tob_caution_status" :value="scope.row.status" />
+              <dict-tag :options="dict.type.tob_caution_status" :value="scope.row.status"/>
 
             </template>
 
           </el-table-column>
 
-          <el-table-column label="备注" align="center" prop="remark" />
+          <el-table-column label="备注" align="center" prop="remark"/>
 
           <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
 
@@ -142,11 +66,13 @@
 
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
 
-                         v-hasPermi="['caution:cautionLog:edit']">修改</el-button>
+                         v-hasPermi="['caution:cautionLog:edit']">修改
+              </el-button>
 
               <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
 
-                         v-hasPermi="['caution:cautionLog:remove']">删除</el-button>
+                         v-hasPermi="['caution:cautionLog:remove']">删除
+              </el-button>
 
             </template>
 
@@ -155,10 +81,10 @@
         </el-table>
 
 
+        <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum"
+                    :limit.sync="queryParams.pageSize"
 
-        <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize"
-
-                    @pagination="getList" />
+                    @pagination="getList"/>
 
       </el-col>
 
@@ -198,7 +124,7 @@
 
         <el-form-item label="车行为id" prop="behaviorId">
 
-          <el-input v-model="form.behaviorId" placeholder="请输入车行为id" />
+          <el-input v-model="form.behaviorId" placeholder="请输入车行为id"/>
 
         </el-form-item>
 
@@ -220,7 +146,7 @@
 
         <el-form-item label="备注" prop="remark">
 
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>
 
         </el-form-item>
 
@@ -241,15 +167,13 @@
 </template>
 
 
-
 <script>
 
-import { listCaution, getCaution, delCaution, addCaution, updateCaution } from "@/api/cigarette/caution/caution";
+import {listCaution, getCaution, delCaution, addCaution, updateCaution} from "@/api/cigarette/caution/caution";
 
-import { listDistrict } from "@/api/cigarette/detection/district";
+import {listDistrict} from "@/api/cigarette/detection/district";
 
-import { listDetection } from "@/api/cigarette/detection/detection";
-
+import {listDetection} from "@/api/cigarette/detection/detection";
 
 
 export default {
@@ -306,7 +230,7 @@ export default {
 
       },
 
-      treeData : [],
+      treeData: [],
 
       districts: [],
 
@@ -342,37 +266,37 @@ export default {
 
         detectionId: [
 
-          { required: true, message: "监测点id不能为空", trigger: "blur" }
+          {required: true, message: "监测点id不能为空", trigger: "blur"}
 
         ],
 
         behaviorId: [
 
-          { required: true, message: "车行为id不能为空", trigger: "blur" }
+          {required: true, message: "车行为id不能为空", trigger: "blur"}
 
         ],
 
         warningEffect: [
 
-          { required: true, message: "警示效果不能为空", trigger: "change" }
+          {required: true, message: "警示效果不能为空", trigger: "change"}
 
         ],
 
         status: [
 
-          { required: true, message: "状态不能为空", trigger: "change" }
+          {required: true, message: "状态不能为空", trigger: "change"}
 
         ],
 
         createTime: [
 
-          { required: true, message: "创建时间不能为空", trigger: "blur" }
+          {required: true, message: "创建时间不能为空", trigger: "blur"}
 
         ],
 
         updateTime: [
 
-          { required: true, message: "更新时间不能为空", trigger: "blur" }
+          {required: true, message: "更新时间不能为空", trigger: "blur"}
 
         ]
 
@@ -441,7 +365,6 @@ export default {
     },
 
 
-
     // 当检测点变更时触发，自动填充地区ID
 
     handleDetectionChange(newValue) {
@@ -458,7 +381,7 @@ export default {
 
       }
 
-    },    getDistrictName(districtId) {
+    }, getDistrictName(districtId) {
 
       const district = this.districtOptions.find(item => item.districtId === districtId);
 
@@ -477,7 +400,6 @@ export default {
     },
 
 
-
     async getList() {
 
       try {
@@ -487,11 +409,9 @@ export default {
         this.districts = districtsResponse.data;
 
 
-
         const detectionsResponse = await listDetection();
 
         this.detections = detectionsResponse.rows;
-
 
 
         listCaution(this.queryParams).then(response => {
@@ -505,7 +425,6 @@ export default {
           this.total = response.total;
 
         });
-
 
 
         this.buildTreeData();
@@ -527,7 +446,6 @@ export default {
       const districtMap = new Map();
 
 
-
       this.districts.forEach(district => {
 
         districtMap.set(district.districtId, {
@@ -543,7 +461,6 @@ export default {
         });
 
       });
-
 
 
       this.detections.forEach(detection => {
@@ -567,7 +484,6 @@ export default {
         }
 
       });
-
 
 
       this.treeData = [];
@@ -599,7 +515,6 @@ export default {
       const detectionIds = [];
 
 
-
       const collectDetectionIds = (node) => {
 
         if (node.type === 'detection') {
@@ -617,9 +532,7 @@ export default {
       };
 
 
-
       collectDetectionIds(data);
-
 
 
       // 如果有多个 detectionId，循环发送请求并合并结果
@@ -649,7 +562,6 @@ export default {
       }
 
     },
-
 
 
     handleSelectionChange(selection) {
@@ -738,29 +650,6 @@ export default {
 
     },
 
-    // 多选框选中数据
-
-    handleSelectionChange(selection) {
-
-      this.ids = selection.map(item => item.cautionId)
-
-      this.single = selection.length !== 1
-
-      this.multiple = !selection.length
-
-    },
-
-    /** 新增按钮操作 */
-
-    handleAdd() {
-
-      this.reset();
-
-      this.open = true;
-
-      this.title = "添加预警记录";
-
-    },
 
     /** 修改按钮操作 */
 
@@ -844,21 +733,11 @@ export default {
 
         this.$modal.msgSuccess("删除成功");
 
-      }).catch(() => { });
+      }).catch(() => {
+      });
 
     },
 
-    /** 导出按钮操作 */
-
-    handleExport() {
-
-      this.download('cigarette/caution/cautionLog/export', {
-
-        ...this.queryParams
-
-      }, `caution_${new Date().getTime()}.xlsx`)
-
-    }
 
   }
 
