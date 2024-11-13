@@ -60,6 +60,7 @@
         <el-table v-loading="loading" :data="videoList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="55" align="center" />
           <el-table-column label="视频ID" align="center" prop="videoId" />
+          <el-table-column label="行为ID" align="center" prop="actionId" />
           <el-table-column label="视频url" align="center" prop="videoPath" min-width="180px">
             <template slot-scope="scope">
               <video v-if="scope.row.videoPath" width="180px" height="140px" controls>
@@ -472,6 +473,7 @@ export default {
     reset() {
       this.form = {
         videoId: null,
+        actionId:null,
         videoPath: null,
         videoName: null,
         cameraId: null,

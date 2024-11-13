@@ -9,12 +9,11 @@ import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
  * 关键帧视频对象 tob_key_video
- * 
+ *
  * @author muyouzhi
  * @date 2024-10-27
  */
-public class TobKeyVideo extends BaseEntity
-{
+public class TobKeyVideo extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     /** 视频ID */
@@ -54,116 +53,121 @@ public class TobKeyVideo extends BaseEntity
     @Excel(name = "地区id")
     private Long districtId;
 
+    /** 行为ID */
+    @Excel(name = "行为ID")
+    private Long actionId; // 新增的属性
+
     /** 状态 */
     @Excel(name = "状态")
     private String status;
 
-    public void setVideoId(Long videoId) 
-    {
+    // Getter and Setter for actionId
+    public Long getActionId() {
+        return actionId;
+    }
+
+    public void setActionId(Long actionId) {
+        this.actionId = actionId;
+    }
+
+    // 其他属性的getter和setter...
+
+    public void setVideoId(Long videoId) {
         this.videoId = videoId;
     }
 
-    public Long getVideoId() 
-    {
+    public Long getVideoId() {
         return videoId;
     }
-    public void setVideoPath(String videoPath) 
-    {
+
+    public void setVideoPath(String videoPath) {
         this.videoPath = videoPath;
     }
 
-    public String getVideoPath() 
-    {
+    public String getVideoPath() {
         return videoPath;
     }
-    public void setVideoName(String videoName) 
-    {
+
+    public void setVideoName(String videoName) {
         this.videoName = videoName;
     }
 
-    public String getVideoName() 
-    {
+    public String getVideoName() {
         return videoName;
     }
-    public void setCameraId(Long cameraId) 
-    {
+
+    public void setCameraId(Long cameraId) {
         this.cameraId = cameraId;
     }
 
-    public Long getCameraId() 
-    {
+    public Long getCameraId() {
         return cameraId;
     }
-    public void setStartTime(Date startTime) 
-    {
+
+    public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
-    public Date getStartTime() 
-    {
+    public Date getStartTime() {
         return startTime;
     }
-    public void setEndTime(Date endTime) 
-    {
+
+    public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
 
-    public Date getEndTime() 
-    {
+    public Date getEndTime() {
         return endTime;
     }
-    public void setVideoSize(Long videoSize) 
-    {
+
+    public void setVideoSize(Long videoSize) {
         this.videoSize = videoSize;
     }
 
-    public Long getVideoSize() 
-    {
+    public Long getVideoSize() {
         return videoSize;
     }
-    public void setDetectionId(Long detectionId) 
-    {
+
+    public void setDetectionId(Long detectionId) {
         this.detectionId = detectionId;
     }
 
-    public Long getDetectionId() 
-    {
+    public Long getDetectionId() {
         return detectionId;
     }
-    public void setDistrictId(Long districtId) 
-    {
+
+    public void setDistrictId(Long districtId) {
         this.districtId = districtId;
     }
 
-    public Long getDistrictId() 
-    {
+    public Long getDistrictId() {
         return districtId;
     }
-    public void setStatus(String status) 
-    {
+
+    public void setStatus(String status) {
         this.status = status;
     }
 
-    public String getStatus() 
-    {
+    public String getStatus() {
         return status;
     }
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("videoId", getVideoId())
-            .append("videoPath", getVideoPath())
-            .append("videoName", getVideoName())
-            .append("cameraId", getCameraId())
-            .append("startTime", getStartTime())
-            .append("endTime", getEndTime())
-            .append("videoSize", getVideoSize())
-            .append("detectionId", getDetectionId())
-            .append("districtId", getDistrictId())
-            .append("remark", getRemark())
-            .append("status", getStatus())
-            .append("createTime", getCreateTime())
-            .toString();
+        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+                .append("videoId", getVideoId())
+                .append("videoPath", getVideoPath())
+                .append("videoName", getVideoName())
+                .append("cameraId", getCameraId())
+                .append("startTime", getStartTime())
+                .append("endTime", getEndTime())
+                .append("videoSize", getVideoSize())
+                .append("detectionId", getDetectionId())
+                .append("districtId", getDistrictId())
+                .append("actionId", getActionId())
+                .append("remark", getRemark())
+                .append("status", getStatus())
+                .append("createTime", getCreateTime())
+                .toString();
     }
 }
