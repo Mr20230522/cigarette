@@ -2,6 +2,7 @@ package com.ruoyi.system.mapper;
 
 import java.util.List;
 import com.ruoyi.system.domain.TobVehicle;
+import com.ruoyi.system.domain.vo.TobVehicleVo;
 
 /**
  * 车辆Mapper接口
@@ -17,15 +18,15 @@ public interface TobVehicleMapper
      * @param carId 车辆主键
      * @return 车辆
      */
-    public TobVehicle selectTobVehicleByCarId(Long carId);
+    public TobVehicleVo selectTobVehicleByCarId(Long carId);
 
     /**
      * 查询车辆列表
      * 
-     * @param tobVehicle 车辆
+     * @param tobVehicleVo 车辆
      * @return 车辆集合
      */
-    public List<TobVehicle> selectTobVehicleList(TobVehicle tobVehicle);
+    public List<TobVehicleVo> selectTobVehicleList(TobVehicleVo tobVehicleVo);
 
     /**
      * 新增车辆

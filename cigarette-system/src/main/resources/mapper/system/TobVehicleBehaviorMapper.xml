@@ -74,7 +74,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT a.*,b.license_plate,c.name
         FROM tob_vehicle_behavior AS a
                  INNER JOIN tob_vehicle AS b ON a.car_id = b.car_id
-                 INNER JOIN tob_person AS c ON a.driver_id = c.suspect_id
+                 LEFT JOIN tob_person AS c ON a.driver_id = c.suspect_id
         <where>
             <if test="carId != null "> and a.car_id = #{carId}</if>
             <if test="carTypeId != null "> and a.car_type_id = #{carTypeId}</if>
