@@ -18,7 +18,7 @@
     <h2>{{ currentContent.title }}</h2>
     <p v-for="(line, index) in currentContent.description" :key="index">{{ line }}</p>
   </div>
-    <FeedBack/>
+    <!--<FeedBack/>-->
 </div>
 </template>
 
