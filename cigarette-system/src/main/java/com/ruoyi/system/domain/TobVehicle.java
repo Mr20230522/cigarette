@@ -42,7 +42,7 @@ public class TobVehicle extends BaseEntity
 
     /** 案件涉及数量 */
     @Excel(name = "案件涉及数量")
-    private String casesInvolved;
+    private Long casesInvolved;
 
     /** 车主id */
     @Excel(name = "车主id")
@@ -122,12 +122,12 @@ public class TobVehicle extends BaseEntity
     {
         return occurrenceNumber;
     }
-    public void setCasesInvolved(String casesInvolved)
+    public void setCasesInvolved(Long casesInvolved)
     {
         this.casesInvolved = casesInvolved;
     }
 
-    public String getCasesInvolved()
+    public Long getCasesInvolved()
     {
         return casesInvolved;
     }

@@ -5,6 +5,8 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 
+import java.math.BigDecimal;
+
 /**
  * 监测区域对象 tob_detection
  *
@@ -33,6 +35,15 @@ public class TobDetection extends BaseEntity
     /** 状态 */
     @Excel(name = "状态")
     private String status;
+
+
+    /** 状态 */
+    @Excel(name = "经度")
+    private BigDecimal longitude;
+
+    /** 状态 */
+    @Excel(name = "纬度")
+    private BigDecimal  latitude;
 
     /** 删除标记 */
     @Excel(name = "删除标记")
@@ -106,6 +117,23 @@ public class TobDetection extends BaseEntity
         return responsibleId;
     }
 
+
+    public BigDecimal getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(BigDecimal longitude) {
+        this.longitude = longitude;
+    }
+
+    public BigDecimal getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(BigDecimal latitude) {
+        this.latitude = latitude;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -118,6 +146,8 @@ public class TobDetection extends BaseEntity
                 .append("remark", getRemark())
                 .append("createTime", getCreateTime())
                 .append("updateTime", getUpdateTime())
+                .append("longitude", getLongitude())
+                .append("latitude", getLatitude())
                 .append("responsibleId", getResponsibleId())
                 .toString();
     }

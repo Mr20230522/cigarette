@@ -286,7 +286,7 @@ export default {
 
 
 <style scoped>
-::v-deep(.el-upload-list--picture-card .el-upload-list__item-actions span + span) {
+/* ::v-deep(.el-upload-list--picture-card .el-upload-list__item-actions span + span) {
   margin-left: 0.6rem !important;
 }
 
@@ -294,7 +294,7 @@ export default {
 ::v-deep(li.el-upload-list__item) {
   width: 70px !important;
   height: 70px !important;
-}
+} */
 
 ::v-deep .el-upload-dragger {
   width: 100%;

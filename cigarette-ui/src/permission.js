@@ -16,7 +16,7 @@ router.beforeEach((to, from, next) => {
     to.meta.title && store.dispatch('settings/setTitle', to.meta.title)
     /* has token*/
     if (to.path === '/login') {
-      next({ path: '/' })
+      next({ path: '/cigaretteIndex' })
       NProgress.done()
     } else if (whiteList.indexOf(to.path) !== -1) {
       next()

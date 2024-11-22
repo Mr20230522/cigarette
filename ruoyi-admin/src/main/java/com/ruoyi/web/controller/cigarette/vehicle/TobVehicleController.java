@@ -88,7 +88,9 @@ public class TobVehicleController extends BaseController
     @PutMapping
     public AjaxResult edit(@RequestBody TobVehicle tobVehicle)
     {
+        System.out.println();
         return toAjax(tobVehicleService.updateTobVehicle(tobVehicle));
+
     }
 
     /**
