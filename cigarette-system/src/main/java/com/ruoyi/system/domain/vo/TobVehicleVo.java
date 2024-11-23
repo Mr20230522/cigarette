@@ -18,15 +18,28 @@ import java.util.Date;
 public class TobVehicleVo extends TobVehicle
 {
     /** 驾驶人id */
-    @Excel(name = "驾驶人姓名")
-    private String Name;
+    @Excel(name = "驾驶员姓名")
+    private String name;
+
+
+    /** 驾驶员电话号码 */
+    @Excel(name = "驾驶员电话号码")
+    private String phone;
 
     public String getName() {
-        return Name;
+        return name;
     }
 
     public void setName(String name) {
-        Name = name;
+        this.name = name;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     @Override
@@ -41,6 +54,7 @@ public class TobVehicleVo extends TobVehicle
                 .append("casesInvolved", getCasesInvolved())
                 .append("carOwnerId", getCarOwnerId())
                 .append("name", getName())
+                .append("phone",getPhone())
                 .append("vehiclePurchaseDate", getVehiclePurchaseDate())
                 .append("illegalStatus", getIllegalStatus())
                 .append("status", getStatus())

@@ -73,18 +73,29 @@
               {{ getDistrictName(scope.row.districtId) }}
             </template>
           </el-table-column>
-          <el-table-column label="状态" align="center" prop="status">
-            <template slot-scope="scope">
-              <dict-tag :options="dict.type.tob_dd_status" :value="scope.row.status" />
-            </template>
-          </el-table-column>
-          <el-table-column label="备注" align="center" prop="remark" />
           <el-table-column label="负责人" align="center" prop="responsibleId">
             <template slot-scope="scope">
               {{ getStaffName(scope.row.responsibleId) }}
             </template>
           </el-table-column>
-          <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+          <el-table-column label="状态" align="center" prop="status">
+            <template slot-scope="scope">
+              <dict-tag :options="dict.type.tob_dd_status" :value="scope.row.status" />
+            </template>
+          </el-table-column>
+
+          <el-table-column label="经度" align="center" prop="longitude" min-width="120" >
+            <template slot-scope="scope"> 
+              <el-button size="mini" type="text" @click="longitudeAndLatitude(scope.row)">{{ scope.row.longitude }}</el-button>
+            </template>
+          </el-table-column>
+          <el-table-column label="纬度" align="center" prop="latitude"  min-width="120" >
+            <template slot-scope="scope">
+              <el-button size="mini" type="text" @click="longitudeAndLatitude(scope.row)">{{ scope.row.latitude }}</el-button>
+            </template>
+          </el-table-column>
+          <el-table-column label="备注" align="center" prop="remark" max-width="200" />
+          <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="120">
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                 v-hasPermi="['cigarette:detection:edit']">修改</el-button>
@@ -104,29 +115,46 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="监测点名称" prop="detectionName">
-          <el-input v-model="form.detectionName" placeholder="请输入监测点名称" />
-        </el-form-item>
+              <el-input v-model="form.detectionName" placeholder="请输入监测点名称" />
+            </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="所属地区" prop="districtId">
-          <treeselect v-model="form.districtId" :options="districtTreeOptions" placeholder="请选择所属地区" />
-        </el-form-item>
+              <treeselect v-model="form.districtId" :options="districtTreeOptions" placeholder="请选择所属地区" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="4">
+            <el-form-item>
+              <el-button type="primary" plain @click="getLocation">获取经纬度</el-button>
+            </el-form-item>
+          </el-col>
+          <el-col :span="9">
+            <el-form-item label="经度" prop="longitude">
+              <el-input v-model="form.longitude" placeholder="请输入经度" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="9">
+            <el-form-item label="纬度" prop="latitude">
+              <el-input v-model="form.latitude" placeholder="请输入纬度" />
+            </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
             <el-form-item label="状态" prop="status">
-          <el-select v-model="form.status">
-            <el-option v-for="status in dict.type.tob_dd_status" :key="status.value" :label="status.label"
-              :value="status.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
+              <el-select v-model="form.status">
+                <el-option v-for="status in dict.type.tob_dd_status" :key="status.value" :label="status.label"
+                  :value="status.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="监测点顺序" prop="orderNum">
-          <el-input-number v-model="form.orderNum" controls-position="right" :min="0" placeholder="请输入监测点顺序" />
-        </el-form-item>
+              <el-input-number v-model="form.orderNum" controls-position="right" :min="0" placeholder="请输入监测点顺序" />
+            </el-form-item>
           </el-col>
         </el-row>
 
@@ -147,11 +175,8 @@
         <!-- 添加下拉框以选择负责人所对应的工作人员 -->
         <el-form-item label="负责人" prop="responsibleId">
           <el-select v-model="form.responsibleId" placeholder="请选择负责人" filterable>
-            <el-option
-            v-for="item in staffOptions"
-            :key="item.staffId"
-            :label="`${getStaffName(item.staffId)} (${item.phone || '无电话'})`"
-            :value="item.staffId"></el-option>
+            <el-option v-for="item in staffOptions" :key="item.staffId"
+              :label="`${getStaffName(item.staffId)} (${item.phone || '无电话'})`" :value="item.staffId"></el-option>
           </el-select>
         </el-form-item>
 
@@ -215,7 +240,10 @@ export default {
         districtId: null
       },
       // 表单参数
-      form: {},
+      form: {
+        longitude: '',
+        latitude: ''
+      },
       defaultProps: {
         children: "children",
         label: "label"
@@ -248,32 +276,32 @@ export default {
     this.getDistrictTree()//加载地区树
   },
   computed: {
-  districtOptionsMap() {
-    return this.districtOptions.reduce((map, item) => {
-      map[item.districtId] = item.districtName;
-      return map;
-    }, {});
-  },
-  staffOptionsMap() {
-    return this.staffOptions.reduce((map, item) => {
-      map[item.staffId] = item;
-      return map;
-    }, {});
-  }
-},
-  methods: {
-     // 加载用户选项
-  loadUserOptions() {
-    listUser().then(response => {
-      this.userOptions = response.rows.reduce((map, item) => {
-        map[item.userId] = item;
+    districtOptionsMap() {
+      return this.districtOptions.reduce((map, item) => {
+        map[item.districtId] = item.districtName;
         return map;
       }, {});
-      this.loadStaffOptions(); // 在这里调用加载工作人员选项的函数
-    }).catch(error => {
-      console.error("Failed to load user options:", error);
-    });
+    },
+    staffOptionsMap() {
+      return this.staffOptions.reduce((map, item) => {
+        map[item.staffId] = item;
+        return map;
+      }, {});
+    }
   },
+  methods: {
+    // 加载用户选项
+    loadUserOptions() {
+      listUser().then(response => {
+        this.userOptions = response.rows.reduce((map, item) => {
+          map[item.userId] = item;
+          return map;
+        }, {});
+        this.loadStaffOptions(); // 在这里调用加载工作人员选项的函数
+      }).catch(error => {
+        console.error("Failed to load user options:", error);
+      });
+    },
     //加载地区选项
     loadDistrictOptions() {
       listDistrict().then(response => {
@@ -290,17 +318,17 @@ export default {
       return district ? district.districtName : '未知地区';
     },
     // 加载工作人员选项
-  loadStaffOptions() {
-    listStaff().then(response => {
-      this.staffOptions = response.rows.map(item => ({
-        staffId: item.staffId,
-        userId: item.userId,
-        phone: this.userOptions[item.userId]?.phonenumber || '无电话'
-      }));
-    }).catch(error => {
-      console.error("Failed to load staff options:", error);
-    });
-  },
+    loadStaffOptions() {
+      listStaff().then(response => {
+        this.staffOptions = response.rows.map(item => ({
+          staffId: item.staffId,
+          userId: item.userId,
+          phone: this.userOptions[item.userId]?.phonenumber || '无电话'
+        }));
+      }).catch(error => {
+        console.error("Failed to load staff options:", error);
+      });
+    },
     // 获取用户信息的方法
     getUserById(userId) {
       return this.userOptions.find(user => user.userId === userId) || {};
@@ -309,11 +337,11 @@ export default {
       return this.staffOptions.find(item => item.staffId === staffId) || {};
     },
     // 根据 responsibleId 获取用户姓名
-  // 获取工作人员姓名
-  getStaffName(staffId) {
-    const staffInfo = this.staffOptions.find(item => item.staffId === staffId);
-    return staffInfo ? this.userOptions[staffInfo.userId]?.nickName || '未知工作人员' : '未知工作人员';
-  },
+    // 获取工作人员姓名
+    getStaffName(staffId) {
+      const staffInfo = this.staffOptions.find(item => item.staffId === staffId);
+      return staffInfo ? this.userOptions[staffInfo.userId]?.nickName || '未知工作人员' : '未知工作人员';
+    },
     // 通过 userId 获取 userName
     getUserName(userId) {
       // 使用 userOptions 数组来查找 userName
@@ -458,7 +486,37 @@ export default {
       this.download('cigarette/detection/export', {
         ...this.queryParams
       }, `detection_${new Date().getTime()}.xlsx`)
-    }
+    },
+    //获取经纬度
+    getLocation() {
+      if (navigator.geolocation) {
+        
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            this.form.longitude = position.coords.longitude;
+            this.form.latitude = position.coords.latitude;
+            
+          },
+          error => {
+            console.error('Error getting location:', error);
+            alert('无法获取当前位置，请检查定位服务是否启用。');
+          }
+        );
+      } else {
+        alert('您的浏览器不支持定位功能');
+      }
+    },
+    // 我来实现跳转定位显示
+    longitudeAndLatitude(row){
+      console.log(row);
+      this.$router.push({
+        name: 'showMapLocation',
+        params: {
+          paramLongitude:row.longitude,
+          paramLatitude:row.latitude,
+        }
+      })
+    },
   }
 };
 </script>

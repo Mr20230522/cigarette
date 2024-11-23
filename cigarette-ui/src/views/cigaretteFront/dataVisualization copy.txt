@@ -1,0 +1,462 @@
+<template>
+  <div class="map-container">
+      <div id="container" style="height:800px;width:100%"></div>
+  </div>
+</template>
+
+<script>
+// 导入依赖
+import AMapLoader from '@amap/amap-jsapi-loader'          // 用于加载高德地图JS API。
+import { mapState } from "vuex"                                // 从Vuex状态管理中导入地图状态。
+import GEO_PROVINCE_DATA from './province.json'              // 省份地理数据
+
+
+// 定义全局变量
+let AMap = null         // 定义高德地图对象
+const TARGET_POINT = [103.796288, 25.490866] // 目标坐标 曲靖市
+const DESTINATION_POINT = [103.796288, 25.490866] // 目标坐标
+
+export default {
+  name: "MapLoca",
+  //   components: {LaunchButton},
+  data() {
+      return {
+          isLoading: false,     // 是否正在加载地图数据
+          map: null,            // 地图对象
+          loca: null,           // 地图对象
+          map_opt: [{
+              city: "曲靖",
+              color: "blue",
+          }
+          ],
+      }
+  },
+  mounted() {
+
+      AMapLoader.load({
+          key: "4cb4e39b657f9849e3b39e14fc41c2b6", // 开发应用的 ID
+          version: "2.0",   // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
+          plugins: ['AMap.DistrictSearch', 'AMap.Driving'],          // 需要加载的插件列表
+          Loca: {
+              version: '2.0.0',
+          },
+          AMapUI: {             // 是否加载 AMapUI，缺省不加载
+              version: '1.1',   // AMapUI 缺省 1.1
+              plugins: [],       // 需要加载的 AMapUI ui插件
+          },
+
+      }).then(map => {
+          AMap = map
+          this.map = new AMap.Map('container', {
+              viewMode: '3D',            // 切换视图模式
+              zoom: 8,                  // 缩放级别
+              pitch: 16,                 // 俯仰角度
+              center: TARGET_POINT,          // 地图中心点
+              mapStyle: 'amap://styles/grey',             // 地图样式
+              showBuildingBlock: true, // 显示建筑物
+              showLabel: true, // 不显示地名什么的
+          })
+           // 获取边界坐标点
+
+          var districtSearch = new AMap.DistrictSearch({
+
+              // 关键字对应的行政区级别，共有5种级别
+              level: "province",
+              //  是否显示下级行政区级数，1表示返回下一级行政区
+              subdistrict: 1,
+              // 返回行政区边界坐标点
+              extensions: "all",
+          });
+
+          for (let i = 0; i < this.map_opt.length; i++) {
+              // 搜索所有省/直辖市信息
+              districtSearch.search(this.map_opt[i].city, (status, result) => {
+                  console.log(result),
+                  // 查询成功时，result即为对应的行政区信息
+                  this.handlePolygon(result, this.map_opt[i].color);
+              });
+          }
+
+
+
+          // 文字图层
+          let labelLayer = new AMap.LabelsLayer({
+              rejectMapMask: true,            // 遮挡住地图的部分不显示
+              collision: true,                   // 碰撞检测
+              animation: true,                  // 动画
+          })
+          this.map.add(labelLayer)
+
+          this.loca = new Loca.Container({
+              map: this.map,
+          })
+
+
+
+          let scatterLayer2 = new Loca.ScatterLayer({               // 轨迹线    
+              zIndex: 10,           // 层级
+              opacity: 0.8,          // 透明度
+              visible: true,             // 是否可见
+              zooms: [6, 22],            // 显示范围
+          })
+          let scatterLayer3 = new Loca.ScatterLayer({           // 轨迹线      
+              zIndex: 10,           // 层级
+              opacity: 0.8,           // 透明度          
+              visible: true,           // 是否可见
+              zooms: [6, 22],         // 显示范围
+          })
+
+          let centerPoint = new Loca.GeoJSONSource({          // 目标点位
+              data: {
+                  'type': 'FeatureCollection',           // 类型
+                  'features': [                       // 点位
+                      {
+                          'type': 'Feature',             // 类型
+                          'geometry': {                       // 点位坐标
+                              'type': 'Point',                // 类型
+                              'coordinates': TARGET_POINT,
+                          },
+                      },
+                  ],
+              },
+          })
+          scatterLayer3.setSource(centerPoint)
+          scatterLayer3.setStyle({
+              size: [300000, 300000],
+              unit: 'meter',
+              texture: 'https://a.amap.com/Loca/static/static/center-point.png',
+          })
+          //   this.loca.add(scatterLayer3)
+
+          let lineGeoMap
+          let scatterGeoMap
+
+
+          let setLabelsLayer = (data) => {
+              labelLayer.clear()        // 清空文字图层
+              data.features.forEach((item) => {
+                  let labelsMarker = new AMap.LabelMarker({      // 文字标注
+                      name: item.properties.province,            // 名称
+                      position: item.geometry.coordinates,       // 位置
+                      zooms: [6, 22],                            // 显示范围
+                      opacity: 1,                                // 不透明
+                      zIndex: 10,                                // 层级
+                      text: {
+                          content: item.properties.province,          // 内容
+                          direction: 'bottom',                      // 方向
+                          offset: [0, -5],                          // 偏移
+                          style: {                               // 样式
+                              fontSize: 13,                          // 字体大小
+                              fontWeight: 'normal',                  // 字体粗细
+                              fillColor: '#fff',                      // 字体颜色
+                          },
+                      },
+                  })
+                  labelLayer.add(labelsMarker)                      // 添加到文字图层
+              })
+              labelLayer.add(
+                  new AMap.LabelMarker({
+                      name: '曲靖市',
+                      position: TARGET_POINT,
+                      zooms: [6, 22],
+                      opacity: 1,
+                      zIndex: 10,
+                      rank: 100,
+                      text: {
+                          content: '曲靖市',
+                          direction: 'bottom',
+                          // offset: [0, -5],                
+                          style: {
+                              fontSize: 13,
+                              fontWeight: 'normal',
+                              fillColor: '#fff',
+                          },
+                      },
+                  }),
+              )
+          }
+
+          const geoDataPoints = new Loca.GeoJSONSource({
+              data: this.dataPoints,
+          });
+          const geoDataLines = new Loca.GeoJSONSource({
+              data: this.dataLines,
+          });
+          const geoDataLinesReverse = new Loca.GeoJSONSource({
+              data: this.dataLinesReverse,
+          });
+
+
+          let loadLocation = () => {
+              setLabelsLayer(this.dataPoints)       // 加载文字 
+              scatterLayer2.setSource(geoDataPoints)        // 加载点位数据
+              scatterLayer2.setStyle({                      // 设置点位样式
+                  size: [10000, 10000],                   // 点位大小
+                  unit: 'miter',                            // 点位单位
+                  animate: true,                             // 点位动画
+                  duration: 1000,                            // 点位动画时间
+                  texture: 'https://a.amap.com/Loca/static/static/orange.png',                // 点位图标
+                  // texture: 'https://a.amap.com/Loca/static/static/green.png',
+              })
+              this.loca.add(scatterLayer2)
+
+              // this.loca.animate.start() // 开始动画
+          }
+          loadLocation()
+
+          let linkLayer = new Loca.LinkLayer({           // 轨迹线    
+              zIndex: 20,                                 // 层级
+              opacity: 1,                                 // 不透明 
+              visible: true,                              // 是否可见
+              zooms: [6, 22],                              // 显示范围
+          })
+          let loadLine = () => {
+              linkLayer.setSource(geoDataLines)              // 加载轨迹线数据
+              linkLayer.setStyle({
+                  lineColors: ['#ff7514', '#ff0008'],        // 线段颜色
+                  height: (index, item) => {
+                      return item.distance / 2               // 线段高度
+                  },
+                  smoothSteps: 300                          // 线段平滑度
+              })
+              this.loca.add(linkLayer)                      // 添加到地图
+          }
+          // loadLine()
+
+          // 建立图层
+          let pulseLayer = new Loca.PulseLinkLayer({
+              zIndex: 20,
+              opacity: 1,
+              visible: true,
+              zooms: [6, 22],
+          })
+          let loadPulse = () => {                  // 加载轨迹线数据
+              pulseLayer.setSource(geoDataLinesReverse)
+              pulseLayer.setStyle({
+                  height: (index, item) => {
+                      return item.distance / 2               // 线段高度
+                  },
+                  unit: 'meter',                         // 线段单位    
+                  dash: [40000, 0, 40000, 0],            // 线段虚线
+                  lineWidth: function () {
+                      return [2000, 200]; // 始末 节点的线段宽度
+                  },
+                  // altitude: 1000,
+                  smoothSteps: 100, // 曲线圆滑度
+                  speed: function (index, prop) {
+                      return 10 + Math.random() * 200000;           // 线段速度
+                  },
+                  flowLength: 100000,                 // 线段流动长度
+                  lineColors: function (index, feat) {
+                      return ['rgb(255,221,0)', 'rgb(255,141,27)', 'rgb(65,0,255)'];
+                  },
+                  maxHeightScale: 0.1, // 弧顶位置比例
+                  headColor: 'rgba(255, 255, 0, 1)',
+                  trailColor: 'rgb(255,84,84)',
+              })
+              //   this.loca.add(pulseLayer)
+          }
+          loadPulse()
+
+          this.animateStart()
+
+          this.map.on('complete', () => {
+              this.loca.animate.start()
+          })
+
+      }).catch(e => {
+          console.log(e)
+      })
+
+      
+     
+      // this.hidden_map();
+  },
+
+  computed: {
+      ...mapState(['insets']),
+      // 根据省份地址，生成展示地图需要的格式化数据
+      dataPoints() {
+          let tempData = GEO_PROVINCE_DATA.map(item => {
+              let co = item.center.split(',').map(item => Number(item))
+              return {
+                  "type": "Feature",
+                  "properties": { "province": item.name },
+                  "geometry": {
+                      "type": "Point", // 点位
+                      "coordinates": co
+                  }
+              }
+          })
+          return {
+              "type": "FeatureCollection",
+              "features": tempData
+          }
+      },
+      dataLines() {
+          let tempData = GEO_PROVINCE_DATA.map(item => {
+              let co = item.center.split(',').map(item => Number(item))
+              return {
+                  "type": "Feature",                                 // 类型
+                  "properties": { "province": item.name },             // 属性
+                  "geometry": {
+                      "type": "LineString", // 线段                 
+                      "coordinates": [                             // 线段坐标
+                          TARGET_POINT, // target location
+                          co
+                      ]
+                  }
+              }
+          })
+          return {
+              "type": "FeatureCollection",               // 类型
+              "features": tempData
+          }
+      },
+      dataLinesReverse() {                               // 反向线段
+          let tempData = GEO_PROVINCE_DATA.map(item => {
+              let co = item.center.split(',').map(item => Number(item))
+              return {
+                  "type": "Feature",
+                  "properties": { "province": item.name },
+                  "geometry": {
+                      "type": "LineString", // 线段
+                      "coordinates": [
+                          co,
+                          TARGET_POINT // target location
+                      ]
+                  }
+              }
+          })
+          return {
+              "type": "FeatureCollection",
+              "features": tempData
+          }
+      },
+  },
+  methods: {
+      // 开始动画
+      animateStart() {
+          this.loca.viewControl.addAnimates([{
+              center: {
+                  value: DESTINATION_POINT, // 动画终点的经纬度
+                  control: [TARGET_POINT, DESTINATION_POINT], // 过渡中的轨迹控制点，地图上的经纬度
+                  timing: [0.42, 0, 0.4, 1], // 动画时间控制点
+                  duration: 5000, // 过渡时间，毫秒（ms）
+              },
+              // 俯仰角动画
+              pitch: {
+                  value: 30, // 动画终点的俯仰角度
+                  control: [[0, 0], [1, 30]], // 控制器，x是0～1的起始区间，y是pitch值
+                  timing: [0, 0, 1, 1], // 这个值是线性过渡
+                  duration: 5000,
+              },
+              // 缩放等级动画
+              zoom: {
+                  value: 9, // 动画终点的地图缩放等级
+                  control: [[0, 14], [1, 9]], // 控制器，x是0～1的起始区间，y是zoom值
+                  timing: [0, 0, 1, 1],
+                  duration: 8000,
+              },
+              // 旋转动画
+              rotation: {
+                  value: 5, // 动画终点的地图旋转角度
+                  control: [[0, 0], [1, 0]], // 控制器，x是0～1的起始区间，y是rotation值
+                  timing: [0, 0, 1, 1],
+                  duration: 8000,
+              }
+          }],
+              () => { })
+      },
+      // 监听窗口大小变化，调整地图大小
+      resizeMap() {
+          let mapContainer = document.getElementById('container')
+          mapContainer.style.height = window.innerHeight + "px"
+          mapContainer.style.width = window.innerWidth + "px"
+      },
+       // 根据坐标点画边界
+  handlePolygon(result, color) {
+      console.log("result");
+      console.log(result);
+    let bounds = result.districtList[0].boundaries;
+    if (bounds) {
+      for (let i = 0, l = bounds.length; i < l; i++) {
+        //生成行政区划polygon
+        let polygon = new AMap.Polygon({
+          map: map, // 指定地图对象
+          strokeWeight: 1, // 轮廓线宽度
+          path: bounds[i], //轮廓线的节点坐标数组
+          fillOpacity: 0.4, //透明度
+          fillColor: color, //填充颜色
+          strokeColor: "#256edc", //线条颜色
+        });
+        // polygon.on('click', (e) => {
+        // 点击绘制的区域时执行其他交互
+        //
+        // })
+      }
+      // 地图自适应
+      // map.setFitView();
+    }
+  },
+  // 隐藏周边多余地图
+  hidden_map() {
+      console.log('hidden_map')
+    new AMap.DistrictSearch({
+      extensions: "all",                // 返回行政区边界坐标点
+      level: "province",               // 关键字对应的行政区级别，共有5种级别
+      showbiz: false,                  // 是否显示商业区
+      showdistrict: true,              // 是否显示行政区边界
+      subdistrict: 1,
+    }).search("云南", function (status, result) {
+      // 外多边形坐标数组和内多边形坐标数组
+      var outer = [
+        new AMap.LngLat(-360, 90, true),
+        new AMap.LngLat(-360, -90, true),
+        new AMap.LngLat(360, -90, true),
+        new AMap.LngLat(360, 90, true),
+      ];
+      var holes = result.districtList[0].boundaries;
+
+      var pathArray = [outer];
+      pathArray.push.apply(pathArray, holes);
+      var polygon = new AMap.Polygon({
+        pathL: pathArray,
+        //线条颜色，使用16进制颜色代码赋值。默认值为#006600
+        strokeColor: "rgb(20,164,173)",
+        strokeWeight: 1,
+        //轮廓线透明度，取值范围[0,1]，0表示完全透明，1表示不透明。默认为0.9
+        strokeOpacity: 0,
+        //多边形填充颜色，使用16进制颜色代码赋值，如：#FFAA00
+        fillColor: "rgba(0,0,0)",
+        //多边形填充透明度，取值范围[0,1]，0表示完全透明，1表示不透明。默认为0.9
+        fillOpacity: 1,
+        //轮廓线样式，实线:solid，虚线:dashed
+        strokeStyle: "solid",
+        /*勾勒形状轮廓的虚线和间隙的样式，此属性在strokeStyle 为dashed 时有效， 此属性在    
+        ie9+浏览器有效 取值： 
+        实线：[0,0,0] 
+        虚线：[10,10] ，[10,10] 表示10个像素的实线和10个像素的空白（如此反复）组成的虚线
+        点画线：[10,2,10]， [10,2,10] 表示10个像素的实线和2个像素的空白 + 10个像素的实 
+        线和10个像素的空白 （如此反复）组成的虚线*/
+        strokeDasharray: [10, 2, 10],
+      });
+      polygon.setPath(pathArray);
+      this.map.add(polygon);
+    });
+  },
+
+  },
+  beforeUnmount() {
+      this.loca.destroy() // 需要先销毁 Loca 再销毁 Map
+      this.map.destroy() // 销毁地图，释放内存
+      this.map = null
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.map-container {
+  position: relative;
+}
+</style>

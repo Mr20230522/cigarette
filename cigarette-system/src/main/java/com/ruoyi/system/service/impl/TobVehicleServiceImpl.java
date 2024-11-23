@@ -2,6 +2,7 @@ package com.ruoyi.system.service.impl;
 
 import java.util.List;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.system.domain.vo.TobVehicleVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.system.mapper.TobVehicleMapper;
@@ -27,7 +28,7 @@ public class TobVehicleServiceImpl implements ITobVehicleService
      * @return 车辆
      */
     @Override
-    public TobVehicle selectTobVehicleByCarId(Long carId)
+    public TobVehicleVo selectTobVehicleByCarId(Long carId)
     {
         return tobVehicleMapper.selectTobVehicleByCarId(carId);
     }
@@ -35,13 +36,13 @@ public class TobVehicleServiceImpl implements ITobVehicleService
     /**
      * 查询车辆列表
      * 
-     * @param tobVehicle 车辆
+     * @param tobVehicleVo 车辆
      * @return 车辆
      */
     @Override
-    public List<TobVehicle> selectTobVehicleList(TobVehicle tobVehicle)
+    public List<TobVehicleVo> selectTobVehicleList(TobVehicleVo tobVehicleVo)
     {
-        return tobVehicleMapper.selectTobVehicleList(tobVehicle);
+        return tobVehicleMapper.selectTobVehicleList(tobVehicleVo);
     }
 
 

@@ -120,8 +120,19 @@
                             <span>{{ parseTime(scope.row.guaranteePeriod, '{y}-{m}-{d}') }}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column label="经度" align="center" prop="longitude" />
-                    <el-table-column label="纬度" align="center" prop="latitude" />
+                    <el-table-column label="经度" align="center" prop="longitude" min-width="120">
+                        <template slot-scope="scope">
+                            <el-button size="mini" type="text" @click="longitudeAndLatitude(scope.row)">{{
+                                scope.row.longitude }}</el-button>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="纬度" align="center" prop="latitude" min-width="120">
+                        <template slot-scope="scope">
+                            <el-button size="mini" type="text" @click="longitudeAndLatitude(scope.row)">{{
+                                scope.row.latitude }}</el-button>
+                        </template>
+                    </el-table-column>
+
                     <el-table-column label="摄像头类型" align="center" prop="cameraType">
                         <template slot-scope="scope">
                             <dict-tag :options="dict.type.tob_camera_type" :value="scope.row.cameraType" />
@@ -146,7 +157,7 @@
                             {{ getDistrictName(scope.row.districtId) }}
                         </template>
                     </el-table-column>
-                    <el-table-column label="操作" align="center" class-name="small-padding fixed-width"  width="100px">
+                    <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="100px">
                         <template slot-scope="scope">
                             <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                                 v-hasPermi="['camera:camera:edit']">修改</el-button>
@@ -275,8 +286,8 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
- 
-                <el-row  >
+
+                <el-row>
                     <el-col :span="4">
                         <el-form-item>
                             <el-button type="primary" plain @click="getLocation">获取经纬度</el-button>
@@ -293,9 +304,9 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
-                        <el-form-item label="备注" prop="remark">
-                            <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
-                        </el-form-item>
+                <el-form-item label="备注" prop="remark">
+                    <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+                </el-form-item>
 
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -346,7 +357,7 @@ export default {
                 children: 'children',
                 label: 'label'
             },
-            detectionOptions:[],    //json数组，用于存储检测点选项
+            detectionOptions: [],    //json数组，用于存储检测点选项
             loading: true,
             // 查询参数
             queryParams: {
@@ -485,10 +496,15 @@ export default {
         //获取经纬度
         getLocation() {
             if (navigator.geolocation) {
+                console.log("navigator")
+                console.log(navigator)
                 navigator.geolocation.getCurrentPosition(
+
                     position => {
                         this.form.longitude = position.coords.longitude;
                         this.form.latitude = position.coords.latitude;
+                        console.log(position.coords.longitude);
+                        console.log(position.coords.latitude);
                     },
                     error => {
                         console.error('Error getting location:', error);
@@ -693,7 +709,18 @@ export default {
             this.download('cigarette/detection/camera/export', {
                 ...this.queryParams
             }, `camera_${new Date().getTime()}.xlsx`)
-        }
+        },
+        // 我来实现跳转定位显示
+        longitudeAndLatitude(row) {
+            console.log(row);
+            this.$router.push({
+                name: 'showMapLocation',
+                params: {
+                    paramLongitude: row.longitude,
+                    paramLatitude: row.latitude,
+                }
+            })
+        },
     }
 };
 </script>
