@@ -2,6 +2,7 @@ package com.ruoyi.system.service;
 
 import java.util.List;
 import com.ruoyi.system.domain.TobVehicle;
+import com.ruoyi.system.domain.vo.TobVehicleVo;
 
 /**
  * 车辆Service接口
@@ -17,7 +18,7 @@ public interface ITobVehicleService
      * @param carId 车辆主键
      * @return 车辆
      */
-    public TobVehicle selectTobVehicleByCarId(Long carId);
+    public TobVehicleVo selectTobVehicleByCarId(Long carId);
 
     /**
      * 查询车辆列表
@@ -25,7 +26,7 @@ public interface ITobVehicleService
      * @param tobVehicle 车辆
      * @return 车辆集合
      */
-    public List<TobVehicle> selectTobVehicleList(TobVehicle tobVehicle);
+    public List<TobVehicleVo> selectTobVehicleList(TobVehicleVo tobVehicleVo);
 
     /**
      * 新增车辆

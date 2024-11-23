@@ -37,6 +37,9 @@
           <el-dropdown-item @click.native="setting = true">
             <span>布局设置</span>
           </el-dropdown-item>
+          <router-link to="/cigaretteIndex">
+            <el-dropdown-item>进入前台</el-dropdown-item>
+          </router-link>
           <el-dropdown-item divided @click.native="logout">
             <span>退出登录</span>
           </el-dropdown-item>

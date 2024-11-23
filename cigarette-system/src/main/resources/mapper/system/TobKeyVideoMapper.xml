@@ -17,10 +17,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="remark"    column="remark"    />
         <result property="status"    column="status"    />
         <result property="createTime"    column="create_time"    />
+        <result property="actionId" column="action_id"/>
     </resultMap>
 
     <sql id="selectTobKeyVideoVo">
-        select video_id, video_path, video_name, camera_id, start_time, end_time, video_size, detection_id, district_id, remark, status, create_time from tob_key_video
+        select video_id, video_path, video_name, camera_id, start_time, end_time, video_size, detection_id, district_id, remark, status, create_time,action_id from tob_key_video
     </sql>
 
     <select id="selectTobKeyVideoList" parameterType="TobKeyVideo" resultMap="TobKeyVideoResult">
@@ -32,6 +33,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="districtId != null "> and district_id = #{districtId}</if>
             <if test="status != null  and status != ''"> and status = #{status}</if>
             <if test="createTime != null "> and create_time = #{createTime}</if>
+            <if test="actionId != null"> and action_id = #{actionId}</if>
         </where>
     </select>
     
@@ -54,6 +56,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="remark != null">remark,</if>
             <if test="status != null and status != ''">status,</if>
             <if test="createTime != null">create_time,</if>
+            <if test="actionId != null">action_id,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="videoPath != null and videoPath != ''">#{videoPath},</if>
@@ -67,6 +70,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="remark != null">#{remark},</if>
             <if test="status != null and status != ''">#{status},</if>
             <if test="createTime != null">#{createTime},</if>
+            <if test="actionId != null">#{actionId},</if>
          </trim>
     </insert>
 
@@ -84,6 +88,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="remark != null">remark = #{remark},</if>
             <if test="status != null and status != ''">status = #{status},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="actionId != null">action_id = #{actionId},</if>
         </trim>
         where video_id = #{videoId}
     </update>

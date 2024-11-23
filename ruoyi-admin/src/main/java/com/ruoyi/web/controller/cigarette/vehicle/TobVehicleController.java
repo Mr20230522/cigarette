@@ -2,6 +2,8 @@ package com.ruoyi.web.controller.cigarette.vehicle;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.ruoyi.system.domain.vo.TobVehicleVo;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,10 +41,10 @@ public class TobVehicleController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('vehicle:vehicle:list')")
     @GetMapping("/list")
-    public TableDataInfo list(TobVehicle tobVehicle)
+    public TableDataInfo list(TobVehicleVo tobVehicleVo)
     {
         startPage();
-        List<TobVehicle> list = tobVehicleService.selectTobVehicleList(tobVehicle);
+        List<TobVehicleVo> list = tobVehicleService.selectTobVehicleList(tobVehicleVo);
         return getDataTable(list);
     }
 
@@ -52,10 +54,10 @@ public class TobVehicleController extends BaseController
     @PreAuthorize("@ss.hasPermi('vehicle:vehicle:export')")
     @Log(title = "车辆", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(HttpServletResponse response, TobVehicle tobVehicle)
+    public void export(HttpServletResponse response, TobVehicleVo tobVehicleVo)
     {
-        List<TobVehicle> list = tobVehicleService.selectTobVehicleList(tobVehicle);
-        ExcelUtil<TobVehicle> util = new ExcelUtil<TobVehicle>(TobVehicle.class);
+        List<TobVehicleVo> list = tobVehicleService.selectTobVehicleList(tobVehicleVo);
+        ExcelUtil<TobVehicleVo> util = new ExcelUtil<TobVehicleVo>(TobVehicleVo.class);
         util.exportExcel(response, list, "车辆数据");
     }
 
