@@ -11,19 +11,19 @@ import com.ruoyi.system.service.ITobVehicleService;
 
 /**
  * 车辆Service业务层处理
- * 
+ *
  * @author cigarette
  * @date 2024-07-27
  */
 @Service
-public class TobVehicleServiceImpl implements ITobVehicleService 
+public class TobVehicleServiceImpl implements ITobVehicleService
 {
     @Autowired
     private TobVehicleMapper tobVehicleMapper;
 
     /**
      * 查询车辆
-     * 
+     *
      * @param carId 车辆主键
      * @return 车辆
      */
@@ -35,7 +35,7 @@ public class TobVehicleServiceImpl implements ITobVehicleService
 
     /**
      * 查询车辆列表
-     * 
+     *
      * @param tobVehicleVo 车辆
      * @return 车辆
      */
@@ -48,7 +48,7 @@ public class TobVehicleServiceImpl implements ITobVehicleService
 
     /**
      * 新增车辆
-     * 
+     *
      * @param tobVehicle 车辆
      * @return 结果
      */
@@ -56,13 +56,13 @@ public class TobVehicleServiceImpl implements ITobVehicleService
     public int insertTobVehicle(TobVehicle tobVehicle)
     {
         tobVehicle.setCreateTime(DateUtils.getNowDate());
-//        tobVehicleMapper.insertTobVehicleInsert(tobVehicle);
+        tobVehicleMapper.insertTobVehicleInsert(tobVehicle);
         return tobVehicleMapper.insertTobVehicle(tobVehicle);
     }
 
     /**
      * 修改车辆
-     * 
+     *
      * @param tobVehicle 车辆
      * @return 结果
      */
@@ -75,7 +75,7 @@ public class TobVehicleServiceImpl implements ITobVehicleService
 
     /**
      * 批量删除车辆
-     * 
+     *
      * @param carIds 需要删除的车辆主键
      * @return 结果
      */
@@ -87,7 +87,7 @@ public class TobVehicleServiceImpl implements ITobVehicleService
 
     /**
      * 删除车辆信息
-     * 
+     *
      * @param carId 车辆主键
      * @return 结果
      */

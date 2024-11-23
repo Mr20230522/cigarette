@@ -197,6 +197,12 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+
+    <el-dialog :title="title" :visible.sync="openvideo" width="60%" append-to-body>
+      <div><span>hh</span></div>
+
+    </el-dialog>
   </div>
 </template>
 
@@ -240,6 +246,7 @@ export default {
       selectedCamera: null,
       // 是否显示弹出层
       open: false,
+      openvideo: false,
       // 查询参数
       queryParams: {
         pageNum: 1,
