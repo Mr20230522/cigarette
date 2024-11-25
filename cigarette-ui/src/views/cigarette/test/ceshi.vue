@@ -1,9 +1,9 @@
 <template>
     <div class="app-container">
- 
-  
 
-  
+
+
+
       <!-- 添加或修改关键帧图片对话框 -->
       <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
         <el-form ref="form" :model="form" :rules="rules" label-width="80px">
@@ -32,7 +32,7 @@
               </el-card>
             </el-scrollbar>
           </el-form-item>
-          
+
         <el-form-item label="违法状态" prop="status">
               <el-select v-model="queryParams.status" placeholder="请选择违法状态" clearable>
                 <el-option v-for="dict in dict.type.tob_illegal_status" :key="dict.value" :label="dict.label"
@@ -50,16 +50,16 @@
       </el-dialog>
     </div>
   </template>
-  
+
   <script>
   import { listPicture, getPicture, delPicture, addPicture, updatePicture } from "@/api/cigarette/multimediaResource/picture";
   import { listUser, } from "@/api/system/user";
-  
-  
+
+
   export default {
     name: "Picture",
     dicts: ['tob_illegal_status'],
-  
+
     data() {
       return {
         // 遮罩层
@@ -84,11 +84,11 @@
         // 是否显示弹出层
         open: false,
         // 查询参数
- 
+
         // 表单参数
         form: {},
 
-        
+
       };
     },
     created() {
@@ -97,7 +97,7 @@
     },
      mounted() {
       this.filteredUsers = [];
-  
+
     },
     methods: {
       /** 查询关键帧图片列表 */
@@ -198,7 +198,7 @@
             user.username.toLowerCase().includes(searchInput) ||
             user.email.toString().includes(searchInput) ||
             user.phonenumber.toString().includes(searchInput)
-            
+
           );
         }).slice(0, 10);
       },
@@ -218,4 +218,3 @@
     }
   };
   </script>
-  

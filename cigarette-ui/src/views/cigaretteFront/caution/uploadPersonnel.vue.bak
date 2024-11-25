@@ -11,9 +11,8 @@
 
     <!-- 搜索框 -->
     <el-row :gutter="20" class="search-row">
-      <el-col :span="6">
+      <el-col :span="6"></el-col>
         <el-input v-model="queryParams.name" placeholder="请输入姓名" clearable></el-input>
-      </el-col>
       <el-col :span="6">
         <el-select v-model="queryParams.gender" placeholder="选择性别">
           <el-option label="男" value="M"></el-option>
@@ -27,7 +26,7 @@
 
     <!-- 卡片展示人员信息 -->
     <el-row gutter="20" type="flex" justify="center" align="top">
-      <el-col :span="8" v-for="(person, index) in personList" :key="person.suspectId">
+      <el-col :span="8" v-for="(person) in personList" :key="person.suspectId">
         <el-card :body-style="{ padding: '0px' }" class="person-card">
 
           <el-table-column label="人员图片" align="center" prop="picture" width="100">

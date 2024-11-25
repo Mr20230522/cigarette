@@ -1,359 +1,303 @@
 <template>
+  
   <div class="map-container">
-      <div id="container" style="height:800px;width:100%"></div>
+    <div class="top-container">
+ 
+<el-menu
+  :default-active="activeIndex2"
+  class="el-menu-demo"
+  mode="horizontal"
+  background-color="#545c64"
+  text-color="#fff"
+  active-text-color="#ffd04b">
+  <el-submenu index="1">
+  <template slot="title">{{ districtName }}</template>
+  <el-menu-item
+    v-for="(item, index) in menuItems"
+    :key="index"
+    @click="handleSubdistrictSelect(item)" 
+    :index="`1-${index + 1}`"
+  >
+  
+    {{ item }}
+  </el-menu-item>
+</el-submenu>
+
+  <el-menu-item index="4"><a href="https://www.ele.me" target="_blank">返回旧版</a></el-menu-item>
+</el-menu>
+      
+    </div>
+    <div id="container" style="height:100%;width:100%"></div>
+    <div class="canva1">
+      <RadarChart />
+    </div>
+    <div class="canva2">
+      <RadarChart />
+    </div>
+    <div class="canva3">
+      <RadarChart />
+    </div>
+    <div class="canva4">
+      <RadarChart />
+    </div>
+    <div class="canva5">
+      <RadarChart />
+    </div>
+    <div class="canva6">
+      <RadarChart />
+    </div>
+    <div class="canva7">
+      <RadarChart />
+    </div>
+    <div class="canva8">
+      <RadarChart />
+    </div>
+
   </div>
 </template>
 
+
 <script>
 
-import AMapLoader from '@amap/amap-jsapi-loader'
-import {mapState} from "vuex"
-import GEO_PROVINCE_DATA from './province.json'
-// import LaunchButton from "@/components/LaunnchButton";
+// 导入依赖
+import AMapLoader from '@amap/amap-jsapi-loader'          // 用于加载高德地图JS API。
+import RadarChart from './echarts/radarChart.vue'
 
-let AMap = null
+const DESTINATION_POINT = [103.796288, 25.490866] // 目标坐标
 
-const TARGET_POINT = [103.796288,25.490866] // 目标坐标 曲靖市
-const DESTINATION_POINT = [103.796288,25.490866] // 目标坐标
-
+window._AMapSecurityConfig = {
+  securityJsCode: "f8d5ea082b4817f61cec5a6f757ae907",
+};
 export default {
   name: "MapLoca",
-//   components: {LaunchButton},
+  components: {
+    RadarChart
+  },
+  
   data() {
-      return {
-          isLoading: false,
-          map: null,
-          loca: null,
-      }
+    return {
+      isLoading: false,     // 是否正在加载地图数据
+      map: null,            // 地图对象
+      loca: null,           // 地图对象
+      AMap: null,        // 定义高德地图对象
+      activeIndex: '1',
+      activeIndex2: '1',
+      // 经度
+      longitude: 104.140288,
+      // 纬度
+      latitude: 25.520866,
+      districtName: '曲靖市',
+      selectSubdistrict: 1,
+      selectZoom:9.25,
+      menuItems: [
+        // {
+        //   districtName: '曲靖市',
+        //   selectSubdistrict: 1,
+        //   selectZoom:9.25,
+        //   longitude:104.140288, 
+        //   latitude:25.520866,
+        // },
+        '曲靖市',
+        '会泽县',
+        '马龙区',
+        '师宗县',
+        '陆良县',
+        '麒麟区',
+        '宣威市',
+        '沾益区',
+        '罗平县',
+        '富源县'
+      ],
+
+    }
   },
   mounted() {
-      AMapLoader.load({
-          key: "4cb4e39b657f9849e3b39e14fc41c2b6", // 开发应用的 ID
-          version: "2.0",   // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
-          plugins: [],
-          Loca:{
-              version: '2.0.0',
-          },
-          AMapUI: {             // 是否加载 AMapUI，缺省不加载
-              version: '1.1',   // AMapUI 缺省 1.1
-              plugins: [],       // 需要加载的 AMapUI ui插件
-          },
-
-      }).then(map => {
-          AMap = map
-          this.map = new AMap.Map('container', {
-              viewMode: '3D',
-              zoom: 6,
-              pitch: 32,
-              center: TARGET_POINT,
-              mapStyle: 'amap://styles/grey',
-              showBuildingBlock: true, // 显示建筑物
-              showLabel: true, // 不显示地名什么的
-          })
-
-
-          // 文字图层
-          let labelLayer = new AMap.LabelsLayer({
-              rejectMapMask: true,
-              collision: true,
-              animation: true,
-          })
-          this.map.add(labelLayer)
-
-          this.loca = new Loca.Container({
-              map: this.map,
-          })
-
-
-
-          let scatterLayer2 = new Loca.ScatterLayer({
-              zIndex: 10,
-              opacity: 0.8,
-              visible: true,
-              zooms: [6, 22],
-          })
-          let scatterLayer3 = new Loca.ScatterLayer({
-              zIndex: 10,
-              opacity: 0.8,
-              visible: true,
-              zooms: [6, 22],
-          })
-
-          let centerPoint = new Loca.GeoJSONSource({
-              data: {
-                  'type': 'FeatureCollection',
-                  'features': [
-                      {
-                          'type': 'Feature',
-                          'geometry': {
-                              'type': 'Point',
-                              'coordinates': TARGET_POINT,
-                          },
-                      },
-                  ],
-              },
-          })
-          scatterLayer3.setSource(centerPoint)
-          scatterLayer3.setStyle({
-              size: [300000, 300000],
-              unit: 'meter',
-              texture: 'https://a.amap.com/Loca/static/static/center-point.png',
-          })
-          this.loca.add(scatterLayer3)
-
-          let lineGeoMap
-          let scatterGeoMap
-
-
-          let setLabelsLayer = (data) => {
-              labelLayer.clear()
-              data.features.forEach((item) => {
-                  let labelsMarker = new AMap.LabelMarker({
-                      name: item.properties.province,
-                      position: item.geometry.coordinates,
-                      zooms: [6, 22],
-                      opacity: 1,
-                      zIndex: 10,
-                      text: {
-                          content: item.properties.province,
-                          direction: 'bottom',
-                          offset: [0, -5],
-                          style: {
-                              fontSize: 13,
-                              fontWeight: 'normal',
-                              fillColor: '#fff',
-                          },
-                      },
-                  })
-                  labelLayer.add(labelsMarker)
-              })
-              labelLayer.add(
-                  new AMap.LabelMarker({
-                      name: '曲靖市',
-                      position: TARGET_POINT,
-                      zooms: [6, 22],
-                      opacity: 1,
-                      zIndex: 10,
-                      rank: 100,
-                      text: {
-                          content: '曲靖市',
-                          direction: 'bottom',
-                          offset: [0, -5],
-                          style: {
-                              fontSize: 13,
-                              fontWeight: 'normal',
-                              fillColor: '#fff',
-                          },
-                      },
-                  }),
-              )
-          }
-
-          const geoDataPoints = new Loca.GeoJSONSource({
-              data: this.dataPoints,
-          });
-          const geoDataLines = new Loca.GeoJSONSource({
-              data: this.dataLines,
-          });
-          const geoDataLinesReverse = new Loca.GeoJSONSource({
-              data: this.dataLinesReverse,
-          });
-
-
-          let loadLocation = () => {
-              setLabelsLayer(this.dataPoints)
-              scatterLayer2.setSource(geoDataPoints)
-              scatterLayer2.setStyle({
-                  size: [250000, 250000],
-                  unit: 'miter',
-                  animate: true,
-                  duration: 1000,
-                  texture: 'https://a.amap.com/Loca/static/static/orange.png',
-                  // texture: 'https://a.amap.com/Loca/static/static/green.png',
-              })
-              this.loca.add(scatterLayer2)
-
-              // this.loca.animate.start() // 开始动画
-          }
-          loadLocation()
-
-          let linkLayer = new Loca.LinkLayer({
-              zIndex: 20,
-              opacity: 1,
-              visible: true,
-              zooms: [6, 22],
-          })
-          let loadLine = () => {
-              linkLayer.setSource(geoDataLines)
-              linkLayer.setStyle({
-                  lineColors: ['#ff7514', '#ff0008'],
-                  height: (index, item) => {
-                      return item.distance / 2
-                  },
-                  smoothSteps: 300
-              })
-              this.loca.add(linkLayer)
-          }
-          // loadLine()
-
-            // 建立图层
-          let pulseLayer = new Loca.PulseLinkLayer({
-              zIndex: 20,
-              opacity: 1,
-              visible: true,
-              zooms: [6, 22],
-          })
-          let loadPulse = () => {
-              pulseLayer.setSource(geoDataLinesReverse)
-              pulseLayer.setStyle({
-                  height: (index, item) => {
-                      return item.distance / 2
-                  },
-                  unit: 'meter',
-                  dash: [40000, 0, 40000, 0],
-                  lineWidth: function () {
-                      return [20000, 2000]; // 始末 节点的线段宽度
-                  },
-                  // altitude: 1000,
-                  smoothSteps: 100, // 曲线圆滑度
-                  speed: function (index, prop) {
-                      return 1000 + Math.random() * 200000;
-                  },
-                  flowLength: 100000,
-                  lineColors: function (index, feat) {
-                      return ['rgb(255,221,0)', 'rgb(255,141,27)', 'rgb(65,0,255)'];
-                  },
-                  maxHeightScale: 0.3, // 弧顶位置比例
-                  headColor: 'rgba(255, 255, 0, 1)',
-                  trailColor: 'rgb(255,84,84)',
-              })
-              this.loca.add(pulseLayer)
-          }
-          loadPulse()
-
-          this.animateStart()
-
-          this.map.on('complete', ()=> {
-              this.loca.animate.start()
-          })
-
-      }).catch(e => {
-          console.log(e)
-      })
+    this.loadMap();
   },
 
   computed: {
-      ...mapState(['insets']),
-      // 根据省份地址，生成展示地图需要的格式化数据
-      dataPoints(){
-          let tempData = GEO_PROVINCE_DATA.map(item => {
-              let co = item.center.split(',').map(item => Number(item))
-              return {
-                  "type": "Feature",
-                  "properties": {"province": item.name},
-                  "geometry": {
-                      "type": "Point", // 点位
-                      "coordinates": co
-                  }
-              }
-          })
-          return {
-              "type": "FeatureCollection",
-              "features": tempData
-          }
-      },
-      dataLines(){
-          let tempData = GEO_PROVINCE_DATA.map(item => {
-              let co = item.center.split(',').map(item => Number(item))
-              return {
-                  "type": "Feature",
-                  "properties": {"province": item.name},
-                  "geometry": {
-                      "type": "LineString", // 线段
-                      "coordinates": [
-                          TARGET_POINT, // target location
-                          co
-                      ]
-                  }
-              }
-          })
-          return {
-              "type": "FeatureCollection",
-              "features": tempData
-          }
-      },
-      dataLinesReverse(){
-          let tempData = GEO_PROVINCE_DATA.map(item => {
-              let co = item.center.split(',').map(item => Number(item))
-              return {
-                  "type": "Feature",
-                  "properties": {"province": item.name},
-                  "geometry": {
-                      "type": "LineString", // 线段
-                      "coordinates": [
-                          co,
-                          TARGET_POINT // target location
-                      ]
-                  }
-              }
-          })
-          return {
-              "type": "FeatureCollection",
-              "features": tempData
-          }
-      },
+
   },
   methods: {
-      animateStart(){
-          this.loca.viewControl.addAnimates([{
-                  center: {
-                      value: DESTINATION_POINT, // 动画终点的经纬度
-                      control: [TARGET_POINT, DESTINATION_POINT], // 过渡中的轨迹控制点，地图上的经纬度
-                      timing: [0.42, 0, 0.4, 1], // 动画时间控制点
-                      duration: 5000, // 过渡时间，毫秒（ms）
-                  },
-                  // 俯仰角动画
-                  pitch: {
-                      value: 60, // 动画终点的俯仰角度
-                      control: [[0, 0], [1, 60]], // 控制器，x是0～1的起始区间，y是pitch值
-                      timing: [0, 0, 1, 1], // 这个值是线性过渡
-                      duration: 5000,
-                  },
-                  // 缩放等级动画
-                  zoom: {
-                      value: 9, // 动画终点的地图缩放等级
-                      control: [[0, 14], [1, 9]], // 控制器，x是0～1的起始区间，y是zoom值
-                      timing: [0, 0, 1, 1],
-                      duration: 8000,
-                  },
-                  // 旋转动画
-                  rotation: {
-                      value: 5, // 动画终点的地图旋转角度
-                      control: [[0, 0], [1, 0]], // 控制器，x是0～1的起始区间，y是rotation值
-                      timing: [0, 0, 1, 1],
-                      duration: 8000,
-                  }
-              }],
-              () => {})
+    loadMap() {
+      AMapLoader.load({
+        key: "4cb4e39b657f9849e3b39e14fc41c2b6", // 开发应用的 ID
+        version: "2.0",   // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
+        plugins: ['AMap.DistrictSearch', 'AMap.Driving'],          // 需要加载的插件列表
+        Loca: {
+          version: '2.0.0',             // 指定要加载的 Loca 版本，缺省时默认为 1.3.2
+        },
+        AMapUI: {             // 是否加载 AMapUI，缺省不加载
+          version: '1.1',   // AMapUI 缺省 1.1
+          plugins: [],       // 需要加载的 AMapUI ui插件
+        },
+
+      }).then(AMap  => {
+        this.AMap  = AMap 
+        this.map = new AMap.Map('container', {
+          viewMode: '3D',            // 切换视图模式
+          zoom: this.selectZoom,                  // 缩放级别
+          rotation: 83,               // 旋转角度
+          pitch: 32,                 // 俯仰角度
+          features: ['bg', 'road', 'point',], // 显示建筑物、道路、点标记
+          center: new AMap.LngLat(this.longitude,this.latitude),          // 地图中心点
+          mapStyle: "amap://styles/c37ade710caaca4fad54ccee74c92ae4", //设置地图的显示样式         
+          depth:2,
+          //   showBuildingBlock: true, // 显示建筑物
+          //   showLabel: false, // 不显示地名
+        })
+
+        if (!this.map) {
+        console.error('地图实例创建失败');
+        return;
+      }
+
+
+        //显示省级地图
+        new AMap.DistrictSearch({
+          extensions: "all",
+          subdistrict: this.selectSubdistrict,
+        }).search(this.districtName, (status, result) => {
+          if (status === 'complete' && result.info === 'OK') {
+            console.log("result");
+          // 外多边形坐标数组和内多边形坐标数组
+          var outer = [
+            new AMap.LngLat(-360, 90, true),
+            new AMap.LngLat(-360, -90, true),
+            new AMap.LngLat(360, -90, true),
+            new AMap.LngLat(360, 90, true),
+          ];
+          var holes = result.districtList[0].boundaries;
+          var pathArray = [outer];
+          pathArray.push.apply(pathArray, holes);
+          var polygon = new AMap.Polygon({
+            pathL: pathArray,
+            strokeColor: "#00eeff", //边框线颜色
+            strokeWeight: 2,
+            fillColor: "#091b2e", //遮罩图层颜色
+            fillOpacity: 0.95,
+          });
+          polygon.setPath(pathArray);
+          this.map.add(polygon);
+          
+          var disProvince =new AMap.DistrictLayer.Province({
+        zIndex: 12,
+        depth: 2,
+        styles: {
+          'fill': function (properties) {
+          },
+          'province-stroke': 'cornflowerblue',
+          'city-stroke': 'white', // 中国地级市边界
+          'county-stroke': 'rgba(255,255,255,0.5)' // 中国区县边界
+        }
+      });
+      this.map.add(disProvince);
+        }
+        });
+      }).catch((e) => {
+        console.error('地图加载失败', e);
+      });
+    },
+    // handleSelect(key, keyPath) {
+    //     console.log(key, keyPath);
+    //   },
+    handleSubdistrictSelect(item) {
+      this.districtName = item;
+      if(item == '曲靖市'){
+        this.selectSubdistrict = 1;
+      }else {
+        this.selectSubdistrict = 2;
+      }
+      this.loadMap();
       },
-      resizeMap() {
-          let mapContainer = document.getElementById('container')
-          mapContainer.style.height = window.innerHeight + "px"
-          mapContainer.style.width = window.innerWidth + "px"
-      },
-   },
-  beforeUnmount() {
-      this.loca.destroy() // 需要先销毁 Loca 再销毁 Map
-      this.map.destroy() // 销毁地图，释放内存
-      this.map = null
+    },
+  beforeDestroy() {
+    if (this.map) {
+      this.map.destroy();
+    }
   }
+
+
 }
 </script>
 
 <style lang="scss" scoped>
 .map-container {
   position: relative;
+  width: 100%;
+  height: 100%;
 }
 
+.top-container{
+  position: absolute;
+  top: 0%;
+  left: 10;
+  width: 100%;
+  height: 25%;
+  z-index: 40;
+}
+.canva1{
+  position: absolute;
+  top: 10%;
+  left: 1%;
+  width: 20%;
+  height: 28%;
+  z-index: 40;
+}
+.canva2{
+  position: absolute;
+  top:40%;
+  left: 1%;
+  width: 20%;
+  height: 28%;
+  z-index: 40;
+}
+.canva3{
+  position: absolute;
+  top: 70%;
+  left: 0;
+  width: 20%;
+  height: 28%;
+  z-index: 40;
+}
+.canva4{
+  position: absolute;
+  top: 10%;
+  right: 1%;
+  width: 20%;
+  height: 28%;
+  z-index: 40;
+}
+.canva5{
+  position: absolute;
+  top: 40%;
+  right: 1%;
+  width: 20%;
+  height: 28%;
+  z-index: 40;
+}
+.canva6{
+  position: absolute;
+  top: 70%;
+  right: 1%;
+  width: 20%;
+  height: 28%;
+  z-index: 40;
+}
+.canva7{
+  position: absolute;
+  top: 70%;
+  left: 22%;
+  width: 20%;
+  height: 28%;
+  z-index: 40;
+}
+.canva8{
+  position: absolute;
+  top: 70%;
+  right:22%;
+  width: 20%;
+  height: 28%;
+  z-index: 40;
+}
 </style>
-

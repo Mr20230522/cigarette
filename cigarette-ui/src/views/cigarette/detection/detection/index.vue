@@ -83,11 +83,18 @@
               <dict-tag :options="dict.type.tob_dd_status" :value="scope.row.status" />
             </template>
           </el-table-column>
-          <el-table-column label="经度" align="center" prop="longitude" min-width="120" />
-          <el-table-column label="纬度" align="center" prop="latitude"  min-width="120" />
+
+          <el-table-column label="经度" align="center" prop="longitude" min-width="120" >
+            <template slot-scope="scope"> 
+              <el-button size="mini" type="text" @click="longitudeAndLatitude(scope.row)">{{ scope.row.longitude }}</el-button>
+            </template>
+          </el-table-column>
+          <el-table-column label="纬度" align="center" prop="latitude"  min-width="120" >
+            <template slot-scope="scope">
+              <el-button size="mini" type="text" @click="longitudeAndLatitude(scope.row)">{{ scope.row.latitude }}</el-button>
+            </template>
+          </el-table-column>
           <el-table-column label="备注" align="center" prop="remark" max-width="200" />
-
-
           <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="120">
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
@@ -482,17 +489,13 @@ export default {
     },
     //获取经纬度
     getLocation() {
-      console.log('getLocation')
-      console.log("我被点名了")
       if (navigator.geolocation) {
-        console.log("navigator")
-        console.log(navigator)
+        
         navigator.geolocation.getCurrentPosition(
           position => {
             this.form.longitude = position.coords.longitude;
             this.form.latitude = position.coords.latitude;
-            console.log(position.coords.longitude);
-            console.log(position.coords.latitude);
+            
           },
           error => {
             console.error('Error getting location:', error);
@@ -502,6 +505,17 @@ export default {
       } else {
         alert('您的浏览器不支持定位功能');
       }
+    },
+    // 我来实现跳转定位显示
+    longitudeAndLatitude(row){
+      console.log(row);
+      this.$router.push({
+        name: 'showMapLocation',
+        params: {
+          paramLongitude:row.longitude,
+          paramLatitude:row.latitude,
+        }
+      })
     },
   }
 };
