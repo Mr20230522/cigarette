@@ -4,7 +4,7 @@
       <h2>自动化测试</h2>
 
       <el-button type="primary" plain icon="el-icon-plus" style="margin-bottom: 30px;" size="mini"
-        @click="handleAdd">新增</el-button>
+        @click="handleAdd">增加一条车辆行为</el-button>
       <el-steps :active="1">
         <el-step title="车辆录入" icon="el-icon-edit"></el-step>
         <el-step title="驾驶人员录入" icon="el-icon-upload"></el-step>
@@ -310,8 +310,8 @@
           </el-form-item>
           <el-form-item label="同伙人" prop="accompliceId">
             <div style="text-align: center">
-              <el-transfer style="text-align: left; display: inline-block;width: 100%; " v-model="value" filterable
-                :left-default-checked="[2, 3]" :right-default-checked="[1]" :render-content="renderFunc"
+              <el-transfer style="text-align: left; display: inline-block;width: 100%; " v-model="multipleValue"
+                filterable :left-default-checked="[2, 3]" :right-default-checked="[1]" :render-content="renderFunc"
                 :titles="['人员库', '同伙人']" :button-texts="['到左边', '到右边']" :format="{
                   noChecked: '${total}',
                   hasChecked: '${checked}/${total}'
@@ -414,7 +414,7 @@ export default {
       //添加车辆行为
       // 穿梭框属性
       transferData: [], // 这里将被动态数据填充
-      value: [], // 这里存储已选择的key
+      multipleValue: [], // 这里存储已选择的key
       leftCheckedKeys: [2, 3], // 根据实际情况设置
       rightCheckedKeys: [1], // 根据实际情况设置
       renderFunc(h, option) {
@@ -681,21 +681,41 @@ export default {
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if (this.form.behaviorId != null) {
-            updateVehicleBehavior(this.form).then(response => {
-              this.$modal.msgSuccess("修改成功");
+          this.$modal.msgSuccess("正在新增行为记录");
+          addVehicleBehavior(this.form).then(response => {
+            this.$modal.msgSuccess("行为记录新增成功");
+            this.$modal.msgSuccess("正在绑定图片")
+            this.form1.behaviorId = response;
+            addPicture(this.form1).then(response => {
+              this.$modal.msgSuccess("图片绑定成功");
             });
-          } else {
-            addVehicleBehavior(this.form).then(response => {
-              this.$modal.msgSuccess("行为记录新增成功");
+            this.$modal.msgSuccess("正在绑定视频")
+            this.form2.actionId = response;
+            addVideo(this.form2).then(response => {
+              this.$modal.msgSuccess("视频绑定成功");
+              this.open = false;
             });
-          }
-          addPicture(this.form1).then(response => {
-            this.$modal.msgSuccess("图片新增成功");
-          });
-          addVideo(this.form2).then(response => {
-            this.$modal.msgSuccess("视频新增成功");
-            this.open = false;
+            if (this.form.degreeSuspicion >= 60) {
+              this.$modal.msgSuccess("正在新增预警")
+              const form3 = {};
+              form3.behaviorId = response;
+              form3.warningEffect = 0;
+              form3.detectionId = this.form.detectionId;
+              form3.districtId = this.form.districtId;
+              if (this.form.degreeSuspicion >= 80) {
+                form3.status = 2;
+                form3.remark = "车辆有异常行为";
+                addCaution(form3).then(response => {
+                  this.$modal.msgSuccess("新增预警成功");
+                });
+              } else {
+                form3.status = 3;
+                form3.remark = "车辆有嫌疑行为";
+                addCaution(form3).then(response => {
+                  this.$modal.msgSuccess("新增预警成功");
+                });
+              }
+            }
           });
         }
       });
@@ -898,54 +918,54 @@ export default {
       }
     },
     generateData() {
-    // 添加图片
-    // 图片名称
-    this.form1.imageName= ['image1.jpg', 'image2.jpg', 'image3.jpg', 'image4.jpg'][Math.floor(Math.random() * 4)];
-    // 坐标
-    this.form1.coordinate=`(${Math.floor(Math.random() * 100)},${Math.floor(Math.random() * 100)})`;  // 随机生成坐标
-    // 违法状态
-    this.form1.status=['1', '2', '3'][Math.floor(Math.random() * 3)];  // 随机选择违法状态
+      // 添加图片
+      // 图片名称
+      this.form1.imageName = ['image1.jpg', 'image2.jpg', 'image3.jpg', 'image4.jpg'][Math.floor(Math.random() * 4)];
+      // 坐标
+      this.form1.coordinate = `${Math.floor(Math.random() * 100)}`;  // 随机生成坐标
+      // 违法状态
+      this.form1.status = ['1', '2', '3'][Math.floor(Math.random() * 3)];  // 随机选择违法状态
 
-    // 备注
-    this.form1.remark='备注：' + Math.random().toString(36).substring(2, 15); // 生成随机备注
+      // 备注
+      this.form1.remark = '备注：' + Math.random().toString(36).substring(2, 15); // 生成随机备注
 
-    // 添加视频
-    // 视频名称
-    this.form2.videoName = ['video1.MP4', 'video2.MP4', 'video3.MP4', 'video.MP4'][Math.floor(Math.random() * 4)];
-    // 视频大小
-    this.form2.videoSize=`${Math.floor(Math.random() * 100)}`;
-    // 违法状态
-    this.form2.status=['1', '2', '3'][Math.floor(Math.random() * 3)];  // 随机选择违法状态
-    // 起始时间
-    this.form2.startTime=['00:05', '00:10', '00:15', '00:20'][Math.floor(Math.random() * 4)];  // 随机选择违法状态
-    // 结束时间" 
-    this.form2.endTime=['00:45', '00:45', '00:50', '00:55'][Math.floor(Math.random() * 4)];  // 随机选择违法状态
-    // 备注
-    this.form2.remark='备注：' + Math.random().toString(36).substring(2, 15); // 生成随机备注
+      // 添加视频
+      // 视频名称
+      this.form2.videoName = ['video1.MP4', 'video2.MP4', 'video3.MP4', 'video.MP4'][Math.floor(Math.random() * 4)];
+      // 视频大小
+      this.form2.videoSize = `${Math.floor(Math.random() * 100)}`;
+      // 违法状态
+      this.form2.status = ['0', '1', '2'][Math.floor(Math.random() * 3)];  // 随机选择违法状态
+      // 起始时间
+      this.form2.startTime = ['00:05', '00:10', '00:15', '00:20'][Math.floor(Math.random() * 4)];  // 随机选择违法状态
+      // 结束时间" 
+      this.form2.endTime = ['00:45', '00:45', '00:50', '00:55'][Math.floor(Math.random() * 4)];  // 随机选择违法状态
+      // 备注
+      this.form2.remark = '备注：' + Math.random().toString(36).substring(2, 15); // 生成随机备注
 
-    // 添加行为记录
-    // 车型
-    this.form.carTypeId=['1', '2', '3'][Math.floor(Math.random() * 3)];
-    // 车身颜色
-    this.form.carColor=['红色', '白色', '蓝色', '黄色'][Math.floor(Math.random() * 4)];
-    // 嫌疑程度
-    this.form.degreeSuspicion=`(${Math.floor(Math.random() * (100 - 10 + 1)) + 10},${Math.floor(Math.random() * (100 - 10 + 1)) + 10})`;
-    // 检测点
-    this.form.detectionId=['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'][Math.floor(Math.random() * 10)];
-    // 监测区域
-    this.form.districtId=['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'][Math.floor(Math.random() * 10)];
-    // 行驶方向
-    this.form.drivingDirection=['0', '1'][Math.floor(Math.random() * 2)];
-    // 违法状态
-    this.form.illegalStatus=['1', '2', '3'][Math.floor(Math.random() * 3)];  // 随机选择违法状态
-    // 状态
-    this.form.status  =['0', '1'][Math.floor(Math.random() * 2)];  // 随机选择违法状态
-    // 备注
-    this.form.remark='备注：' + Math.random().toString(36).substring(5, 20); // 生成随机备注
-    
-  }
+      // 添加行为记录
+      // 车型
+      this.form.carTypeId = ['1', '2', '3'][Math.floor(Math.random() * 3)];
+      // 车身颜色
+      this.form.carColor = ['红色', '白色', '蓝色', '黄色'][Math.floor(Math.random() * 4)];
+      // 嫌疑程度
+      this.form.degreeSuspicion = `(${Math.floor(Math.random() * (100 - 10 + 1)) + 10},${Math.floor(Math.random() * (100 - 10 + 1)) + 10})`;
+      // 检测点
+      this.form.detectionId = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'][Math.floor(Math.random() * 10)];
+      // 监测区域
+      this.form.districtId = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'][Math.floor(Math.random() * 10)];
+      // 行驶方向
+      this.form.drivingDirection = ['0', '1'][Math.floor(Math.random() * 2)];
+      // 违法状态
+      this.form.illegalStatus = ['0', '1', '2'][Math.floor(Math.random() * 3)];  // 随机选择违法状态
+      // 状态
+      this.form.status = ['0', '1'][Math.floor(Math.random() * 2)];  // 随机选择违法状态
+      // 备注
+      this.form.remark = '备注：' + Math.random().toString(36).substring(5, 20); // 生成随机备注
+
+    }
   },
-  
+
 };
 </script>
 

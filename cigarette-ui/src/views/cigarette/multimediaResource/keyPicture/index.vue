@@ -59,6 +59,7 @@
     <el-table v-loading="loading" :data="pictureList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="图片id" align="center" prop="keyPictureId" />
+      <el-table-column label="行为id" align="center" prop="behaviorId" />
       <el-table-column label="图片url" align="center" prop="image" width="100">
         <template slot-scope="scope">
           <image-preview :src="scope.row.image" :width="50" :height="50" />
@@ -109,6 +110,9 @@
         </el-form-item>
           <el-form-item label="坐标" prop="coordinate">
           <el-input v-model="form.coordinate" placeholder="请输入坐标" />
+        </el-form-item>
+        <el-form-item label="行为id" prop="coordinate">
+          <el-input v-model="form.behaviorId" placeholder="请输入行为ID" />
         </el-form-item>
         
         <el-form-item label="违法状态" prop="status">
@@ -386,11 +390,8 @@ export default {
         pageNum: null,
         pageSize: 100000
       }).then(response => {
-        console.log("response");
-        console.log(response);
         // 获取到用户信息后，保存原始用户列表数据
         this.cameraIdList = response.rows.map(camera => {
-          console.log("camera"+camera.detectionId);
           return {
             cameraDetectionId: camera.detectionId,
             cameraIp: camera.cameraIp,

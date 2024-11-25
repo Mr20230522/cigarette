@@ -3,10 +3,6 @@
     <el-row :gutter="20">
       <!-- 地区数据 -->
       <el-col :span="4" :xs="24">
-        <!-- <div>
-                    <el-input v-model="districtName" placeholder="请输入地区名称" clearable size="small"
-                        prefix-icon="el-icon-search" style="margin-bottom: 20px" />
-                </div> -->
         <div>
           <el-tree :data="treeData" node-key="nodeKey" default-expand-all :props="defaultProps"
             @node-click="handleNodeClick">
@@ -126,7 +122,7 @@
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="addCautionFrom(scope.row)"
                 v-hasPermi="['vehicle:vehicleBehavior:edit']" style="color: red;">一键预警</el-button>
-                <el-button size="mini" type="text" icon="el-icon-view" @click="handleUpdate(scope.row)"
+              <el-button size="mini" type="text" icon="el-icon-view" @click="viewDetail(scope.row)"
                 v-hasPermi="['vehicle:vehicleBehavior:edit']" style="color: green;">详情</el-button>
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                 v-hasPermi="['vehicle:vehicleBehavior:edit']">修改</el-button>
@@ -145,24 +141,24 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row>
           <el-col :span="20">
-        <el-form-item label="搜索">
-          <el-input v-model="searchInputCar" @input="filterCar" placeholder="请输入车辆编号或者车牌号" clearable
-            suffix-icon="el-icon-search" style="width: 90%"></el-input>
-          <el-scrollbar wrap-class="scrollbar-wrapper" style="max-height: 'auto';width: 90%">
-            <el-card class="user-list">
-              <el-row v-for="(car, index) in filteredCar" :key="index" class="user-info"
-                :class="{ 'bg-color': index % 2 === 1, 'selected': car === selectedCar }">
-                <el-col :span="24">
-                  <span @click="selectCar(car)" class="label" style="cursor:pointer;">车辆ID:{{ car.carId
-                    }}&nbsp;&nbsp;车牌编号:{{ car.licensePlate }}</span>
-                </el-col>
-              </el-row>
-            </el-card>
-          </el-scrollbar>
-        </el-form-item>
-      </el-col>
-      <el-button type="text" @click="vehicleCar()">车辆不存在？</el-button>
-    </el-row>
+            <el-form-item label="搜索">
+              <el-input v-model="searchInputCar" @input="filterCar" placeholder="请输入车辆编号或者车牌号" clearable
+                suffix-icon="el-icon-search" style="width: 90%"></el-input>
+              <el-scrollbar wrap-class="scrollbar-wrapper" style="max-height: 'auto';width: 90%">
+                <el-card class="user-list">
+                  <el-row v-for="(car, index) in filteredCar" :key="index" class="user-info"
+                    :class="{ 'bg-color': index % 2 === 1, 'selected': car === selectedCar }">
+                    <el-col :span="24">
+                      <span @click="selectCar(car)" class="label" style="cursor:pointer;">车辆ID:{{ car.carId
+                        }}&nbsp;&nbsp;车牌编号:{{ car.licensePlate }}</span>
+                    </el-col>
+                  </el-row>
+                </el-card>
+              </el-scrollbar>
+            </el-form-item>
+          </el-col>
+          <el-button type="text" @click="vehicleCar()">车辆不存在？</el-button>
+        </el-row>
         <el-row>
           <el-col :span="12">
             <el-form-item label="车辆编号" prop="carId">
@@ -214,27 +210,27 @@
             </el-form-item>
           </el-col>
         </el-row>
-                <el-row>
+        <el-row>
           <el-col :span="20">
-        <el-form-item label="搜索">
-          <el-input v-model="searchInput" @input="filterUsers" placeholder="请输入驾驶员名称、ID 或电话号码" clearable
-            suffix-icon="el-icon-search" style="width: 90%"></el-input>
-          <el-scrollbar wrap-class="scrollbar-wrapper" style="max-height: 'auto';width: 90%">
-            <el-card class="user-list">
-              <el-row v-for="(user, index) in filteredUsers" :key="index" class="user-info"
-                :class="{ 'bg-color': index % 2 === 1, 'selected': user === selectedUser }">
-                <el-col :span="24">
-                  <span @click="selectUser(user)" class="label" style="cursor:pointer;">用户ID:{{ user.id
-                    }}&nbsp;&nbsp;用户名称:{{ user.username }}&nbsp;&nbsp;电话号码:{{ user.phonenumber }}
-                  </span>
-                </el-col>
-              </el-row>
-            </el-card>
-          </el-scrollbar>
-        </el-form-item>
-      </el-col>
-      <el-button type="text" @click="vehicleUser()">车主不存在？</el-button>
-    </el-row>
+            <el-form-item label="搜索">
+              <el-input v-model="searchInput" @input="filterUsers" placeholder="请输入驾驶员名称、ID 或电话号码" clearable
+                suffix-icon="el-icon-search" style="width: 90%"></el-input>
+              <el-scrollbar wrap-class="scrollbar-wrapper" style="max-height: 'auto';width: 90%">
+                <el-card class="user-list">
+                  <el-row v-for="(user, index) in filteredUsers" :key="index" class="user-info"
+                    :class="{ 'bg-color': index % 2 === 1, 'selected': user === selectedUser }">
+                    <el-col :span="24">
+                      <span @click="selectUser(user)" class="label" style="cursor:pointer;">用户ID:{{ user.id
+                        }}&nbsp;&nbsp;用户名称:{{ user.username }}&nbsp;&nbsp;电话号码:{{ user.phonenumber }}
+                      </span>
+                    </el-col>
+                  </el-row>
+                </el-card>
+              </el-scrollbar>
+            </el-form-item>
+          </el-col>
+          <el-button type="text" @click="vehicleUser()">车主不存在？</el-button>
+        </el-row>
         <el-row>
           <el-col :span="12">
             <el-form-item label="车主姓名" prop="name">
@@ -328,6 +324,186 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+
+
+    <!-- 行为详情 -->
+    <el-dialog :title="title" :visible.sync="detailOpen" width="70%" append-to-body>
+      <el-card style="width: 100%;">
+        <el-table  :data="pictureList">
+      <el-table-column label="图片id" align="center" prop="keyPictureId" />
+      <el-table-column label="行为id" align="center" prop="behaviorId" />
+      <el-table-column label="图片url" align="center" prop="image" width="100">
+        <template slot-scope="scope">
+          <image-preview :src="scope.row.image" :width="50" :height="50" />
+        </template>
+      </el-table-column>
+      <el-table-column label="图片名称" align="center" prop="imageName" />
+      <el-table-column label="摄像头id" align="center" prop="cameraId" />
+      <el-table-column label="坐标" align="center" prop="coordinate" />
+
+      <el-table-column label="违法状态" align="center" prop="status" > 
+            <template slot-scope="scope">
+              <dict-tag :options="dict.type.tob_illegal_status" :value="scope.row.status" />
+            </template> 
+      </el-table-column>
+      <el-table-column label="监测点" align="center" prop="detectionId">
+            <template slot-scope="scope">
+              {{ getDetectionName(scope.row.detectionId) }}
+            </template>
+          </el-table-column>
+          <el-table-column label="备注" align="center" prop="remark" />
+      
+    </el-table>
+
+      </el-card>
+
+      <el-card style="width: 100%;">
+        <el-table v-loading="loading" :data="videoList">
+          <el-table-column label="视频ID" align="center" prop="videoId" />
+          <el-table-column label="行为ID" align="center" prop="actionId" />
+          <!-- <el-table-column label="视频url" align="center" prop="videoPath" min-width="180px">
+            <template slot-scope="scope">
+              <video v-if="scope.row.videoPath" width="180px" height="140px" controls>
+                <source :src="scope.row.videoPath" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            </template>
+          </el-table-column> -->
+          <el-table-column label="视频名称" align="center" prop="videoName" />
+          <el-table-column label="摄像头id" align="center" prop="cameraId" />
+          <el-table-column label="起始时间" align="center" prop="startTime" width="180" />
+          <el-table-column label="结束时间" align="center" prop="endTime" width="180" />
+          <el-table-column label="视频大小" align="center" prop="videoSize">
+            <template slot-scope="scope">
+              {{ scope.row.videoSize }}MB
+            </template>
+          </el-table-column>
+          <el-table-column label="监测区域" align="center" prop="detectionId">
+            <template slot-scope="scope">
+              {{ getDetectionName(scope.row.detectionId) }}
+            </template>
+          </el-table-column>
+          <el-table-column label="状态" align="center" prop="status">
+            <template slot-scope="scope">
+              <dict-tag :options="dict.type.tob_illegal_status" :value="scope.row.status" />
+            </template>
+          </el-table-column>
+          <el-table-column label="备注" align="center" prop="remark" />
+        </el-table>
+
+      </el-card>
+
+
+      <el-card style="width: 100%;">
+        <el-descriptions class="margin-top" :column="3"  border>
+           
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-user"></i>
+              车辆行为编号
+            </template>
+            {{ detailForm.behaviorId }}
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-mobile-phone"></i>
+              车辆编号
+            </template>
+            {{ detailForm.carId }}
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-location-outline"></i>
+              车牌编号
+            </template>
+            {{ detailForm.licensePlate }}
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-tickets"></i>
+              车型
+            </template>
+            <dict-tag :options="dict.type.tob_vehicle_type" :value="detailForm.carTypeId" />
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-office-building"></i>
+              车身颜色
+            </template>
+            {{ detailForm.carColor }}
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-office-building"></i>
+              嫌疑程度
+            </template>
+            <dict-tag :options="dict.type.tob_driving_irection" :value="detailForm.drivingDirection" />
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-office-building"></i>
+              车员编号
+            </template>
+            {{ detailForm.driverId }}
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-office-building"></i>
+              驾驶员姓名
+            </template>
+            {{ detailForm.driverName }}
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-office-building"></i>
+              行驶方向
+            </template>
+            <dict-tag :options="dict.type.tob_driving_irection" :value="detailForm.drivingDirection" />
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-office-building"></i>
+              违法状态
+            </template>
+            <dict-tag :options="dict.type.tob_illegal_status" :value="detailForm.illegalStatus" />
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-office-building"></i>
+              状态
+            </template>
+            <dict-tag :options="dict.type.sys_normal_disable" :value="detailForm.status" />
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-office-building"></i>
+              监测点
+            </template>
+            {{ getDetectionName(detailForm.detectionId) }}
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-office-building"></i>
+              备注
+            </template>
+            {{ detailForm.remark }}
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-office-building"></i>
+              同伙编号
+            </template>
+            {{ detailForm.accompliceId }}
+          </el-descriptions-item>
+
+        </el-descriptions>
+
+
+
+      </el-card>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -347,6 +523,8 @@ import {
   listVehicle
 } from "@/api/cigarette/vehicle/vehicle";
 
+import { listPictureByBehaviorId } from "@/api/cigarette/multimediaResource/picture";
+import { listVideoByBehaviorId } from "@/api/cigarette/multimediaResource/keyVideo";
 import { listDistrict } from "@/api/cigarette/detection/district";
 import { listDetection } from "@/api/cigarette/detection/detection";
 import { addCaution } from "@/api/cigarette/caution/caution";
@@ -383,6 +561,7 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      detailOpen: false,
       submitCautionOpen: false,
       // 查询参数
       queryParams: {
@@ -404,6 +583,10 @@ export default {
         accompliceId: []
       },
       cautionForm: {},
+      detailForm: {
+      },
+      pictureList: [],
+      videoList:[],
       // 存储搜索信息
       searchInput: '',
       // 存储用户信息
@@ -856,13 +1039,31 @@ export default {
 
       });
     },
-    vehicleUser(){
-        this.open = false; 
-        this.$router.push({ path: "/cigarette/vehicle/person"});
-      },
-    vehicleCar(){
-      this.open = false; 
-      this.$router.push({ path: "/cigarette/vehicle/vehicle"});
+    vehicleUser() {
+      this.open = false;
+      this.$router.push({ path: "/cigarette/vehicle/person" });
+    },
+    vehicleCar() {
+      this.open = false;
+      this.$router.push({ path: "/cigarette/vehicle/vehicle" });
+    },
+    viewDetail(row) {
+      this.detailForm = row;
+      listPictureByBehaviorId(row.behaviorId).then(response => {
+        console.log("图片response.data");
+        console.log(response.data);
+        this.pictureList = response.data;
+        console.log(this.pictureList);
+      });
+      
+      listVideoByBehaviorId(row.behaviorId).then(response => {
+        console.log("视频response.data");
+        console.log(response.data);
+        this.videoList = response.data;
+        console.log(this.videoList);
+      });
+      this.detailOpen = true;
+      this.title = "车辆行为记录详情";
     }
   }
 };

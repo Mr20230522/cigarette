@@ -69,6 +69,8 @@ public class TobKeyPictureController extends BaseController
         return success(tobKeyPictureService.selectTobKeyPictureByKeyPictureId(keyPictureId));
     }
 
+
+
     /**
      * 新增关键帧图片
      */
@@ -100,5 +102,15 @@ public class TobKeyPictureController extends BaseController
     public AjaxResult remove(@PathVariable Long[] keyPictureIds)
     {
         return toAjax(tobKeyPictureService.deleteTobKeyPictureByKeyPictureIds(keyPictureIds));
+    }
+
+    /**
+     * 获取关键帧图片详细信息
+     */
+    @PreAuthorize("@ss.hasPermi('multimediaResource:picture:query')")
+    @GetMapping(value = "/behavior/{behaviorId}")
+    public AjaxResult listPictureByBehaviorId(@PathVariable("behaviorId") Long behaviorId)
+    {
+        return success(tobKeyPictureService.listPictureByBehaviorId(behaviorId));
     }
 }

@@ -58,4 +58,13 @@ public interface TobKeyPictureMapper
      * @return 结果
      */
     public int deleteTobKeyPictureByKeyPictureIds(Long[] keyPictureIds);
+
+    /**
+     * 查询关键帧图片列表
+     *
+     * @param behaviorId 行为ID
+     * @return 关键帧图片集合
+     */
+    public List<TobKeyPicture> listPictureByBehaviorId(Long behaviorId);
+
 }

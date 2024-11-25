@@ -131,4 +131,15 @@ public class TobKeyVideoController extends BaseController
             return AjaxResult.error("上传视频异常，请联系管理员");
         }
     }
+
+
+    /**
+     * 获取关键帧图片详细信息
+     */
+    @PreAuthorize("@ss.hasPermi('multimediaResource:keyVideo:query')")
+    @GetMapping(value = "/behavior/{behaviorId}")
+    public AjaxResult listVideoByBehaviorId(@PathVariable("behaviorId") Long behaviorId)
+    {
+        return success(tobKeyVideoService.listVideoByBehaviorId(behaviorId));
+    }
 }

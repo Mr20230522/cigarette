@@ -17,6 +17,8 @@ export function getPicture(keyPictureId) {
   })
 }
 
+
+
 // 新增关键帧图片
 export function addPicture(data) {
   return request({
@@ -40,5 +42,14 @@ export function delPicture(keyPictureId) {
   return request({
     url: '/cigarette/multimediaResource/picture/' + keyPictureId,
     method: 'delete'
+  })
+}
+
+
+// 根据行为ID查询关键帧图片详细
+export function listPictureByBehaviorId(behaviorId) {
+  return request({
+    url: '/cigarette/multimediaResource/picture/behavior/' + behaviorId,
+    method: 'get'
   })
 }

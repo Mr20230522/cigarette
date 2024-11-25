@@ -92,4 +92,15 @@ public class TobKeyPictureServiceImpl implements ITobKeyPictureService
     {
         return tobKeyPictureMapper.deleteTobKeyPictureByKeyPictureId(keyPictureId);
     }
+    /**
+     * 根据行为ID查询关键帧图片列表
+     *
+     * @param behaviorId 关键帧图片
+     * @return 关键帧图片
+     */
+    @Override
+    public List<TobKeyPicture> listPictureByBehaviorId(Long behaviorId)
+    {
+        return tobKeyPictureMapper.listPictureByBehaviorId(behaviorId);
+    }
 }

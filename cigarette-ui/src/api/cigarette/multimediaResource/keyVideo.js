@@ -17,6 +17,8 @@ export function getVideo(videoId) {
   })
 }
 
+
+
 // 新增关键帧视频
 export function addVideo(data) {
   return request({
@@ -44,11 +46,20 @@ export function delVideo(videoId) {
 }
 
 
-// 用户头像上传
+// 用户视频上传
 export function uploadVideo(data) {
   return request({
     url: '/cigarette/multimediaResource/keyVideo/uploadVideo',
     method: 'post',
     data: data
+  })
+}
+
+
+// 根据行为ID查询关键帧视频详细
+export function listVideoByBehaviorId(behaviorId) {
+  return request({
+    url: '/cigarette/multimediaResource/keyVideo/behavior/' + behaviorId,
+    method: 'get'
   })
 }

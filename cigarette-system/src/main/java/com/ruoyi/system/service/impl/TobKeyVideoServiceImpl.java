@@ -2,6 +2,7 @@ package com.ruoyi.system.service.impl;
 
 import java.util.List;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.system.domain.TobKeyPicture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.system.mapper.TobKeyVideoMapper;
@@ -91,5 +92,17 @@ public class TobKeyVideoServiceImpl implements ITobKeyVideoService
     public int deleteTobKeyVideoByVideoId(Long videoId)
     {
         return tobKeyVideoMapper.deleteTobKeyVideoByVideoId(videoId);
+    }
+
+    /**
+     * 根据行为ID查询关键帧视频列表
+     *
+     * @param behaviorId 行为1iID
+     * @return 关键帧视频
+     */
+    @Override
+    public List<TobKeyVideo> listVideoByBehaviorId(Long behaviorId)
+    {
+        return tobKeyVideoMapper.listVideoByBehaviorId(behaviorId);
     }
 }

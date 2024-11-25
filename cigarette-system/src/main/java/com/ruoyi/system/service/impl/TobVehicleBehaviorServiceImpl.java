@@ -7,7 +7,6 @@ import com.ruoyi.system.domain.TobVehicle;
 import com.ruoyi.system.domain.vo.TobVehicleBehaviorVo;
 import com.ruoyi.system.mapper.TobPersonMapper;
 import com.ruoyi.system.mapper.TobVehicleMapper;
-import com.ruoyi.system.service.ITobVehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.system.mapper.TobVehicleBehaviorMapper;
@@ -65,6 +64,9 @@ public class TobVehicleBehaviorServiceImpl implements ITobVehicleBehaviorService
         return tobVehicleBehaviorMapper.selectTobVehicleBehaviorVoList(tobVehicleBehaviorVo);
     }
 
+
+
+
     /**
      * 新增车辆行为记录
      * 
@@ -72,7 +74,7 @@ public class TobVehicleBehaviorServiceImpl implements ITobVehicleBehaviorService
      * @return 结果
      */
     @Override
-    public int insertTobVehicleBehavior(TobVehicleBehavior tobVehicleBehavior) {
+    public Long insertTobVehicleBehavior(TobVehicleBehavior tobVehicleBehavior) {
         // 设置创建时间
         tobVehicleBehavior.setCreateTime(DateUtils.getNowDate());
 
@@ -98,9 +100,10 @@ public class TobVehicleBehaviorServiceImpl implements ITobVehicleBehaviorService
             tobPersonMapper.updateTobPerson(person);
 
         }
+        tobVehicleBehaviorMapper.insertTobVehicleBehavior(tobVehicleBehavior);
 
-        // 插入新的车辆行为记录
-        return tobVehicleBehaviorMapper.insertTobVehicleBehavior(tobVehicleBehavior);
+        return tobVehicleBehavior.getBehaviorId();
+
     }
 //    public int insertTobVehicleBehavior(TobVehicleBehavior tobVehicleBehavior) {
 //        tobVehicleBehavior.setCreateTime(DateUtils.getNowDate());

@@ -1,6 +1,8 @@
 package com.ruoyi.system.service;
 
 import java.util.List;
+
+import com.ruoyi.system.domain.TobKeyPicture;
 import com.ruoyi.system.domain.TobKeyVideo;
 
 /**
@@ -58,4 +60,13 @@ public interface ITobKeyVideoService
      * @return 结果
      */
     public int deleteTobKeyVideoByVideoId(Long videoId);
+
+
+    /**
+     * 根据行为ID查询关键帧视频列表
+     *
+     * @param behaviorId 关键帧视频
+     * @return 关键帧图片集合
+     */
+    public List<TobKeyVideo> listVideoByBehaviorId(Long behaviorId);
 }

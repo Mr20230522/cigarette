@@ -103,4 +103,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{videoId}
         </foreach>
     </delete>
+
+    <select id="listVideoByBehaviorId" parameterType="Long" resultMap="TobKeyVideoResult">
+        <include refid="selectTobKeyVideoVo"/>
+        where action_id = #{behaviorId}
+    </select>
 </mapper>

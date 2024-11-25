@@ -31,7 +31,7 @@ public interface ITobVehicleBehaviorService
     /**
      * 查询车辆行为记录列表
      *
-     * @param voTobVehicleBehavior 车辆行为记录
+     * @param tobVehicleBehaviorVo 车辆行为记录
      * @return 车辆行为记录集合
      */
     public List<TobVehicleBehaviorVo> selectTobVehicleBehaviorVoList(TobVehicleBehaviorVo tobVehicleBehaviorVo );
@@ -42,7 +42,7 @@ public interface ITobVehicleBehaviorService
      * @param tobVehicleBehavior 车辆行为记录
      * @return 结果
      */
-    public int insertTobVehicleBehavior(TobVehicleBehavior tobVehicleBehavior);
+    public Long insertTobVehicleBehavior(TobVehicleBehavior tobVehicleBehavior);
 
     /**
      * 修改车辆行为记录

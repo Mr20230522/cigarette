@@ -46,6 +46,11 @@ public class TobKeyPicture extends BaseEntity
     @Excel(name = "地区id")
     private Long districtId;
 
+    /** 行为ID */
+    @Excel(name = "行为ID")
+    private Long behaviorId;
+
+
     public void setKeyPictureId(Long keyPictureId) 
     {
         this.keyPictureId = keyPictureId;
@@ -119,6 +124,16 @@ public class TobKeyPicture extends BaseEntity
         return districtId;
     }
 
+    public void setBehaviorId(Long behaviorId)
+    {
+        this.behaviorId = behaviorId;
+    }
+
+    public Long getBehaviorId()
+    {
+        return behaviorId;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -132,6 +147,7 @@ public class TobKeyPicture extends BaseEntity
             .append("status", getStatus())
             .append("detectionId", getDetectionId())
             .append("districtId", getDistrictId())
+            .append("behaviorId", getBehaviorId())
             .toString();
     }
 }

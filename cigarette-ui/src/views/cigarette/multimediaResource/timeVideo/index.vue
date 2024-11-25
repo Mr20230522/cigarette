@@ -456,11 +456,8 @@ export default {
         pageNum: null,
         pageSize: 100000
       }).then(response => {
-        console.log("response");
-        console.log(response);
         // 获取到用户信息后，保存原始用户列表数据
         this.cameraIdList = response.rows.map(camera => {
-          console.log("camera"+camera.detectionId);
           return {
             cameraDetectionId: camera.detectionId,
             cameraIp: camera.cameraIp,
@@ -617,8 +614,6 @@ export default {
         this.$message.error("视频大小不能超过50MB");
         return false;
       }
-      console.log("beforeUploadVideo");
-      console.log("视频符合要求");
       
       this.videoFlag = false;
     },

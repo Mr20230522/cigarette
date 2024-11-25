@@ -58,4 +58,13 @@ public interface ITobKeyPictureService
      * @return 结果
      */
     public int deleteTobKeyPictureByKeyPictureId(Long keyPictureId);
+
+    /**
+     * 根据行为ID查询关键帧图片列表
+     *
+     * @param behaviorId 关键帧图片
+     * @return 关键帧图片集合
+     */
+    public List<TobKeyPicture> listPictureByBehaviorId(Long behaviorId);
+
 }

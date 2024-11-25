@@ -1,6 +1,8 @@
 package com.ruoyi.system.mapper;
 
 import java.util.List;
+
+import com.ruoyi.system.domain.TobKeyPicture;
 import com.ruoyi.system.domain.TobKeyVideo;
 
 /**
@@ -58,4 +60,15 @@ public interface TobKeyVideoMapper
      * @return 结果
      */
     public int deleteTobKeyVideoByVideoIds(Long[] videoIds);
+
+
+    /**
+     * 查询关键帧视频列表
+     *
+     * @param behaviorId 行为iID
+     * @return 关键帧视频集合
+     */
+    public List<TobKeyVideo> listVideoByBehaviorId(Long behaviorId);
+
+
 }

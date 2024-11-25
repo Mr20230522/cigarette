@@ -63,10 +63,7 @@
           <el-table-column label="行为ID" align="center" prop="actionId" />
           <el-table-column label="视频url" align="center" prop="videoPath" min-width="180px">
             <template slot-scope="scope">
-              <video v-if="scope.row.videoPath" width="180px" height="140px" controls>
-                <source :src="scope.row.videoPath" type="video/mp4">
-                Your browser does not support the video tag.
-              </video>
+              <vue-core-video-player v-if="scope.row.videoPath" :src="scope.row.videoPath" loop />
             </template>
           </el-table-column>
           <el-table-column label="视频名称" align="center" prop="videoName" />
@@ -197,18 +194,11 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
-
-
-    <el-dialog :title="title" :visible.sync="openvideo" width="60%" append-to-body>
-      <div><span>hh</span></div>
-
-    </el-dialog>
   </div>
 </template>
 
 <script>
 import { listVideo, getVideo, delVideo, addVideo, updateVideo } from "@/api/cigarette/multimediaResource/keyVideo";
-
 import { listDistrict } from "@/api/cigarette/detection/district";
 import { listDetection } from "@/api/cigarette/detection/detection";
 import { listCamera } from "@/api/cigarette/detection/camera";
@@ -246,7 +236,6 @@ export default {
       selectedCamera: null,
       // 是否显示弹出层
       open: false,
-      openvideo: false,
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -452,11 +441,9 @@ export default {
         pageNum: null,
         pageSize: 100000
       }).then(response => {
-        console.log("response");
-        console.log(response);
         // 获取到用户信息后，保存原始用户列表数据
         this.cameraIdList = response.rows.map(camera => {
-          console.log("camera" + camera.detectionId);
+
           return {
             cameraDetectionId: camera.detectionId,
             cameraIp: camera.cameraIp,
@@ -480,7 +467,7 @@ export default {
     reset() {
       this.form = {
         videoId: null,
-        actionId:null,
+        actionId: null,
         videoPath: null,
         videoName: null,
         cameraId: null,
@@ -616,8 +603,6 @@ export default {
         this.$message.error("视频大小不能超过50MB");
         return false;
       }
-      console.log("beforeUploadVideo");
-      console.log("视频符合要求");
 
       this.videoFlag = false;
     },
@@ -634,6 +619,14 @@ export default {
         this.$message.error("视频上传失败，请重新上传！");
       }
     },
+    getVideoPath(videoPath) {
+      // 确保 videoPath 是一个正确的路径
+      if (videoPath) {
+        // 如果 videoPath 是一个静态资源路径，使用 require 引入
+        return require(videoPath);
+      }
+      return '';
+    }
   },
 };
 </script>

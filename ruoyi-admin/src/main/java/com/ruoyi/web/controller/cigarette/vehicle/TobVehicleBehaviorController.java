@@ -91,14 +91,16 @@ public class TobVehicleBehaviorController extends BaseController
     @PreAuthorize("@ss.hasPermi('vehicle:vehicleBehavior:add')")
     @Log(title = "车辆行为记录", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody TobVehicleBehavior tobVehicleBehavior)
-    {
-        return toAjax(tobVehicleBehaviorService.insertTobVehicleBehavior(tobVehicleBehavior));
+    public Long add(@RequestBody TobVehicleBehavior tobVehicleBehavior) {
+
+        Long VehicleBehaviorId = tobVehicleBehaviorService.insertTobVehicleBehavior(tobVehicleBehavior);
+
+        return VehicleBehaviorId;
     }
 
-    /**
-     * 修改车辆行为记录
-     */
+        /**
+         * 新增车辆行为记录
+         */
     @PreAuthorize("@ss.hasPermi('vehicle:vehicleBehavior:edit')")
     @Log(title = "车辆行为记录", businessType = BusinessType.UPDATE)
     @PutMapping
