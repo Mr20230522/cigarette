@@ -138,14 +138,15 @@
             </el-form-item>
           </el-col>
         </el-row>
+          <el-col :span="20">
             <el-form-item label="搜索车主">
               <el-input v-model="searchInput" @input="filterUsers" placeholder="请输入驾驶员名称、ID 或电话号码" clearable
-                suffix-icon="el-icon-search"></el-input>
-              <el-scrollbar wrap-class="scrollbar-wrapper" style="max-height: 'auto';">
+                suffix-icon="el-icon-search" style="width: 90%"></el-input>
+              <el-scrollbar wrap-class="scrollbar-wrapper" style="max-height: 'auto';width: 90%">
                 <el-card class="user-list">
                   <el-row v-for="(user, index) in filteredUsers" :key="index" class="user-info"
                     :class="{ 'bg-color': index % 2 === 1,'selected': user === selectedUser }">
-                    <el-col :span="24">
+                    <el-col :span="20">
                       <span @click="selectUser(user)" class="label"
                         style="cursor:pointer;">用户ID:{{ user.id }}&nbsp;&nbsp;用户名称:{{ user.username }}&nbsp;&nbsp;电话号码:{{ user.phonenumber }}
                       </span>
@@ -154,6 +155,8 @@
                 </el-card>
               </el-scrollbar>
             </el-form-item>
+          </el-col>
+          <el-button type="text" @click="vehicleUser()">车主不存在？</el-button>
             <el-row>
           <el-col :span="12">
             <el-form-item label="车主姓名" prop="name">
@@ -454,6 +457,10 @@
         this.$set(this.form, "name", user.username);
         this.$set(this.form, "phone", user.phonenumber);
       },
+      vehicleUser(){
+        this.open = false; 
+        this.$router.push({ path: "/cigarette/vehicle/person"});
+      }
     }
   };
 </script>

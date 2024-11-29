@@ -82,6 +82,7 @@ public class TobVehicleBehaviorServiceImpl implements ITobVehicleBehaviorService
         // 确保车辆信息存在
         if (vehicle != null) {
             vehicle.setOccurrenceNumber(vehicle.getOccurrenceNumber() != null ? vehicle.getOccurrenceNumber() + 1 : 1);
+            tobVehicleMapper.updateTobVehicle(vehicle);
 
         } else {
             // 处理车辆未找到的情况，可以抛出异常或返回错误信息
@@ -95,14 +96,8 @@ public class TobVehicleBehaviorServiceImpl implements ITobVehicleBehaviorService
         if (person != null) {
             person.setOccurrenceNumber(person.getOccurrenceNumber() != null ? person.getOccurrenceNumber() + 1 : 1);
             tobPersonMapper.updateTobPerson(person);
-            tobVehicleMapper.updateTobVehicle(vehicle);
-        } else {
-            // 处理人员未找到的情况，可以抛出异常或返回错误信息
-            throw new IllegalArgumentException("嫌疑人ID对应的人员未找到, ID: " + tobVehicleBehavior.getDriverId());
-        }
 
-        // 更新车辆行为记录
-        tobVehicleBehaviorMapper.updateTobVehicleBehavior(tobVehicleBehavior);
+        }
 
         // 插入新的车辆行为记录
         return tobVehicleBehaviorMapper.insertTobVehicleBehavior(tobVehicleBehavior);

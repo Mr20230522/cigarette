@@ -33,6 +33,14 @@
           <el-table-column label="行为" align="center" prop="behavior" />
           <el-table-column label="是否工作" align="center" prop="workFlag" />
           <el-table-column label="备注" align="center" prop="remark" />
+          <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="120px" >
+            <template slot-scope="scope">
+              <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
+                v-hasPermi="['detection:dutyLog:edit']">修改</el-button>
+              <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
+                v-hasPermi="['detection:dutyLog:remove']">删除</el-button>
+            </template>
+          </el-table-column>
         </el-table>
 
         <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum"
@@ -157,6 +165,42 @@ export default {
         console.error('Failed to fetch data:', error);
         this.loading = false;
       }
+    },
+     /** 新增按钮操作 */
+     handleAdd() {
+      this.reset();
+      this.open = true;
+      this.title = "添加执勤记录";
+    },
+    /** 修改按钮操作 */
+    handleUpdate(row) {
+      this.reset();
+      const dutyId = row.dutyId || this.ids
+      getDutyLog(dutyId).then(response => {
+        this.form = response.data;
+        this.open = true;
+        this.title = "修改执勤记录";
+      });
+    },
+    /** 提交按钮 */
+    submitForm() {
+      this.$refs["form"].validate(valid => {
+        if (valid) {
+          if (this.form.dutyId != null) {
+            updateDutyLog(this.form).then(response => {
+              this.$modal.msgSuccess("修改成功");
+              this.open = false;
+              this.getList();
+            });
+          } else {
+            addDutyLog(this.form).then(response => {
+              this.$modal.msgSuccess("新增成功");
+              this.open = false;
+              this.getList();
+            });
+          }
+        }
+      });
     },
   }
 };

@@ -23,6 +23,28 @@
         <result property="picture" column="picture"/>
     </resultMap>
 
+<!--    车辆信息VO-->
+    <resultMap type="TobVehicleVo" id="TobVehicleVoResult">
+        <result property="carId" column="car_id"/>
+        <result property="licensePlate" column="license_plate"/>
+        <result property="licensePlateType" column="license_plate_type"/>
+        <result property="carTypeId" column="car_type_id"/>
+        <result property="carColor" column="car_color"/>
+        <result property="occurrenceNumber" column="occurrence_number"/>
+        <result property="casesInvolved" column="cases_involved"/> <!-- 确保这里是 Long 类型 -->
+        <result property="carOwnerId" column="car_owner_id"/>
+        <result property="name" column="name"/>
+        <result property="phone" column="phone"/>
+        <result property="vehiclePurchaseDate" column="vehicle_purchase_date"/>
+        <result property="illegalStatus" column="illegal_status"/>
+        <result property="status" column="status"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="picture" column="picture"/>
+    </resultMap>
+
     <sql id="selectTobVehicleVo">
         SELECT car_id, license_plate, license_plate_type, car_type_id, car_color,
                occurrence_number, cases_involved, car_owner_id, vehicle_purchase_date,
@@ -30,28 +52,32 @@
         FROM tob_vehicle
     </sql>
 
-    <select id="selectTobVehicleList" parameterType="TobVehicle" resultMap="TobVehicleResult">
-        <include refid="selectTobVehicleVo"/>
+
+    <select id="selectTobVehicleList" parameterType="TobVehicleVo" resultMap="TobVehicleVoResult">
+        SELECT a.*,b.name,b.phone
+        FROM tob_vehicle AS a
+        left Join tob_person AS b ON a.car_owner_id=b.suspect_id
         <where>
-            <if test="licensePlate != null and licensePlate != ''"> AND license_plate = #{licensePlate}</if>
-            <if test="licensePlateType != null"> AND license_plate_type = #{licensePlateType}</if>
-            <if test="carTypeId != null"> AND car_type_id = #{carTypeId}</if>
-            <if test="carColor != null and carColor != ''"> AND car_color = #{carColor}</if>
-            <if test="occurrenceNumber != null"> AND occurrence_number = #{occurrenceNumber}</if>
-            <if test="casesInvolved != null"> AND cases_involved = #{casesInvolved}</if> <!-- 确保这里的类型为 Long -->
-            <if test="carOwnerId != null"> AND car_owner_id = #{carOwnerId}</if>
-            <if test="vehiclePurchaseDate != null"> AND vehicle_purchase_date = #{vehiclePurchaseDate}</if>
-            <if test="illegalStatus != null and illegalStatus != ''"> AND illegal_status = #{illegalStatus}</if>
-            <if test="status != null and status != ''"> AND status = #{status}</if>
-            <if test="picture != null and picture != ''"> AND picture = #{picture}</if>
-            AND del_flag = '0'
+            <if test="licensePlate != null and licensePlate != ''"> AND a.license_plate = #{licensePlate}</if>
+            <if test="licensePlateType != null"> AND a.license_plate_type = #{licensePlateType}</if>
+            <if test="carTypeId != null"> AND a.car_type_id = #{carTypeId}</if>
+            <if test="carColor != null and carColor != ''"> AND a.car_color = #{carColor}</if>
+            <if test="occurrenceNumber != null"> AND a.occurrence_number = #{occurrenceNumber}</if>
+            <if test="casesInvolved != null"> AND a.cases_involved = #{casesInvolved}</if> <!-- 确保这里的类型为 Long -->
+            <if test="name != null"> AND b.name #{name}</if>
+            <if test="vehiclePurchaseDate != null"> AND a.vehicle_purchase_date = #{vehiclePurchaseDate}</if>
+            <if test="illegalStatus != null and illegalStatus != ''"> AND a.illegal_status = #{illegalStatus}</if>
+            <if test="status != null and status != ''"> AND a.status = #{status}</if>
+            AND a.del_flag = '0'
         </where>
     </select>
 
 
-    <select id="selectTobVehicleByCarId" parameterType="Long" resultMap="TobVehicleResult">
-        <include refid="selectTobVehicleVo"/>
-        WHERE car_id = #{carId}
+    <select id="selectTobVehicleByCarId" parameterType="Long" resultMap="TobVehicleVoResult">
+        SELECT a.*,b.name,b.phone
+        FROM tob_vehicle AS a
+                 left Join tob_person AS b ON a.car_owner_id=b.suspect_id
+        WHERE a.car_id = #{carId}
     </select>
 
     <insert id="insertTobVehicle" parameterType="TobVehicle" useGeneratedKeys="true" keyProperty="carId">

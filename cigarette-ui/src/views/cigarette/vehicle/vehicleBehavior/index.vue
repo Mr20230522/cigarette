@@ -126,8 +126,8 @@
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="addCautionFrom(scope.row)"
                 v-hasPermi="['vehicle:vehicleBehavior:edit']" style="color: red;">一键预警</el-button>
-              <el-button size="mini" type="text" icon="el-icon-edit" @click="addCaseFrom(scope.row)"
-                v-hasPermi="['vehicle:vehicleBehavior:edit']">一键入案</el-button>
+                <el-button size="mini" type="text" icon="el-icon-view" @click="handleUpdate(scope.row)"
+                v-hasPermi="['vehicle:vehicleBehavior:edit']" style="color: green;">详情</el-button>
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                 v-hasPermi="['vehicle:vehicleBehavior:edit']">修改</el-button>
               <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
@@ -143,10 +143,12 @@
     <!-- 添加或修改车辆行为记录对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="60%" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-row>
+          <el-col :span="20">
         <el-form-item label="搜索">
           <el-input v-model="searchInputCar" @input="filterCar" placeholder="请输入车辆编号或者车牌号" clearable
-            suffix-icon="el-icon-search"></el-input>
-          <el-scrollbar wrap-class="scrollbar-wrapper" style="max-height: 'auto';">
+            suffix-icon="el-icon-search" style="width: 90%"></el-input>
+          <el-scrollbar wrap-class="scrollbar-wrapper" style="max-height: 'auto';width: 90%">
             <el-card class="user-list">
               <el-row v-for="(car, index) in filteredCar" :key="index" class="user-info"
                 :class="{ 'bg-color': index % 2 === 1, 'selected': car === selectedCar }">
@@ -158,6 +160,9 @@
             </el-card>
           </el-scrollbar>
         </el-form-item>
+      </el-col>
+      <el-button type="text" @click="vehicleCar()">车辆不存在？</el-button>
+    </el-row>
         <el-row>
           <el-col :span="12">
             <el-form-item label="车辆编号" prop="carId">
@@ -209,10 +214,12 @@
             </el-form-item>
           </el-col>
         </el-row>
+                <el-row>
+          <el-col :span="20">
         <el-form-item label="搜索">
           <el-input v-model="searchInput" @input="filterUsers" placeholder="请输入驾驶员名称、ID 或电话号码" clearable
-            suffix-icon="el-icon-search"></el-input>
-          <el-scrollbar wrap-class="scrollbar-wrapper" style="max-height: 'auto';">
+            suffix-icon="el-icon-search" style="width: 90%"></el-input>
+          <el-scrollbar wrap-class="scrollbar-wrapper" style="max-height: 'auto';width: 90%">
             <el-card class="user-list">
               <el-row v-for="(user, index) in filteredUsers" :key="index" class="user-info"
                 :class="{ 'bg-color': index % 2 === 1, 'selected': user === selectedUser }">
@@ -225,6 +232,9 @@
             </el-card>
           </el-scrollbar>
         </el-form-item>
+      </el-col>
+      <el-button type="text" @click="vehicleUser()">车主不存在？</el-button>
+    </el-row>
         <el-row>
           <el-col :span="12">
             <el-form-item label="车主姓名" prop="name">
@@ -845,6 +855,14 @@ export default {
         path: '/cigarette/personnel/caseInformation',
 
       });
+    },
+    vehicleUser(){
+        this.open = false; 
+        this.$router.push({ path: "/cigarette/vehicle/person"});
+      },
+    vehicleCar(){
+      this.open = false; 
+      this.$router.push({ path: "/cigarette/vehicle/vehicle"});
     }
   }
 };
