@@ -1,39 +1,90 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.TobDetectionMapper">
-    
+
     <resultMap type="TobDetection" id="TobDetectionResult">
-        <result property="detectionId"    column="detection_id"    />
-        <result property="districtId"    column="district_id"    />
-        <result property="orderNum"    column="order_num"    />
-        <result property="districtName"    column="district_name"    />
-        <result property="status"    column="status"    />
-        <result property="delFlag"    column="del_flag"    />
-        <result property="reamke"    column="reamke"    />
-        <result property="createTime"    column="create_time"    />
-        <result property="updateTime"    column="update_time"    />
+        <result property="detectionId" column="detection_id"/>
+        <result property="districtId" column="district_id"/>
+        <result property="orderNum" column="order_num"/>
+        <result property="detectionName" column="detection_name"/>
+        <result property="status" column="status"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+        <result property="longitude" column="longitude"/>
+        <result property="latitude" column="latitude"/>
+        <result property="updateTime" column="update_time"/>
+
+        <result property="responsibleId" column="responsible_id"/>
     </resultMap>
 
     <sql id="selectTobDetectionVo">
-        select detection_id, district_id, order_num, district_name, status, del_flag, reamke, create_time, update_time from tob_detection
+        select detection_id,
+               district_id,
+               order_num,
+               detection_name,
+               status,
+               longitude,
+               latitude,
+               del_flag,
+               remark,
+               create_time,
+               update_time,
+               responsible_id
+        from tob_detection
     </sql>
 
     <select id="selectTobDetectionList" parameterType="TobDetection" resultMap="TobDetectionResult">
         <include refid="selectTobDetectionVo"/>
-        <where>  
-            <if test="districtId != null "> and district_id = #{districtId}</if>
-            <if test="orderNum != null  and orderNum != ''"> and order_num = #{orderNum}</if>
-            <if test="districtName != null  and districtName != ''"> and district_name like concat('%', #{districtName}, '%')</if>
-            <if test="status != null  and status != ''"> and status = #{status}</if>
-            <if test="reamke != null  and reamke != ''"> and reamke = #{reamke}</if>
+        <where>
+            <if test="districtId != null ">and district_id = #{districtId}</if>
+            <if test="orderNum != null  and orderNum != ''">and order_num = #{orderNum}</if>
+            <if test="detectionName != null  and detectionName != ''">and detection_name like concat('%',
+                #{detectionName}, '%')
+            </if>
+            <if test="status != null  and status != ''">and status = #{status}</if>
+            and del_flag = 0
+            <if test="responsibleId != null ">and responsible_id = #{responsibleId}</if>
         </where>
     </select>
-    
+
     <select id="selectTobDetectionByDetectionId" parameterType="Long" resultMap="TobDetectionResult">
         <include refid="selectTobDetectionVo"/>
         where detection_id = #{detectionId}
+    </select>
+
+    <select id="selectTobDetectionListByDistrictId" parameterType="TobDetection" resultMap="TobDetectionResult" >
+        <include refid="selectTobDetectionVo"/>
+        <where>
+            <choose>
+                <when test="districtId != null and districtId != ''">
+                    district_id IN (
+                    SELECT DISTINCT district_id
+                    FROM tob_district
+                    WHERE CONCAT(ancestors, ',', district_id) LIKE CONCAT('%,', #{districtId}, ',%')
+                    OR district_id = #{districtId}  -- 包括自身地区ID
+                    )
+                </when>
+                <otherwise>
+                    <!-- 如果没有地区ID传入，则不添加任何地区限制条件 -->
+                </otherwise>
+            </choose>
+            <!-- 其他条件 -->
+            <if test="orderNum != null and orderNum != ''">
+                AND td.order_num = #{orderNum}
+            </if>
+            <if test="detectionName != null and detectionName != ''">
+                AND td.detection_name LIKE CONCAT('%', #{detectionName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND td.status = #{status}
+            </if>
+            <if test="responsibleId != null">
+                AND td.responsible_id = #{responsibleId}
+            </if>
+        </where>
     </select>
 
     <insert id="insertTobDetection" parameterType="TobDetection" useGeneratedKeys="true" keyProperty="detectionId">
@@ -41,23 +92,29 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="districtId != null">district_id,</if>
             <if test="orderNum != null">order_num,</if>
-            <if test="districtName != null">district_name,</if>
-            <if test="status != null">status,</if>
-            <if test="delFlag != null">del_flag,</if>
-            <if test="reamke != null">reamke,</if>
+            <if test="detectionName != null and detectionName != ''">detection_name,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="longitude != null">longitude,</if>
+            <if test="latitude != null">latitude,</if>
+            del_flag,
+            <if test="remark != null">remark,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateTime != null">update_time,</if>
-         </trim>
+            <if test="responsibleId != null">responsible_id,</if>
+        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="districtId != null">#{districtId},</if>
             <if test="orderNum != null">#{orderNum},</if>
-            <if test="districtName != null">#{districtName},</if>
-            <if test="status != null">#{status},</if>
-            <if test="delFlag != null">#{delFlag},</if>
-            <if test="reamke != null">#{reamke},</if>
+            <if test="detectionName != null and detectionName != ''">#{detectionName},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="longitude != null">#{longitude},</if>
+            <if test="latitude != null">#{latitude},</if>
+            0,
+            <if test="remark != null">#{remark},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateTime != null">#{updateTime},</if>
-         </trim>
+            <if test="responsibleId != null">#{responsibleId},</if>
+        </trim>
     </insert>
 
     <update id="updateTobDetection" parameterType="TobDetection">
@@ -65,23 +122,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <trim prefix="SET" suffixOverrides=",">
             <if test="districtId != null">district_id = #{districtId},</if>
             <if test="orderNum != null">order_num = #{orderNum},</if>
-            <if test="districtName != null">district_name = #{districtName},</if>
-            <if test="status != null">status = #{status},</if>
+            <if test="detectionName != null and detectionName != ''">detection_name = #{detectionName},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="longitude != null">longitude = #{longitude},</if>
+            <if test="latitude != null">latitude = #{latitude},</if>
             <if test="delFlag != null">del_flag = #{delFlag},</if>
-            <if test="reamke != null">reamke = #{reamke},</if>
+            <if test="remark != null">remark = #{remark},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="responsibleId != null">responsible_id = #{responsibleId},</if>
         </trim>
         where detection_id = #{detectionId}
     </update>
 
     <delete id="deleteTobDetectionByDetectionId" parameterType="Long">
-        delete from tob_detection where detection_id = #{detectionId}
+        update tob_detection set del_flag = '1' where detection_id = #{detectionId}
     </delete>
 
     <delete id="deleteTobDetectionByDetectionIds" parameterType="String">
-        delete from tob_detection where detection_id in 
-        <foreach item="detectionId" collection="array" open="(" separator="," close=")">
+        update tob_detection set del_flag = '1' where detection_id in
+        <foreach collection="array" item="detectionId" open="(" separator="," close=")">
             #{detectionId}
         </foreach>
     </delete>

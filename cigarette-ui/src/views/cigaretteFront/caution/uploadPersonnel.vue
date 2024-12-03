@@ -1,0 +1,154 @@
+<template>
+  <div class="app-container">
+    <!-- 页面顶部居中的标题 -->
+    <div class="page-title">
+      <el-row type="flex" justify="center" align="middle">
+        <el-col :span="24">
+          <h1>已录入人员</h1>
+        </el-col>
+      </el-row>
+    </div>
+
+    <!-- 搜索框 -->
+    <el-row :gutter="20" class="search-row">
+      <el-col :span="6">
+        <el-input v-model="queryParams.name" placeholder="请输入姓名" clearable></el-input>
+      </el-col>
+      <el-col :span="6">
+        <el-select v-model="queryParams.gender" placeholder="选择性别">
+          <el-option label="男" value="M"></el-option>
+          <el-option label="女" value="F"></el-option>
+        </el-select>
+      </el-col>
+      <el-col :span="6">
+        <el-button type="primary" @click="getList">搜索</el-button>
+      </el-col>
+    </el-row>
+
+    <!-- 卡片展示人员信息 -->
+    <el-row gutter="20" type="flex" justify="center" align="top">
+      <el-col :span="8" v-for="(person, index) in personList" :key="person.suspectId">
+        <el-card :body-style="{ padding: '0px' }" class="person-card">
+
+          <el-table-column label="人员图片" align="center" prop="picture" width="100">
+            <template slot-scope="scope">
+              <image-preview :src="scope.row.picture" :width="50" :height="50" v-if="scope.row.picture"/>
+              <el-tag type="warning" v-else>未上传</el-tag>
+            </template>
+          </el-table-column>
+
+
+          <img :src="person.picture" alt="人员图片" class="image" />
+          <div style="padding: 14px;">
+            <div class="card-title">
+              <span>{{ person.name }}</span>
+              <span class="person-info">身份证号：{{ person.identityCard }}</span>
+            </div>
+            <div class="person-details">
+              <p>年龄：{{ person.age }}</p>
+              <p>性别：<dict-tag :options="dict.type.gender" :value="person.gender" /></p>
+              <p>电话：{{ person.phone }}</p>
+              <p>驾驶证号：{{ person.suspectLicenseNumber }}</p>
+              <p>地址：{{ person.address }}</p>
+              <p>出现次数：{{ person.occurrenceNumber }}</p>
+              <p>违法状态：<dict-tag :options="dict.type.illegal_status" :value="person.illegalStatus" /></p>
+              <p>涉案数：{{ person.caseInvolved }}</p>
+              <p>备注：{{ person.remark }}</p>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <!-- 分页 -->
+    <pagination
+      v-show="total > 0"
+      :total="total"
+      :page.sync="queryParams.pageNum"
+      :limit.sync="queryParams.pageSize"
+      @pagination="getList"
+    />
+  </div>
+</template>
+
+<script>
+import { listPerson } from "@/api/cigarette/personnel/person";
+
+export default {
+  name: "Person",
+  dicts: ["gender", "illegal_status"],
+  data() {
+    return {
+      loading: true,
+      ids: [],
+      single: true,
+      multiple: true,
+      showSearch: true,
+      total: 0,
+      personList: [],
+      title: "",
+      open: false,
+      queryParams: {
+        pageNum: 1,
+        pageSize: 10,
+        name: null,
+        age: null,
+        gender: null,
+        identityCard: null,
+        phone: null,
+        address: null,
+        suspectLicenseNumber: null,
+        occurrenceNumber: null,
+        illegalStatus: null,
+        caseInvolved: null,
+        picture: null
+      },
+    };
+  },
+  created() {
+    this.getList();
+  },
+  methods: {
+    /** 查询人员列表 */
+    getList() {
+      this.loading = true;
+      listPerson(this.queryParams).then((response) => {
+        this.personList = response.rows;
+        this.total = response.total;
+        this.loading = false;
+      });
+    },
+  },
+};
+</script>
+
+<style>
+.page-title h1 {
+  font-size: 24px;
+  margin: 20px 0;
+  color: #333;
+}
+
+.search-row {
+  margin-bottom: 20px;
+}
+
+.person-card {
+  margin-bottom: 20px;
+}
+
+.image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.person-info {
+  font-size: 14px;
+  color: #666;
+}
+
+.person-details {
+  margin-top: 10px;
+}
+</style>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobDutyLogMapper">
+    
+    <resultMap type="TobDutyLog" id="TobDutyLogResult">
+        <result property="dutyId"    column="duty_id"    />
+        <result property="staffId"    column="staff_id"    />
+        <result property="dutyTime"    column="duty_time"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="remark"    column="remark"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="flag"    column="flag"    />
+        <result property="keyPictureId"    column="key_picture_id"    />
+        <result property="videoId"    column="video_id"    />
+        <result property="behavior"    column="behavior"    />
+        <result property="workFlag"    column="work_flag"    />
+        <result property="detectionId" column="detection_id"/>
+        <result property="districtId" column="district_id"/>
+    </resultMap>
+
+    <sql id="selectTobDutyLogVo">
+        select duty_id, staff_id, duty_time, del_flag, remark, create_time, update_time, flag, key_picture_id, video_id, behavior, work_flag,detection_id,district_id from tob_duty_log
+    </sql>
+
+    <select id="selectTobDutyLogList" parameterType="TobDutyLog" resultMap="TobDutyLogResult">
+        <include refid="selectTobDutyLogVo"/>
+        <where>  
+            <if test="staffId != null "> and staff_id = #{staffId}</if>
+            <if test="dutyTime != null "> and duty_time = #{dutyTime}</if>
+            <if test="flag != null  and flag != ''"> and flag = #{flag}</if>
+            <if test="keyPictureId != null "> and key_picture_id = #{keyPictureId}</if>
+            <if test="videoId != null "> and video_id = #{videoId}</if>
+            <if test="behavior != null  and behavior != ''"> and behavior = #{behavior}</if>
+            <if test="workFlag != null  and workFlag != ''"> and work_flag = #{workFlag}</if>
+            <if test="detectionId != null "> and detection_id = #{detectionId}</if>
+            <if test="districtId != null "> and district_id = #{districtId}</if>
+            and del_flag = '0'
+        </where>
+    </select>
+    
+    <select id="selectTobDutyLogByDutyId" parameterType="Long" resultMap="TobDutyLogResult">
+        <include refid="selectTobDutyLogVo"/>
+        where duty_id = #{dutyId}
+    </select>
+
+    <insert id="insertTobDutyLog" parameterType="TobDutyLog" useGeneratedKeys="true" keyProperty="dutyId">
+        insert into tob_duty_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="staffId != null">staff_id,</if>
+            <if test="dutyTime != null">duty_time,</if>
+            del_flag,
+            <if test="remark != null">remark,</if>
+            create_time,
+            update_time,
+            <if test="flag != null and flag != ''">flag,</if>
+            <if test="keyPictureId != null">key_picture_id,</if>
+            <if test="videoId != null">video_id,</if>
+            <if test="behavior != null">behavior,</if>
+            <if test="workFlag != null">work_flag,</if>
+            <if test="detectionId != null">detection_id,</if>
+            <if test="districtId != null">district_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="staffId != null">#{staffId},</if>
+            <if test="dutyTime != null">#{dutyTime},</if>
+            0,
+            <if test="remark != null">#{remark},</if>
+            sysdate(),
+            sysdate(),
+            <if test="flag != null and flag != ''">#{flag},</if>
+            <if test="keyPictureId != null">#{keyPictureId},</if>
+            <if test="videoId != null">#{videoId},</if>
+            <if test="behavior != null">#{behavior},</if>
+            <if test="workFlag != null">#{workFlag},</if>
+            <if test="detectionId != null">#{detectionId},</if>
+            <if test="districtId != null">#{districtId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTobDutyLog" parameterType="TobDutyLog">
+        update tob_duty_log
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="staffId != null">staff_id = #{staffId},</if>
+            <if test="dutyTime != null">duty_time = #{dutyTime},</if>
+            <if test="delFlag != null and delFlag != ''">del_flag = #{delFlag},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate(),
+            <if test="flag != null and flag != ''">flag = #{flag},</if>
+            <if test="keyPictureId != null">key_picture_id = #{keyPictureId},</if>
+            <if test="videoId != null">video_id = #{videoId},</if>
+            <if test="behavior != null">behavior = #{behavior},</if>
+            <if test="workFlag != null">work_flag = #{workFlag},</if>
+            <if test="detectionId != null">detection_id = #{detectionId},</if>
+            <if test="districtId != null">district_id = #{districtId},</if>
+        </trim>
+        where duty_id = #{dutyId}
+    </update>
+
+    <delete id="deleteTobDutyLogByDutyId" parameterType="Long">
+        update tob_duty_log set del_flag = '1' where duty_id = #{dutyId}
+    </delete>
+
+    <delete id="deleteTobDutyLogByDutyIds" parameterType="String">
+        update tob_duty_log set del_flag = '1' where duty_id in
+        <foreach item="dutyId" collection="array" open="(" separator="," close=")">
+            #{dutyId}
+        </foreach>
+    </delete>
+</mapper>

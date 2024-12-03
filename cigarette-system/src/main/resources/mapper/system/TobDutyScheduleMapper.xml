@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobDutyScheduleMapper">
+    
+    <resultMap type="TobDutySchedule" id="TobDutyScheduleResult">
+        <result property="dutyId"    column="duty_id"    />
+        <result property="scheduleName"    column="schedule_name"    />
+        <result property="dutyDate"    column="duty_date"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="dutyLocation"    column="duty_location"    />
+        <result property="remark"    column="remark"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="contactInfo"    column="contact_info"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="dutyType"    column="duty_type"    />
+    </resultMap>
+
+    <sql id="selectTobDutyScheduleVo">
+        select duty_id, schedule_name, duty_date, start_time, end_time, duty_location, remark, create_time, contact_info, dept_id, duty_type from tob_duty_schedule
+    </sql>
+
+    <select id="selectTobDutyScheduleList" parameterType="TobDutySchedule" resultMap="TobDutyScheduleResult">
+        <include refid="selectTobDutyScheduleVo"/>
+        <where>  
+            <if test="scheduleName != null  and scheduleName != ''"> and schedule_name like concat('%', #{scheduleName}, '%')</if>
+            <if test="dutyDate != null "> and duty_date = #{dutyDate}</if>
+            <if test="startTime != null "> and start_time = #{startTime}</if>
+            <if test="endTime != null "> and end_time = #{endTime}</if>
+            <if test="dutyLocation != null  and dutyLocation != ''"> and duty_location = #{dutyLocation}</if>
+            <if test="contactInfo != null  and contactInfo != ''"> and contact_info = #{contactInfo}</if>
+            <if test="deptId != null "> and dept_id = #{deptId}</if>
+            <if test="dutyType != null  and dutyType != ''"> and duty_type = #{dutyType}</if>
+        </where>
+    </select>
+    
+    <select id="selectTobDutyScheduleByDutyId" parameterType="Long" resultMap="TobDutyScheduleResult">
+        <include refid="selectTobDutyScheduleVo"/>
+        where duty_id = #{dutyId}
+    </select>
+
+    <insert id="insertTobDutySchedule" parameterType="TobDutySchedule" useGeneratedKeys="true" keyProperty="dutyId">
+        insert into tob_duty_schedule
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="scheduleName != null and scheduleName != ''">schedule_name,</if>
+            <if test="dutyDate != null">duty_date,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="dutyLocation != null">duty_location,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="contactInfo != null">contact_info,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="dutyType != null and dutyType != ''">duty_type,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="scheduleName != null and scheduleName != ''">#{scheduleName},</if>
+            <if test="dutyDate != null">#{dutyDate},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="dutyLocation != null">#{dutyLocation},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="contactInfo != null">#{contactInfo},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="dutyType != null and dutyType != ''">#{dutyType},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTobDutySchedule" parameterType="TobDutySchedule">
+        update tob_duty_schedule
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="scheduleName != null and scheduleName != ''">schedule_name = #{scheduleName},</if>
+            <if test="dutyDate != null">duty_date = #{dutyDate},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="dutyLocation != null">duty_location = #{dutyLocation},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="contactInfo != null">contact_info = #{contactInfo},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="dutyType != null and dutyType != ''">duty_type = #{dutyType},</if>
+        </trim>
+        where duty_id = #{dutyId}
+    </update>
+
+    <delete id="deleteTobDutyScheduleByDutyId" parameterType="Long">
+        delete from tob_duty_schedule where duty_id = #{dutyId}
+    </delete>
+
+    <delete id="deleteTobDutyScheduleByDutyIds" parameterType="String">
+        delete from tob_duty_schedule where duty_id in 
+        <foreach item="dutyId" collection="array" open="(" separator="," close=")">
+            #{dutyId}
+        </foreach>
+    </delete>
+</mapper>

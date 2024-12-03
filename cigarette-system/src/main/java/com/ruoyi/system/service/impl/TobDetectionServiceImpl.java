@@ -10,19 +10,19 @@ import com.ruoyi.system.service.ITobDetectionService;
 
 /**
  * 监测区域Service业务层处理
- * 
+ *
  * @author ruoyi
- * @date 2024-07-11
+ * @date 2024-07-24
  */
 @Service
-public class TobDetectionServiceImpl implements ITobDetectionService 
+public class TobDetectionServiceImpl implements ITobDetectionService
 {
     @Autowired
     private TobDetectionMapper tobDetectionMapper;
 
     /**
      * 查询监测区域
-     * 
+     *
      * @param detectionId 监测区域主键
      * @return 监测区域
      */
@@ -34,7 +34,7 @@ public class TobDetectionServiceImpl implements ITobDetectionService
 
     /**
      * 查询监测区域列表
-     * 
+     *
      * @param tobDetection 监测区域
      * @return 监测区域
      */
@@ -46,7 +46,7 @@ public class TobDetectionServiceImpl implements ITobDetectionService
 
     /**
      * 新增监测区域
-     * 
+     *
      * @param tobDetection 监测区域
      * @return 结果
      */
@@ -59,7 +59,7 @@ public class TobDetectionServiceImpl implements ITobDetectionService
 
     /**
      * 修改监测区域
-     * 
+     *
      * @param tobDetection 监测区域
      * @return 结果
      */
@@ -72,7 +72,7 @@ public class TobDetectionServiceImpl implements ITobDetectionService
 
     /**
      * 批量删除监测区域
-     * 
+     *
      * @param detectionIds 需要删除的监测区域主键
      * @return 结果
      */
@@ -84,7 +84,7 @@ public class TobDetectionServiceImpl implements ITobDetectionService
 
     /**
      * 删除监测区域信息
-     * 
+     *
      * @param detectionId 监测区域主键
      * @return 结果
      */
@@ -93,4 +93,16 @@ public class TobDetectionServiceImpl implements ITobDetectionService
     {
         return tobDetectionMapper.deleteTobDetectionByDetectionId(detectionId);
     }
+
+    /**
+     * 根据地区数据查询监测区域列表
+     * @param tobDetection
+     * @return
+     */
+    @Override
+    public List<TobDetection> selectTobDetectionListByDistrictId(TobDetection tobDetection) {
+        return tobDetectionMapper.selectTobDetectionListByDistrictId(tobDetection);
+    }
+
+
 }

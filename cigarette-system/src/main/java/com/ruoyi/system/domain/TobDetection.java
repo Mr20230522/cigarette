@@ -5,11 +5,13 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 
+import java.math.BigDecimal;
+
 /**
  * 监测区域对象 tob_detection
- * 
+ *
  * @author ruoyi
- * @date 2024-07-11
+ * @date 2024-07-29
  */
 public class TobDetection extends BaseEntity
 {
@@ -28,95 +30,125 @@ public class TobDetection extends BaseEntity
 
     /** 监测点名称 */
     @Excel(name = "监测点名称")
-    private String districtName;
+    private String detectionName;
 
     /** 状态 */
     @Excel(name = "状态")
     private String status;
 
+
+    /** 状态 */
+    @Excel(name = "经度")
+    private BigDecimal longitude;
+
+    /** 状态 */
+    @Excel(name = "纬度")
+    private BigDecimal  latitude;
+
     /** 删除标记 */
+    @Excel(name = "删除标记")
     private String delFlag;
 
-    /** 备注 */
-    @Excel(name = "备注")
-    private String reamke;
+    /** 负责人id */
+    @Excel(name = "负责人id")
+    private Long responsibleId;
 
-    public void setDetectionId(Long detectionId) 
+    public void setDetectionId(Long detectionId)
     {
         this.detectionId = detectionId;
     }
 
-    public Long getDetectionId() 
+    public Long getDetectionId()
     {
         return detectionId;
     }
-    public void setDistrictId(Long districtId) 
+    public void setDistrictId(Long districtId)
     {
         this.districtId = districtId;
     }
 
-    public Long getDistrictId() 
+    public Long getDistrictId()
     {
         return districtId;
     }
-    public void setOrderNum(String orderNum) 
+    public void setOrderNum(String orderNum)
     {
         this.orderNum = orderNum;
     }
 
-    public String getOrderNum() 
+    public String getOrderNum()
     {
         return orderNum;
     }
-    public void setDistrictName(String districtName) 
+    public void setDetectionName(String detectionName)
     {
-        this.districtName = districtName;
+        this.detectionName = detectionName;
     }
 
-    public String getDistrictName() 
+    public String getDetectionName()
     {
-        return districtName;
+        return detectionName;
     }
-    public void setStatus(String status) 
+    public void setStatus(String status)
     {
         this.status = status;
     }
 
-    public String getStatus() 
+    public String getStatus()
     {
         return status;
     }
-    public void setDelFlag(String delFlag) 
+    public void setDelFlag(String delFlag)
     {
         this.delFlag = delFlag;
     }
 
-    public String getDelFlag() 
+    public String getDelFlag()
     {
         return delFlag;
     }
-    public void setReamke(String reamke) 
+    public void setResponsibleId(Long responsibleId)
     {
-        this.reamke = reamke;
+        this.responsibleId = responsibleId;
     }
 
-    public String getReamke() 
+    public Long getResponsibleId()
     {
-        return reamke;
+        return responsibleId;
+    }
+
+
+    public BigDecimal getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(BigDecimal longitude) {
+        this.longitude = longitude;
+    }
+
+    public BigDecimal getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(BigDecimal latitude) {
+        this.latitude = latitude;
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("detectionId", getDetectionId())
-            .append("districtId", getDistrictId())
-            .append("orderNum", getOrderNum())
-            .append("districtName", getDistrictName())
-            .append("status", getStatus())
-            .append("delFlag", getDelFlag())
-            .append("reamke", getReamke())
-            .append("createTime", getCreateTime())
-            .append("updateTime", getUpdateTime())
-            .toString();
+                .append("detectionId", getDetectionId())
+                .append("districtId", getDistrictId())
+                .append("orderNum", getOrderNum())
+                .append("detectionName", getDetectionName())
+                .append("status", getStatus())
+                .append("delFlag", getDelFlag())
+                .append("remark", getRemark())
+                .append("createTime", getCreateTime())
+                .append("updateTime", getUpdateTime())
+                .append("longitude", getLongitude())
+                .append("latitude", getLatitude())
+                .append("responsibleId", getResponsibleId())
+                .toString();
     }
 }

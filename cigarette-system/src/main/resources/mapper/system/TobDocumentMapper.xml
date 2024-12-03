@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobDocumentMapper">
+    
+    <resultMap type="TobDocument" id="TobDocumentResult">
+        <result property="id"    column="id"    />
+        <result property="fileName"    column="fileName"    />
+        <result property="fileType"    column="fileType"    />
+        <result property="uploadPath"    column="uploadPath"    />
+        <result property="uploadFileName"    column="uploadFileName"    />
+        <result property="pdfPath"    column="pdfPath"    />
+        <result property="pdfName"    column="pdfName"    />
+        <result property="documentType"    column="documentType"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="remark"    column="remark"    />
+        <result property="previewUrl"    column="preview_url"    />
+        <result property="detectionId" column="detection_id"/>
+        <result property="districtId" column="district_id"/>
+    </resultMap>
+
+    <sql id="selectTobDocumentVo">
+        select id, fileName, fileType, uploadPath, uploadFileName, pdfPath, pdfName, documentType, create_time, create_by, update_time, update_by, remark, preview_url,detection_id,district_id from tob_document
+    </sql>
+
+    <select id="selectTobDocumentList" parameterType="TobDocument" resultMap="TobDocumentResult">
+        <include refid="selectTobDocumentVo"/>
+        <where>  
+            <if test="fileName != null  and fileName != ''"> and fileName like concat('%', #{fileName}, '%')</if>
+            <if test="fileType != null  and fileType != ''"> and fileType = #{fileType}</if>
+            <if test="uploadPath != null  and uploadPath != ''"> and uploadPath = #{uploadPath}</if>
+            <if test="uploadFileName != null  and uploadFileName != ''"> and uploadFileName like concat('%', #{uploadFileName}, '%')</if>
+            <if test="pdfPath != null  and pdfPath != ''"> and pdfPath = #{pdfPath}</if>
+            <if test="pdfName != null  and pdfName != ''"> and pdfName like concat('%', #{pdfName}, '%')</if>
+            <if test="documentType != null  and documentType != ''"> and documentType = #{documentType}</if>
+            <if test="previewUrl != null  and previewUrl != ''"> and preview_url = #{previewUrl}</if>
+            <if test="detectionId != null "> and detection_id = #{detectionId}</if>
+            <if test="districtId != null "> and district_id = #{districtId}</if>
+        </where>
+    </select>
+    
+    <select id="selectTobDocumentById" parameterType="Long" resultMap="TobDocumentResult">
+        <include refid="selectTobDocumentVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertTobDocument" parameterType="TobDocument" useGeneratedKeys="true" keyProperty="id">
+        insert into tob_document
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fileName != null and fileName != ''">fileName,</if>
+            <if test="fileType != null and fileType != ''">fileType,</if>
+            <if test="uploadPath != null and uploadPath != ''">uploadPath,</if>
+            <if test="uploadFileName != null and uploadFileName != ''">uploadFileName,</if>
+            <if test="pdfPath != null and pdfPath != ''">pdfPath,</if>
+            <if test="pdfName != null and pdfName != ''">pdfName,</if>
+            <if test="documentType != null and documentType != ''">documentType,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="updateBy != null and updateBy != ''">update_by,</if>
+            <if test="remark != null">remark,</if>
+            <if test="previewUrl != null">preview_url,</if>
+            <if test="detectionId != null "> detection_id</if>
+            <if test="districtId != null "> district_id </if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="fileName != null and fileName != ''">#{fileName},</if>
+            <if test="fileType != null and fileType != ''">#{fileType},</if>
+            <if test="uploadPath != null and uploadPath != ''">#{uploadPath},</if>
+            <if test="uploadFileName != null and uploadFileName != ''">#{uploadFileName},</if>
+            <if test="pdfPath != null and pdfPath != ''">#{pdfPath},</if>
+            <if test="pdfName != null and pdfName != ''">#{pdfName},</if>
+            <if test="documentType != null and documentType != ''">#{documentType},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="previewUrl != null">#{previewUrl},</if>
+            <if test="detectionId != null ">  #{detectionId}</if>
+            <if test="districtId != null ">  #{districtId}</if>
+         </trim>
+    </insert>
+
+    <update id="updateTobDocument" parameterType="TobDocument">
+        update tob_document
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="fileName != null and fileName != ''">fileName = #{fileName},</if>
+            <if test="fileType != null and fileType != ''">fileType = #{fileType},</if>
+            <if test="uploadPath != null and uploadPath != ''">uploadPath = #{uploadPath},</if>
+            <if test="uploadFileName != null and uploadFileName != ''">uploadFileName = #{uploadFileName},</if>
+            <if test="pdfPath != null and pdfPath != ''">pdfPath = #{pdfPath},</if>
+            <if test="pdfName != null and pdfName != ''">pdfName = #{pdfName},</if>
+            <if test="documentType != null and documentType != ''">documentType = #{documentType},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="previewUrl != null">preview_url = #{previewUrl},</if>
+            <if test="detectionId != null ">detection_id = #{detectionId}</if>
+            <if test="districtId != null "> district_id = #{districtId}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTobDocumentById" parameterType="Long">
+        delete from tob_document where id = #{id}
+    </delete>
+
+    <delete id="deleteTobDocumentByIds" parameterType="String">
+        delete from tob_document where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
