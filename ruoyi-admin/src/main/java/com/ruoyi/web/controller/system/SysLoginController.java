@@ -2,11 +2,12 @@ package com.ruoyi.web.controller.system;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.ruoyi.common.core.domain.entity.SysRole;
+import com.ruoyi.common.sample.Sample;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysMenu;
@@ -83,4 +84,22 @@ public class SysLoginController
         List<SysMenu> menus = menuService.selectMenuTreeByUserId(userId);
         return AjaxResult.success(menuService.buildMenus(menus));
     }
+
+    /**
+     * 电话号码登录
+     *
+     * @return 电话号码登录
+     */
+    @GetMapping("/login/{phone}")
+    public AjaxResult getPhoneCode(@PathVariable("phone") String phone) {
+        try {
+            Sample.getPhoneCode(null,phone);
+            AjaxResult ajax = AjaxResult.success();
+            return ajax;
+        } catch (Exception e) {
+            AjaxResult ajax = AjaxResult.error();
+            return ajax;
+        }
+    }
+
 }
