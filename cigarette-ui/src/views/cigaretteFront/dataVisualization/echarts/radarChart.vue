@@ -1,5 +1,5 @@
 <template>
-  <div ref="main" style="width: 100%; height: 100%;"></div>
+  <div ref="chartContainer" style="width: 100%; height: 200px;"></div>
 </template>
 
 <script>
@@ -9,57 +9,113 @@ export default {
   name: 'RadarChart',
   data() {
     return {
-      myChart: null
+      chart: null
     };
   },
   mounted() {
     this.initChart();
   },
-  beforeDestroy() {
-    if (this.myChart) {
-      this.myChart.dispose();
-    }
-  },
   methods: {
     initChart() {
-      var chartDom = this.$refs.main;
-      this.myChart = echarts.init(chartDom);
-      var option = {
+      const chartDom = this.$refs.chartContainer;
+      this.chart = echarts.init(chartDom);
+      const option = {
         title: {
-          text: ' '
+          text: ''
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'cross',
+            label: {
+              backgroundColor: '#6a7985'
+            }
+          }
         },
         legend: {
-          data: ['Allocated Budget', 'Actual Spending']
+          data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']
         },
-        radar: {
-          // shape: 'circle',
-          indicator: [
-            { name: 'Sales', max: 6500 },
-            { name: 'Administration', max: 16000 },
-            { name: 'Information Technology', max: 30000 },
-            { name: 'Customer Support', max: 38000 },
-            { name: 'Development', max: 52000 },
-            { name: 'Marketing', max: 25000 }
-          ]
+        toolbox: {
+          feature: {
+            saveAsImage: {}
+          }
         },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        xAxis: [
+          {
+            type: 'category',
+            boundaryGap: false,
+            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+          }
+        ],
+        yAxis: [
+          {
+            type: 'value'
+          }
+        ],
         series: [
           {
-            name: 'Budget vs spending',
-            type: 'radar',
-            data: [
-              {
-                value: [4200, 3000, 20000, 35000, 50000, 18000],
-                name: 'Allocated Budget'
-              },
-              {
-                value: [5000, 14000, 28000, 26000, 42000, 21000],
-                name: 'Actual Spending'
-              }
-            ]
+            name: 'Email',
+            type: 'line',
+            stack: 'Total',
+            areaStyle: {},
+            emphasis: {
+              focus: 'series'
+            },
+            data: [120, 132, 101, 134, 90, 230, 210]
+          },
+          {
+            name: 'Union Ads',
+            type: 'line',
+            stack: 'Total',
+            areaStyle: {},
+            emphasis: {
+              focus: 'series'
+            },
+            data: [220, 182, 191, 234, 290, 330, 310]
+          },
+          {
+            name: 'Video Ads',
+            type: 'line',
+            stack: 'Total',
+            areaStyle: {},
+            emphasis: {
+              focus: 'series'
+            },
+            data: [150, 232, 201, 154, 190, 330, 410]
+          },
+          {
+            name: 'Direct',
+            type: 'line',
+            stack: 'Total',
+            areaStyle: {},
+            emphasis: {
+              focus: 'series'
+            },
+            data: [320, 332, 301, 334, 390, 330, 320]
+          },
+          {
+            name: 'Search Engine',
+            type: 'line',
+            stack: 'Total',
+            label: {
+              show: true,
+              position: 'top'
+            },
+            areaStyle: {},
+            emphasis: {
+              focus: 'series'
+            },
+            data: [820, 932, 901, 934, 1290, 1330, 1320]
           }
         ]
       };
-      this.myChart.setOption(option);
+      this.chart.setOption(option);
     }
   }
 };

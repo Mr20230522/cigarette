@@ -32,10 +32,10 @@
       <RadarChart />
     </div>
     <div class="canva2">
-      <RadarChart />
+      <RadarChart2 />
     </div>
     <div class="canva3">
-      <RadarChart />
+      <RadarChart3 />
     </div>
     <div class="canva4">
       <RadarChart />
@@ -62,6 +62,8 @@
 // 导入依赖
 import AMapLoader from '@amap/amap-jsapi-loader'          // 用于加载高德地图JS API。
 import RadarChart from './echarts/radarChart.vue'
+import RadarChart2 from './echarts/radarChart2.vue'
+import RadarChart3 from './echarts/radarChart3.vue'
 
 const DESTINATION_POINT = [103.796288, 25.490866] // 目标坐标
 
@@ -71,7 +73,9 @@ window._AMapSecurityConfig = {
 export default {
   name: "MapLoca",
   components: {
-    RadarChart
+    RadarChart,
+    RadarChart2,
+    RadarChart3,
   },
   
   data() {
