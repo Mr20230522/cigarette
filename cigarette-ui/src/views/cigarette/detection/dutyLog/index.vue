@@ -82,7 +82,7 @@
           <el-table-column label="行为" align="center" prop="behavior" />
           <el-table-column label="是否工作" align="center" prop="workFlag" />
           <el-table-column label="备注" align="center" prop="remark" />
-          <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="120px" >
+          <el-table-column label="操作" fixed="right" align="center" class-name="small-padding fixed-width" min-width="130px" >
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                 v-hasPermi="['detection:dutyLog:edit']">修改</el-button>
@@ -327,7 +327,7 @@ export default {
       }).catch(error => {
         console.error("Failed to load detection options:", error);
       });
-    },   
+    },
      // 当检测点变更时触发，自动填充地区ID
     handleDetectionChange(newValue) {
       // 通过检测点ID找到对应的地区ID
@@ -550,7 +550,7 @@ export default {
           user.username.toLowerCase().includes(searchInput) ||
           user.email.toString().includes(searchInput) ||
           user.phonenumber.toString().includes(searchInput)
-          
+
         );
       }).slice(0, 10);
     },

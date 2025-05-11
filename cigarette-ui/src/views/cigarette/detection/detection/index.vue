@@ -85,7 +85,7 @@
           </el-table-column>
 
           <el-table-column label="经度" align="center" prop="longitude" min-width="120" >
-            <template slot-scope="scope"> 
+            <template slot-scope="scope">
               <el-button size="mini" type="text" @click="longitudeAndLatitude(scope.row)">{{ scope.row.longitude }}</el-button>
             </template>
           </el-table-column>
@@ -95,7 +95,7 @@
             </template>
           </el-table-column>
           <el-table-column label="备注" align="center" prop="remark" max-width="200" />
-          <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="120">
+          <el-table-column fixed="right" label="操作" align="center" class-name="small-padding fixed-width" min-width="130">
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                 v-hasPermi="['cigarette:detection:edit']">修改</el-button>
@@ -490,12 +490,12 @@ export default {
     //获取经纬度
     getLocation() {
       if (navigator.geolocation) {
-        
+
         navigator.geolocation.getCurrentPosition(
           position => {
             this.form.longitude = position.coords.longitude;
             this.form.latitude = position.coords.latitude;
-            
+
           },
           error => {
             console.error('Error getting location:', error);

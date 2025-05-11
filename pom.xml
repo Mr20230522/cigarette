@@ -179,6 +179,13 @@
                 <version>${ruoyi.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.cloopen</groupId>
+                <artifactId>java-sms-sdk</artifactId>
+                <version>1.0.4</version>
+            </dependency>
+
+
         </dependencies>
     </dependencyManagement>
 

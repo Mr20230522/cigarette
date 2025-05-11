@@ -42,6 +42,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="accompliceId"    column="accomplice_id"    />
         <result property="detectionId" column="detection_id"/>
         <result property="districtId" column="district_id"/>
+        <result property="picture" column="picture"/> <!-- 新增 picture 映射 -->
     </resultMap>
 
     <sql id="selectTobVehicleBehaviorVo">
@@ -71,7 +72,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     -->
     <select id="selectTobVehicleBehaviorVoList" parameterType="TobVehicleBehaviorVo" resultMap="TobVehicleBehaviorVoResult">
 
-        SELECT a.*,b.license_plate,c.name
+        SELECT a.*,b.license_plate,b.picture,c.name
         FROM tob_vehicle_behavior AS a
                  INNER JOIN tob_vehicle AS b ON a.car_id = b.car_id
                  LEFT JOIN tob_person AS c ON a.driver_id = c.suspect_id

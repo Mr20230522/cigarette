@@ -87,7 +87,7 @@
           <el-table-column type="selection" width="55" align="center" />
           <el-table-column label="车辆行为序号" align="center" prop="behaviorId" />
           <el-table-column label="车辆序号" align="center" prop="carId" />
-          <el-table-column label="车牌编号" align="center" prop="licensePlate" />
+          <el-table-column label="车牌编号" align="center" prop="licensePlate" width="120px" />
           <el-table-column label="车型" prop="carTypeId">
             <template slot-scope="scope">
               <dict-tag :options="dict.type.tob_vehicle_type" :value="scope.row.carTypeId" />
@@ -113,16 +113,16 @@
               <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.status" />
             </template>
           </el-table-column>
-          <el-table-column label="监测点" align="center" prop="detectionId">
+          <el-table-column label="监测点" align="center" prop="detectionId"  :show-overflow-tooltip="true">
             <template slot-scope="scope">
               {{ getDetectionName(scope.row.detectionId) }}
             </template>
           </el-table-column>
-          <el-table-column label="备注" align="center" prop="remark" />
+          <el-table-column label="备注" align="center" prop="remark" width="120px" :show-overflow-tooltip="true"/>
           <el-table-column label="同伙id" align="center" prop="accompliceId" />
           <el-table-column label="同伙姓名" align="center" prop="name" min-width="120px" />
           <el-table-column label="记录时间" align="center" prop="createTime" min-width="160px" />
-          <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="280px">
+          <el-table-column label="操作" fixed="right" align="center" class-name="small-padding fixed-width" min-width="250px">
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="addCautionFrom(scope.row)"
                 v-hasPermi="['vehicle:vehicleBehavior:edit']" style="color: red;">一键预警</el-button>
@@ -132,6 +132,9 @@
                 v-hasPermi="['vehicle:vehicleBehavior:edit']">修改</el-button>
               <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
                 v-hasPermi="['vehicle:vehicleBehavior:remove']">删除</el-button>
+              <!-- 新增预览按钮 -->
+<!--              <el-button size="mini" type="text" icon="el-icon-picture" @click="handlePreview(scope.row)"-->
+<!--                v-hasPermi="['vehicle:vehicleBehavior:view']" style="color: #409EFF;">车辆预览</el-button>-->
             </template>
           </el-table-column>
         </el-table>
@@ -300,6 +303,69 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 预览车辆行为弹窗 -->
+    <el-dialog title="车辆行为预览" :visible.sync="previewVisible" width="70%">
+      <el-row :gutter="20">
+        <el-col :span="12">
+          <div class="preview-item">
+            <h4>车牌照片</h4>
+            <div class="preview-content">
+              <el-image
+                style="width: 100%; height: 200px"
+                :src="previewData.plateImageUrl"
+                :preview-src-list="[previewData.plateImageUrl]"
+                fit="contain">
+                <div slot="error" class="image-slot">
+                  <i class="el-icon-picture-outline"></i>
+                  <div>无法加载车牌照片</div>
+                </div>
+              </el-image>
+              <div class="url-text">{{ previewData.plateImageUrl }}</div>
+            </div>
+          </div>
+        </el-col>
+        <el-col :span="12">
+          <div class="preview-item">
+            <h4>车辆照片</h4>
+            <div class="preview-content">
+              <el-image
+                style="width: 100%; height: 200px"
+                :src="getVehicleImageUrl()"
+                :preview-src-list="[previewData.vehicleImageUrl]"
+                fit="contain">
+                <div slot="error" class="image-slot">
+                  <i class="el-icon-picture-outline"></i>
+                  <div>无法加载车牌照片</div>
+                </div>
+              </el-image>
+              <div class="url-text">{{ previewData.vehicleImageUrl }}</div>
+            </div>
+          </div>
+        </el-col>
+      </el-row>
+      <el-row style="margin-top: 20px;">
+        <el-col :span="24">
+          <div class="preview-item">
+            <h4>行为视频</h4>
+            <div class="preview-content">
+              <video
+                style="width: 100%; height: 200px"
+                controls
+                :src="previewData.behaviorVideoUrl"
+              >
+                您的浏览器不支持视频播放
+              </video>
+              <div class="url-text">{{ previewData.behaviorVideoUrl }}</div>
+            </div>
+          </div>
+        </el-col>
+      </el-row>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="previewVisible = false">关 闭</el-button>
+      </div>
+    </el-dialog>
+
     <!-- 添加或修改预警记录对话框 -->
     <el-dialog title="一键预警" :visible.sync="submitCautionOpen" width="500px" append-to-body>
       <el-form ref="cautionForm" :model="cautionForm" :rules="rules" label-width="80px">
@@ -338,14 +404,18 @@ import {
   getVehicleBehavior,
   delVehicleBehavior,
   addVehicleBehavior,
-  updateVehicleBehavior
+  updateVehicleBehavior,
+
 } from "@/api/cigarette/vehicle/vehicleBehavior";
 import {
   listPerson
 } from "@/api/cigarette/personnel/person";
 import {
-  listVehicle
+  listVehicle,getVehicle
 } from "@/api/cigarette/vehicle/vehicle";
+import {
+  getBehaviorMedia
+} from "@/api/cigarette/vehicle/vehicleBehaviorMedia";
 
 import { listDistrict } from "@/api/cigarette/detection/district";
 import { listDetection } from "@/api/cigarette/detection/detection";
@@ -357,6 +427,13 @@ export default {
   data() {
 
     return {
+      // path234:'@/assets/uploads/licensePlate/licensePlate1.png',
+      previewVisible: false, // 预览弹窗是否显示
+      previewData: {        // 预览数据
+        plateImageUrl: '',  // 车牌照片URL
+        vehicleImageUrl: '', // 车辆照片URL
+        behaviorVideoUrl: '' // 行为视频URL
+      },
       transferData: [], // 这里将被动态数据填充
       value: [], // 这里存储已选择的key
       leftCheckedKeys: [2, 3], // 根据实际情况设置
@@ -435,11 +512,11 @@ export default {
           message: "车辆编号不能为空",
           trigger: "blur"
         }],
-        driverId: [{
-          required: true,
-          message: "驾驶员编号不能为空",
-          trigger: "blur"
-        }],
+        // driverId: [{
+        //   required: true,
+        //   message: "驾驶员编号不能为空",
+        //   trigger: "blur"
+        // }],
         carTypeId: [{
           required: true,
           message: "车型不能为空",
@@ -489,16 +566,56 @@ export default {
     this.loadDistrictOptions(); // 加载地区选项
   },
   methods: {
-    //加载地区选项
-    loadDistrictOptions() {
-      listDistrict().then(response => {
-        this.districtOptions = response.data.map(item => ({
-          districtId: item.districtId,
-          districtName: item.districtName
-        }));
-      }).catch(error => {
-        console.error("Failed to load district options:", error);
+    getVehicleImageUrl(){
+      return this.previewData.vehicleImageUrl;
+    },
+    // 预览车辆行为
+    handlePreview(row) {
+      if (!row || !row.behaviorId) {
+        this.$modal.msgError("无法获取行为ID，数据可能不完整");
+        console.error('无效的行数据:', row);
+        return;
+      }
+
+      console.log('正在获取行为ID为[' + row.behaviorId + ']的媒体文件');
+
+      this.loading = true; // 显示加载状态
+      getVehicle(row.carId).then(response => {
+        console.log('获取车辆信息成功:')
+        console.log(response.data.picture);
+        this.previewData.vehicleImageUrl=response.data.picture;
+
+        console.log('this.previewData.vehicleImageUrl:',this.previewData.vehicleImageUrl)
+        this.previewVisible = true;
       });
+
+      // getBehaviorMedia(row.behaviorId)
+      //   .then(response => {
+      //     if (!response.data) throw new Error("响应数据为空");
+      //
+      //     // 处理路径：确保路径能正确指向文件
+      //     const basePath = process.env.NODE_ENV === 'development' ? '' : '';
+      //
+      //     this.previewData = {
+      //       // plateImageUrl: '../../../../assets/uploads/licensePlate/licensePlate1.png',
+      //       plateImageUrl: response.data.picture,
+      //       vehicleImageUrl: `${basePath}${response.data.vehiclePhotoPath}`,
+      //       behaviorVideoUrl: `${basePath}${response.data.vehicleBehaviorVedioPath}`
+      //     };
+      //
+      //     this.previewVisible = true;
+      //   })
+      //   .catch(error => {
+      //     this.$modal.msgError("获取媒体文件失败: " + (error.message || '未知错误'));
+      //     console.error('获取媒体文件失败:', {
+      //       error: error,
+      //       behaviorId: row.behaviorId,
+      //       rowData: row
+      //     });
+      //   })
+      //   .finally(() => {
+      //     this.loading = false;
+      //   });
     },
     // 加载检测点选项
     loadDetectionOptions() {
@@ -541,6 +658,7 @@ export default {
         listVehicleBehaviorVo(this.queryParams).then(response => {
           this.vehicleBehaviorList = response.rows;
           this.total = response.total;
+          console.log('@@@this.vehicleBehaviorList', this.vehicleBehaviorList);
         });
 
         this.buildTreeData();
@@ -857,11 +975,11 @@ export default {
       });
     },
     vehicleUser(){
-        this.open = false; 
+        this.open = false;
         this.$router.push({ path: "/cigarette/vehicle/person"});
       },
     vehicleCar(){
-      this.open = false; 
+      this.open = false;
       this.$router.push({ path: "/cigarette/vehicle/vehicle"});
     }
   }
@@ -869,6 +987,35 @@ export default {
 </script>
 
 <style>
+.preview-item {
+  margin-bottom: 20px;
+}
+
+.preview-content {
+  border: 1px solid #ebeef5;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.url-text {
+  margin-top: 10px;
+  padding: 5px;
+  background-color: #f5f7fa;
+  border-radius: 4px;
+  word-break: break-all;
+  font-size: 12px;
+  color: #909399;
+}
+
+.video-placeholder {
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #f5f7fa;
+  color: #909399;
+}
 .bg-color {
   background-color: #f0f0f0;
 }

@@ -70,9 +70,6 @@ public class TobVehicleBehaviorController extends BaseController
     {
         startPage();
         List<TobVehicleBehaviorVo> list = tobVehicleBehaviorService.selectTobVehicleBehaviorVoList(tobVehicleBehaviorVo);
-//打印list
-        System.out.println(list);
-
         return getDataTable(list);
     }
     /**

@@ -86,7 +86,7 @@
                 <el-table v-loading="loading" :data="cameraList" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" width="55" align="center" />
                     <el-table-column label="摄像头id" align="center" prop="cameraId" />
-                    <el-table-column label="摄像头ip" align="center" prop="cameraIp" />
+                    <el-table-column label="摄像头ip" align="center" prop="cameraIp" width="130px"/>
                     <el-table-column label="摄像头型号" align="center" prop="cameraModel" />
                     <el-table-column label="摄像头厂商" align="center" prop="cameraManufacturer" />
                     <el-table-column label="监测点" align="center" prop="detectionId">
@@ -157,7 +157,7 @@
                             {{ getDistrictName(scope.row.districtId) }}
                         </template>
                     </el-table-column>
-                    <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="100px">
+                    <el-table-column fixed="right" label="操作" align="center" class-name="small-padding fixed-width" width="130px">
                         <template slot-scope="scope">
                             <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                                 v-hasPermi="['camera:camera:edit']">修改</el-button>

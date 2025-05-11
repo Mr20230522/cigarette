@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.ToVehicleBehaviorMediaMapper">
+
+    <resultMap id="BehaviorMediaResult" type="com.ruoyi.system.domain.vo.ToVehicleBehaviorMediaVo">
+        <result property="behaviorId" column="behavior_id"/>
+        <result property="licnesePlatePhotoPath" column="plate_image"/>
+        <result property="vehiclePhotoPath" column="vehicle_image"/>
+        <result property="vehicleBehaviorVedioPath" column="behavior_video"/>
+    </resultMap>
+
+    <select id="selectBehaviorMedia" parameterType="Long" resultMap="BehaviorMediaResult">
+        SELECT
+            #{behaviorId} AS behavior_id,
+            (SELECT image FROM tob_license_plate_image
+             WHERE behavior_id = #{behaviorId} LIMIT 1) AS plate_image,
+
+            (SELECT image FROM tob_key_picture
+             WHERE behavior_id = #{behaviorId} LIMIT 1) AS vehicle_image,
+
+            (SELECT video_path FROM tob_key_video
+            WHERE action_id = #{behaviorId} LIMIT 1) AS behavior_video
+        FROM dual
+    </select>
+</mapper>

@@ -217,5 +217,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			#{userId}
         </foreach> 
  	</delete>
+
+	<select id="selectUserIdByPhoneNumber" parameterType="String" resultType="Long">
+		SELECT COALESCE(user_id, -1) FROM users WHERE phone = #{phone} LIMIT 1
+	</select>
 	
 </mapper> 

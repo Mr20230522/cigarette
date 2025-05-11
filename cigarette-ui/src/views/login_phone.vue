@@ -1,63 +1,49 @@
 <template>
-  <div class="register">
+  <div class="login">
     <div class="space" style="margin-left: -20%;">
       <div class="stars" id="stars"></div>
       <div class="stars2" id="stars2"></div>
       <div class="stars3" id="stars3"></div>
     </div>
 
-    <div class="register-division" style="margin-top: -20%; margin-left: 8%;">
+    <div class="login-division" style="margin-top: -20%; margin-left: 8%;">
       <h1 class="title">无证运输烟叶违法行为监管有效性研究与应用管理系统</h1>
     </div>
-
     <el-form
-      ref="registerForm"
-      :model="registerForm"
-      :rules="registerRules"
-      class="register-form"
+      ref="loginForm"
+      :model="loginForm"
+      :rules="loginRules"
+      class="login-form"
       style="margin-top: 15%;margin-left: 12%;"
     >
-      <h3 class="form_title">注册管理系统</h3>
-      <el-form-item prop="username">
-        <el-input v-model="registerForm.username" type="text" auto-complete="off" placeholder="账号">
-          <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
+      <h3 class="form_title">登录管理系统</h3>
+      <el-form-item prop="phone">
+        <el-input
+          v-model="loginForm.phone"
+          type="text"
+          auto-complete="off"
+          placeholder="手机号"
+        >
+          <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon"/>
         </el-input>
       </el-form-item>
-      <el-form-item prop="password">
+      <el-form-item prop="smsCode">
         <el-input
-          v-model="registerForm.password"
-          type="password"
+          v-model="loginForm.smsCode"
           auto-complete="off"
-          placeholder="密码"
-          @keyup.enter.native="handleRegister"
+          placeholder="短信验证码"
+          @keyup.enter.native="handleLogin"
+          style="width: 60%"
         >
-          <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
+          <svg-icon slot="prefix" icon-class="validCode" class="el-input__icon input-icon"/>
         </el-input>
-      </el-form-item>
-      <el-form-item prop="confirmPassword">
-        <el-input
-          v-model="registerForm.confirmPassword"
-          type="password"
-          auto-complete="off"
-          placeholder="确认密码"
-          @keyup.enter.native="handleRegister"
+        <el-button
+          :disabled="codeSendDisabled"
+          style="width: 35%; margin-left: 5%"
+          @click="sendCode"
         >
-          <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
-        </el-input>
-      </el-form-item>
-      <el-form-item prop="code" v-if="captchaEnabled">
-        <el-input
-          v-model="registerForm.code"
-          auto-complete="off"
-          placeholder="验证码"
-          style="width: 63%"
-          @keyup.enter.native="handleRegister"
-        >
-          <svg-icon slot="prefix" icon-class="validCode" class="el-input__icon input-icon" />
-        </el-input>
-        <div class="register-code">
-          <img :src="codeUrl" @click="getCode" class="register-code-img"/>
-        </div>
+          {{ codeSendText }}
+        </el-button>
       </el-form-item>
       <el-form-item style="width:100%;">
         <el-button
@@ -65,125 +51,159 @@
           size="medium"
           type="primary"
           style="width:100%;"
-          @click.native.prevent="handleRegister"
+          @click.native.prevent="handleLogin"
         >
-          <span v-if="!loading">注 册</span>
-          <span v-else>注 册 中...</span>
+          <span v-if="!loading">登 录</span>
+          <span v-else>登 录 中...</span>
         </el-button>
-        <div style="float: right;">
-          <router-link class="link-type" :to="'/login'">使用已有账户登录</router-link>
+        <div style="float: left;" v-if="login">
+          <router-link class="link-type" :to="'/login'">账号登陆</router-link>
+        </div>
+        <div style="float: right;" v-if="register">
+          <router-link class="link-type" :to="'/register'">立即注册</router-link>
         </div>
       </el-form-item>
     </el-form>
-
     <div class="login-division"></div>
 
     <div class="login-division"></div>
-
     <!--  底部  -->
-    <div class="el-register-footer">
+    <div class="el-login-footer">
       <span>版权所有©：无证运输烟叶违法行为监管有效性研究与应用 (滇ICP备110120119号)</span>
     </div>
   </div>
+
 </template>
 
 <script>
-import { getCodeImg, register } from "@/api/login";
-
+import Cookies from 'js-cookie'
+import { encrypt, decrypt } from '@/utils/jsencrypt'
+import { sendSmsCode,verifySmsCode} from '@/api/cigarette/sms/sms.js'
 export default {
-  name: "Register",
+
+  name: 'LoginPhone',
   data() {
-    const equalToPassword = (rule, value, callback) => {
-      if (this.registerForm.password !== value) {
-        callback(new Error("两次输入的密码不一致"));
+    const validatePhone = (rule, value, callback) => {
+      if (!/^1[3-9]\d{9}$/.test(value)) {
+        callback(new Error('请输入正确的手机号码'))
       } else {
-        callback();
+        callback()
       }
-    };
+    }
+
     return {
-      codeUrl: "",
-      registerForm: {
-        username: "",
-        password: "",
-        confirmPassword: "",
-        code: "",
-        uuid: ""
+      loginForm: {
+        phone: '',
+        smsCode: '',
+        rememberMe: false
       },
-      registerRules: {
-        username: [
-          { required: true, trigger: "blur", message: "请输入您的账号" },
-          { min: 2, max: 20, message: '用户账号长度必须介于 2 和 20 之间', trigger: 'blur' }
+      loginRules: {
+        phone: [
+          { required: true, trigger: 'blur', message: '请输入手机号' },
+          { validator: validatePhone, trigger: 'blur' }
         ],
-        password: [
-          { required: true, trigger: "blur", message: "请输入您的密码" },
-          { min: 5, max: 20, message: "用户密码长度必须介于 5 和 20 之间", trigger: "blur" },
-          { pattern: /^[^<>"'|\\]+$/, message: "不能包含非法字符：< > \" ' \\\ |", trigger: "blur" }
-        ],
-        confirmPassword: [
-          { required: true, trigger: "blur", message: "请再次输入您的密码" },
-          { required: true, validator: equalToPassword, trigger: "blur" }
-        ],
-        code: [{ required: true, trigger: "change", message: "请输入验证码" }]
+        smsCode: [
+          { required: true, trigger: 'blur', message: '请输入验证码' },
+          { pattern: /^\d{6}$/, message: '验证码为6位数字', trigger: 'blur' }
+        ]
       },
       loading: false,
-      captchaEnabled: true
-    };
+      login:true,
+      register: true,
+      codeSendDisabled: false,
+      codeSendText: '获取验证码',
+      countdown: 60
+    }
   },
   created() {
-    this.getCode();
+    this.getCookie()
   },
   methods: {
-    getCode() {
-      getCodeImg().then(res => {
-        this.captchaEnabled = res.captchaEnabled === undefined ? true : res.captchaEnabled;
-        if (this.captchaEnabled) {
-          this.codeUrl = "data:image/gif;base64," + res.img;
-          this.registerForm.uuid = res.uuid;
-        }
-      });
+    // 获取保存的cookie
+    getCookie() {
+      const phone = Cookies.get('phone')
+      const rememberMe = Cookies.get('rememberMe')
+      this.loginForm = {
+        phone: phone ? decrypt(phone) : '',
+        smsCode: '',
+        rememberMe: rememberMe === 'true'
+      }
     },
-    handleRegister() {
-      this.$refs.registerForm.validate(valid => {
-        if (valid) {
-          this.loading = true;
-          register(this.registerForm).then(res => {
-            const username = this.registerForm.username;
-            this.$alert("<font color='red'>恭喜你，您的账号 " + username + " 注册成功！</font>", '系统提示', {
-              dangerouslyUseHTMLString: true,
-              type: 'success'
-            }).then(() => {
-              this.$router.push("/login");
-            }).catch(() => {});
-          }).catch(() => {
-            this.loading = false;
-            if (this.captchaEnabled) {
-              this.getCode();
+
+    // 发送验证码
+    sendCode() {
+      this.$refs.loginForm.validateField('phone', valid => {
+        if (!valid) {
+          this.codeSendDisabled = true
+          const timer = setInterval(() => {
+            if (this.countdown <= 0) {
+              clearInterval(timer)
+              this.codeSendText = '重新获取'
+              this.codeSendDisabled = false
+              this.countdown = 60
+            } else {
+              this.codeSendText = `${this.countdown}秒后重试`
+              this.countdown--
             }
+          }, 1000)
+
+          // 这里调用发送验证码接口
+          // sendSmsCode(this.loginForm.phone).then(...)
+        }
+      })
+    },
+
+    // 处理登录
+    handleLogin() {
+      this.$refs.loginForm.validate(valid => {
+        if (valid) {
+          this.loading = true
+          if (this.loginForm.rememberMe) {
+            Cookies.set('phone', encrypt(this.loginForm.phone), { expires: 30 })
+            Cookies.set('rememberMe', this.loginForm.rememberMe, { expires: 30 })
+          } else {
+            Cookies.remove('phone')
+            Cookies.remove('rememberMe')
+          }
+
+          // 修改为调用短信登录接口
+          this.$store.dispatch('SmsLogin', {
+            phone: this.loginForm.phone,
+            code: this.loginForm.smsCode
+          }).then(() => {
+            this.$router.push({ path: '/cigaretteIndex' })
+          }).catch(() => {
+            this.loading = false
           })
         }
-      });
+      })
     }
   }
-};
+}
 </script>
 
 <style rel="stylesheet/scss" lang="scss">
-.register {
+.login {
   display: flex;
+  //justify-content: flex-start;
   justify-content: space-around;
+
   align-items: center;
   height: 100%;
+  //background-image: url("../assets/images/login-background.jpg");
   background: radial-gradient(circle at center, #1B2735 0%, #090A0F 100%);
   overflow: hidden;
   background-size: cover;
 }
 
 .title {
+  // line-height: 100px;
   white-space: nowrap;
   text-align: left;
   color: #FFFFFF;
   font-weight: bolder;
   font-size: xxx-large;
+  //font-smoothing: auto;
 }
 
 .form_title {
@@ -194,13 +214,16 @@ export default {
   font-size: large;
 }
 
-.register-division {
+.login-division {
   width: 0;
 }
 
-.register-form {
+.login-form {
+  //margin-right: 250px;
+  //transform: translateX(100%);
   border-radius: 6px;
   background: rgba(27, 38, 52, 0.9);
+  //width: 400px;
   padding: 25px 25px 5px 25px;
   box-shadow: 0 0 100px 0 rgba(9, 11, 16, .2);
 
@@ -219,13 +242,13 @@ export default {
   }
 }
 
-.register-tip {
+.login-tip {
   font-size: 13px;
   text-align: center;
   color: #bfbfbf;
 }
 
-.register-code {
+.login-code {
   width: 33%;
   height: 38px;
   float: right;
@@ -236,7 +259,7 @@ export default {
   }
 }
 
-.el-register-footer {
+.el-login-footer {
   height: 40px;
   line-height: 40px;
   position: fixed;
@@ -249,11 +272,10 @@ export default {
   letter-spacing: 1px;
 }
 
-.register-code-img {
+.login-code-img {
   height: 38px;
 }
 
-/* 星空背景样式 */
 //背景
 .stars {
   opacity: 1;
@@ -321,11 +343,24 @@ export default {
   box-shadow: 5763px 3092px #FFF, 331px 784px #FFF, 815px 1635px #FFF, 2627px 4866px #FFF, 8256px 3599px #FFF, 3521px 5541px #FFF, 7809px 2016px #FFF, 3526px 1633px #FFF, 6588px 1767px #FFF, 1583px 2946px #FFF, 9872px 3490px #FFF, 3042px 5721px #FFF, 9743px 4753px #FFF, 5259px 1385px #FFF, 6925px 4115px #FFF, 6326px 1649px #FFF, 2483px 5967px #FFF, 171px 1197px #FFF, 1802px 5022px #FFF, 3475px 1514px #FFF, 8810px 2917px #FFF, 772px 5159px #FFF, 7715px 1671px #FFF, 9430px 1287px #FFF, 5829px 631px #FFF, 1984px 2233px #FFF, 6493px 1666px #FFF, 9419px 2358px #FFF, 8746px 1791px #FFF, 1410px 4459px #FFF, 1907px 1851px #FFF, 3685px 1873px #FFF, 9513px 2117px #FFF, 2809px 1285px #FFF, 1229px 5985px #FFF, 9652px 842px #FFF, 4756px 5440px #FFF, 819px 2319px #FFF, 918px 1653px #FFF, 310px 5608px #FFF, 2593px 5547px #FFF, 9608px 3892px #FFF, 9956px 2999px #FFF, 9085px 3240px #FFF, 86px 632px #FFF, 4372px 831px #FFF, 9038px 4388px #FFF, 1543px 294px #FFF, 1167px 3362px #FFF, 8846px 5370px #FFF, 5911px 4085px #FFF, 9889px 3748px #FFF, 3781px 3096px #FFF, 9301px 645px #FFF, 4853px 1810px #FFF, 7574px 1938px #FFF, 3337px 4863px #FFF, 669px 5019px #FFF, 3051px 4377px #FFF, 1902px 4261px #FFF, 7036px 4802px #FFF, 1443px 3840px #FFF, 6642px 617px #FFF, 5593px 1706px #FFF, 6629px 3197px #FFF, 6601px 5229px #FFF, 7806px 2972px #FFF, 5095px 376px #FFF, 6447px 3044px #FFF, 4323px 1163px #FFF, 7578px 1128px #FFF, 9934px 228px #FFF, 9300px 1964px #FFF, 7325px 883px #FFF, 5889px 993px #FFF, 2754px 2161px #FFF, 5192px 3346px #FFF, 6328px 5785px #FFF, 2788px 1801px #FFF, 7474px 1933px #FFF, 3742px 5761px #FFF, 3471px 3540px #FFF, 4954px 2038px #FFF, 686px 5568px #FFF, 1021px 1520px #FFF, 4573px 858px #FFF, 4346px 1998px #FFF, 1498px 2646px #FFF, 3777px 5290px #FFF, 9642px 4565px #FFF, 895px 3940px #FFF, 4847px 5165px #FFF, 2102px 3718px #FFF, 7890px 3763px #FFF, 5069px 2154px #FFF, 6588px 2602px #FFF, 8128px 4846px #FFF, 7254px 400px #FFF, 4357px 1498px #FFF, 5354px 2235px #FFF, 7965px 5997px #FFF, 7073px 3459px #FFF, 6340px 5040px #FFF, 451px 78px #FFF, 42px 2621px #FFF, 1510px 2349px #FFF, 1328px 3499px #FFF, 9308px 1374px #FFF, 2030px 3285px #FFF, 5041px 4332px #FFF, 9519px 5433px #FFF, 8121px 5950px #FFF, 9654px 3812px #FFF, 2519px 2528px #FFF, 9988px 4877px #FFF, 5048px 5386px #FFF, 5663px 581px #FFF, 1964px 5058px #FFF, 3486px 3758px #FFF, 6564px 1603px #FFF, 1595px 5441px #FFF, 6497px 1628px #FFF, 6329px 4051px #FFF, 6241px 1506px #FFF, 567px 865px #FFF, 579px 803px #FFF, 5976px 1282px #FFF, 2176px 350px #FFF, 7714px 2491px #FFF, 1454px 3673px #FFF, 3766px 4523px #FFF, 4537px 4002px #FFF, 9408px 3199px #FFF, 3837px 4369px #FFF, 9873px 2140px #FFF, 1641px 2009px #FFF, 9082px 3370px #FFF, 4612px 685px #FFF, 3729px 282px #FFF, 8420px 2419px #FFF, 442px 3953px #FFF, 7120px 3656px #FFF, 8825px 1590px #FFF, 1093px 5230px #FFF, 4085px 2185px #FFF, 537px 2354px #FFF, 1250px 1379px #FFF, 4663px 240px #FFF, 86px 5219px #FFF, 5196px 3603px #FFF, 6717px 201px #FFF, 3706px 5964px #FFF, 1362px 1776px #FFF, 4379px 5562px #FFF, 2749px 5792px #FFF, 8100px 1125px #FFF, 494px 2008px #FFF, 1491px 4731px #FFF, 2155px 681px #FFF, 3260px 2354px #FFF, 8px 464px #FFF, 3085px 5564px #FFF, 496px 2211px #FFF, 7030px 1894px #FFF, 5739px 420px #FFF, 5606px 5431px #FFF, 4446px 1164px #FFF, 5361px 5604px #FFF, 238px 2935px #FFF, 604px 3400px #FFF, 1128px 4394px #FFF, 392px 5447px #FFF, 7569px 4543px #FFF, 399px 4605px #FFF, 3257px 1810px #FFF, 2226px 5243px #FFF, 9653px 4247px #FFF, 6124px 3012px #FFF, 3593px 13px #FFF, 7952px 623px #FFF, 3605px 833px #FFF, 8985px 873px #FFF, 5262px 5729px #FFF, 7330px 1374px #FFF, 8802px 492px #FFF, 6871px 2243px #FFF, 7043px 276px #FFF, 6796px 3906px #FFF, 1949px 3514px #FFF, 9746px 5320px #FFF, 1345px 1155px #FFF, 1453px 774px #FFF, 2911px 4522px #FFF, 5427px 5123px #FFF, 4568px 3179px #FFF, 3724px 415px #FFF, 7176px 5864px #FFF, 9075px 539px #FFF, 8832px 5966px #FFF, 8478px 3025px #FFF, 6038px 5572px #FFF, 2624px 36px #FFF, 9677px 2144px #FFF, 3574px 5249px #FFF, 4861px 3387px #FFF, 2616px 2196px #FFF, 6831px 432px #FFF, 7272px 5175px #FFF, 2519px 5196px #FFF, 3041px 3195px #FFF, 1015px 886px #FFF, 2495px 4517px #FFF, 5052px 3622px #FFF, 8810px 714px #FFF, 8737px 4330px #FFF, 5196px 2881px #FFF, 3357px 4607px #FFF, 1474px 631px #FFF, 462px 3167px #FFF, 4264px 918px #FFF, 2967px 2651px #FFF, 3762px 3646px #FFF, 113px 849px #FFF, 3130px 4511px #FFF, 24px 5867px #FFF, 6842px 2815px #FFF, 4652px 5273px #FFF, 5171px 782px #FFF, 9377px 3630px #FFF, 861px 5199px #FFF, 8120px 2959px #FFF, 1231px 607px #FFF, 8327px 4362px #FFF, 8512px 1576px #FFF, 4464px 2491px #FFF, 5537px 317px #FFF, 3117px 5938px #FFF, 2650px 4332px #FFF, 5371px 4053px #FFF, 4012px 4271px #FFF, 9438px 1433px #FFF, 1850px 1124px #FFF, 4811px 5877px #FFF, 8757px 3987px #FFF, 110px 5px #FFF, 5773px 4362px #FFF, 854px 2942px #FFF, 3622px 4637px #FFF, 3874px 1178px #FFF, 9703px 1266px #FFF, 9733px 4522px #FFF, 8823px 3306px #FFF, 9283px 5391px #FFF, 4994px 5713px #FFF, 9050px 173px #FFF, 2028px 2176px #FFF, 8648px 717px #FFF, 8741px 3735px #FFF, 4537px 838px #FFF, 5173px 456px #FFF, 682px 4376px #FFF, 5524px 312px #FFF, 5857px 3085px #FFF, 3640px 1466px #FFF, 3755px 2362px #FFF, 1315px 4403px #FFF, 5522px 4430px #FFF, 7187px 2275px #FFF, 3100px 5145px #FFF, 2343px 839px #FFF, 9540px 5176px #FFF, 711px 5237px #FFF, 6251px 840px #FFF, 1618px 1228px #FFF, 4081px 24px #FFF, 4867px 3697px #FFF, 1358px 5686px #FFF, 8655px 3149px #FFF, 3757px 248px #FFF, 7081px 701px #FFF, 3898px 259px #FFF, 1308px 2266px #FFF, 8661px 1024px #FFF, 1827px 4178px #FFF, 8630px 2359px #FFF, 8375px 823px #FFF, 2566px 4536px #FFF, 816px 1234px #FFF, 4024px 1474px #FFF, 8024px 4190px #FFF, 7939px 592px #FFF, 6746px 2504px #FFF, 7604px 3561px #FFF, 6106px 1139px #FFF, 8501px 1897px #FFF, 3049px 3231px #FFF, 3562px 1366px #FFF, 2455px 1724px #FFF, 461px 2985px #FFF, 8065px 903px #FFF;
 }
 
-@keyframes animStar {
+@-webkit-keyframes animStar {
   from {
+    -webkit-transform: translateY(0px);
     transform: translateY(0px);
   }
   to {
+    -webkit-transform: translateY(-6000px);
+    transform: translateY(-6000px);
+  }
+}
+
+@keyframes animStar {
+  from {
+    -webkit-transform: translateY(0px);
+    transform: translateY(0px);
+  }
+  to {
+    -webkit-transform: translateY(-6000px);
     transform: translateY(-6000px);
   }
 }

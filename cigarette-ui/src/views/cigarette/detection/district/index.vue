@@ -47,7 +47,7 @@
         </template>
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="150px" >
+      <el-table-column fixed="right" label="操作" align="center" class-name="small-padding fixed-width" min-width="160px" >
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
             v-hasPermi="['cigarette:district:edit']">修改</el-button>
@@ -63,12 +63,12 @@
     <el-dialog :title="title" :visible.sync="open" width="50%" append-to-body style="margin-top: 100px;">
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row>
-          <el-col :span="12"> 
+          <el-col :span="12">
             <el-form-item label="地区名称" prop="districtName">
           <el-input v-model="form.districtName" placeholder="请输入地区名称" />
         </el-form-item>
           </el-col>
-          <el-col :span="12"> 
+          <el-col :span="12">
             <el-form-item label="显示顺序" prop="orderNum">
           <el-input-number v-model="form.orderNum" controls-position="right" :min="0" />
         </el-form-item>
@@ -92,12 +92,12 @@
         </el-form-item>
 
         <el-row>
-          <el-col :span="12"> 
+          <el-col :span="12">
             <el-form-item label="负责人" prop="leader">
           <el-input :disabled="true" v-model="form.leader" placeholder="请在上方搜索人员" />
         </el-form-item>
           </el-col>
-          <el-col :span="12"> 
+          <el-col :span="12">
             <el-form-item label="联系电话" prop="phone">
           <el-input :disabled="true" v-model="form.phone" placeholder="请在上方搜索人员" />
         </el-form-item>
@@ -105,12 +105,12 @@
         </el-row>
 
         <el-row>
-          <el-col :span="12"> 
+          <el-col :span="12">
             <el-form-item label="邮箱" prop="email">
           <el-input :disabled="true" v-model="form.email" placeholder="请在上方搜索人员" />
         </el-form-item>
           </el-col>
-          <el-col :span="12"> 
+          <el-col :span="12">
             <el-form-item label="状态" prop="status">
           <el-select v-model="form.status">
             <el-option v-for="dict in dict.type.tob_dd_status" :key="dict.value" :label="dict.label"

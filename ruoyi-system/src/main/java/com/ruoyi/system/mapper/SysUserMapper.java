@@ -124,4 +124,12 @@ public interface SysUserMapper
      * @return 结果
      */
     public SysUser checkEmailUnique(String email);
+
+
+    /**
+     * 通过手机号判断用户是否存在并返回用户id
+     * @param phone 手机号
+     * @return 用户id
+     */
+    public Long selectUserIdByPhoneNumber(String phone);
 }

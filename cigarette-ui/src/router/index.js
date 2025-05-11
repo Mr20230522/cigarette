@@ -48,7 +48,17 @@ export const constantRoutes = [
   },
   {
     path: '/register',
-    component: () => import('@/views/register'),
+    component: () => import('@/views/register.vue'),
+    hidden: true
+  },
+  {
+    path: '/register',
+    component: () => import('@/views/register.vue'),
+    hidden: true
+  },
+  {
+    path: '/login_phone',
+    component: () => import('@/views/login_phone.vue'),
     hidden: true
   },
   {
@@ -93,7 +103,7 @@ export const constantRoutes = [
     name: 'dataVisualization',
     component: () => import('@/views/cigaretteFront/dataVisualization/dataVisualization')
   },
-  
+
   {
     path: '/showMapLocation',
     name: 'showMapLocation',

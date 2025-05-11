@@ -547,4 +547,8 @@ public class SysUserServiceImpl implements ISysUserService
         }
         return successMsg.toString();
     }
+
+    public Long selectUserIdByPhoneNumber(String phone){
+        return userMapper.selectUserIdByPhoneNumber(phone);
+    }
 }
