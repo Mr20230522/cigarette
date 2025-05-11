@@ -10,7 +10,6 @@
     <li class="tab highlight" @click="selectTab('intro')">简介</li>
     <li class="tab" @click="selectTab('vision')">愿景及使命</li>
     <li class="tab" @click="selectTab('history')">发展历程</li>
-
     <li class="tab" @click="selectTab('team')">管理团队</li>
 
   </ul>

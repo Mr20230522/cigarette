@@ -70,18 +70,18 @@
     <el-table v-loading="loading" :data="personList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="驾驶人ID" align="center" prop="suspectId" />
-      <el-table-column label="身份证ID" align="center" prop="identityCard" min-width="170px" />
-      <el-table-column label="人脸特征编码" align="center" prop="faceFeature" min-width="120px">
-        <template slot-scope="scope">
-          <!-- 使用作用域数据 scope.row 来访问行数据 -->
-          <el-button v-if="scope.row.faceFeature === null" type="warning" @click="handleNotRecorded(scope.row)">
-            尚未录入
-          </el-button>
-          <el-button v-else type="success" @click="handleRecorded(scope.row)">
-            已录入
-          </el-button>
-        </template>
-      </el-table-column>
+<!--      <el-table-column label="身份证ID" align="center" prop="identityCard" min-width="170px" />-->
+<!--      <el-table-column label="人脸特征编码" align="center" prop="faceFeature" min-width="120px">-->
+<!--        <template slot-scope="scope">-->
+<!--          &lt;!&ndash; 使用作用域数据 scope.row 来访问行数据 &ndash;&gt;-->
+<!--          <el-button v-if="scope.row.faceFeature === null" type="warning" @click="handleNotRecorded(scope.row)">-->
+<!--            尚未录入-->
+<!--          </el-button>-->
+<!--          <el-button v-else type="success" @click="handleRecorded(scope.row)">-->
+<!--            已录入-->
+<!--          </el-button>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
       <el-table-column label="电话号码" align="center" prop="phone" min-width="120px" />
       <el-table-column label="驾驶证号码" align="center" prop="suspectLicenseNumber" min-width="170px" />
       <el-table-column label="姓名" align="center" prop="name" min-width="120px" />

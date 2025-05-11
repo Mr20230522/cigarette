@@ -50,3 +50,5 @@ export function delVehicleBehavior(behaviorId) {
     method: 'delete'
   })
 }
+
+

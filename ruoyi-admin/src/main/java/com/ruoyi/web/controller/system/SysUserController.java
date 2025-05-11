@@ -225,4 +225,14 @@ public class SysUserController extends BaseController {
     public AjaxResult deptTree(SysDept dept) {
         return success(deptService.selectDeptTreeList(dept));
     }
+
+    /**
+     * 手机号是否存在
+     */
+    @GetMapping("/phone")
+    public AjaxResult getPhone(String phone) {
+        Long user = userService.selectUserIdByPhoneNumber(phone);
+        return AjaxResult.success(user != null);
+    }
+
 }

@@ -9,7 +9,11 @@
     <div class="login-division" style="margin-top: -20%; margin-left: 8%;">
       <h1 class="title">无证运输烟叶违法行为监管有效性研究与应用管理系统</h1>
     </div>
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" style="margin-top: 15%;margin-left: 12%;">
+    <el-form ref="loginForm"
+             :model="loginForm"
+             :rules="loginRules" class="login-form"
+             style="margin-top: 15%;margin-left: 12%;"
+    >
       <h3 class="form_title">登录管理系统</h3>
       <el-form-item prop="username">
         <el-input
@@ -58,6 +62,9 @@
           <span v-if="!loading">登 录</span>
           <span v-else>登 录 中...</span>
         </el-button>
+        <div style="float: left;" v-if="login_phone">
+          <router-link class="link-type" :to="'/login_phone'">验证码登陆</router-link>
+        </div>
         <div style="float: right;" v-if="register">
           <router-link class="link-type" :to="'/register'">立即注册</router-link>
         </div>
@@ -103,7 +110,8 @@ export default {
       // 验证码开关
       captchaEnabled: true,
       // 注册开关
-      register: false,
+      register: true,
+      login_phone:true,
       redirect: undefined
     }
   },
