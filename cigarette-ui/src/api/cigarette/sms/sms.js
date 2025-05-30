@@ -14,7 +14,7 @@ export function verifySmsCode(data) {
   return request({
     url: '/sms/verify',
     method: 'post',
-    data  // { phone: '', code: '' }
+    data :data // { phone: '', code: '' }
   })
 }
 

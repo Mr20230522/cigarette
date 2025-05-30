@@ -27,6 +27,8 @@ public class LoginBody
      */
     private String uuid;
 
+    private String phone;
+
     public String getUsername()
     {
         return username;
@@ -66,4 +68,11 @@ public class LoginBody
     {
         this.uuid = uuid;
     }
+    public String getPhone() {
+        return phone;
+    }
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
 }

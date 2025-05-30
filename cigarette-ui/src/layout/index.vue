@@ -1,6 +1,7 @@
 <template>
   <div :class="classObj" class="app-wrapper" :style="{'--current-color': theme}">
-    <!-- 原有内容保持不变 -->
+
+    <space-background />
     <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside"/>
     <sidebar v-if="!sidebar.hide" class="sidebar-container"/>
     <div :class="{hasTagsView:needTagsView,sidebarHide:sidebar.hide}" class="main-container">
@@ -21,7 +22,7 @@
 
 <script>
 import RightPanel from '@/components/RightPanel'
-import { AppMain, Navbar, Settings, Sidebar, TagsView ,AIAssistant} from './components'
+import { AppMain, Navbar, Settings, Sidebar, TagsView ,AIAssistant, SpaceBackground } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
 import { mapState } from 'vuex'
 import variables from '@/assets/styles/variables.scss'
@@ -35,7 +36,9 @@ export default {
     Settings,
     Sidebar,
     TagsView,
-    AIAssistant // 注册组件
+    AIAssistant,
+    SpaceBackground,
+
   },
   mixins: [ResizeMixin],
   computed: {

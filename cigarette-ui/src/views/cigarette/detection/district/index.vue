@@ -46,7 +46,7 @@
           <dict-tag :options="dict.type.tob_dd_status" :value="scope.row.status" />
         </template>
       </el-table-column>
-      <el-table-column label="备注" align="center" prop="remark" />
+      <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true"/>
       <el-table-column fixed="right" label="操作" align="center" class-name="small-padding fixed-width" min-width="160px" >
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"

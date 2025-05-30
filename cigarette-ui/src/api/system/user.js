@@ -133,3 +133,13 @@ export function deptTreeSelect() {
     method: 'get'
   })
 }
+
+//获取查询手机号在用户表是否存在
+export function checkPhoneExist(phone) {
+  console.log('获得手机号',phone)
+    return request({
+      url: '/system/user/checkPhoneExist',
+      method: 'get',
+      params: {phone}  // 自动转为?phone=13800138000
+    })
+  }

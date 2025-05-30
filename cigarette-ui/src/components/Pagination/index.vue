@@ -105,9 +105,19 @@ export default {
 
 <style scoped>
 .pagination-container {
+  position: relative;  /* 让内部绝对定位元素参考它 */
+  width: 100%;        /* 确保宽度占满父容器 */
+  padding: 16px 0;    /* 调整上下间距 */
+  margin-top: 16px;   /* 和表格保持间距 */
   background: #fff;
-  padding: 32px 16px;
 }
+
+.pagination-container ::v-deep .el-pagination {
+  display: flex;
+  justify-content: center;  /* 强制分页居中 */
+  width: 100%;             /* 确保宽度占满 */
+}
+
 .pagination-container.hidden {
   display: none;
 }

@@ -85,11 +85,11 @@
 
                 <el-table v-loading="loading" :data="cameraList" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" width="55" align="center" />
-                    <el-table-column label="摄像头id" align="center" prop="cameraId" />
-                    <el-table-column label="摄像头ip" align="center" prop="cameraIp" width="130px"/>
-                    <el-table-column label="摄像头型号" align="center" prop="cameraModel" />
-                    <el-table-column label="摄像头厂商" align="center" prop="cameraManufacturer" />
-                    <el-table-column label="监测点" align="center" prop="detectionId">
+                    <el-table-column label="摄像头id" align="center" prop="cameraId"/>
+                    <el-table-column label="摄像头ip" align="center" prop="cameraIp" width="130px" :show-overflow-tooltip="true"/>
+                    <el-table-column label="摄像头型号" align="center" prop="cameraModel" width="100":show-overflow-tooltip="true"/>
+                    <el-table-column label="摄像头厂商" align="center" prop="cameraManufacturer" width="100"/>
+                    <el-table-column label="监测点" align="center" prop="detectionId" :show-overflow-tooltip="true">
                         <template slot-scope="scope">
                             {{ getDetectionName(scope.row.detectionId) }}
                         </template>
@@ -133,13 +133,13 @@
                         </template>
                     </el-table-column>
 
-                    <el-table-column label="摄像头类型" align="center" prop="cameraType">
+                    <el-table-column label="摄像头类型" align="center" prop="cameraType" width="100">
                         <template slot-scope="scope">
                             <dict-tag :options="dict.type.tob_camera_type" :value="scope.row.cameraType" />
                         </template>
                     </el-table-column>
-                    <el-table-column label="摄像头组号" align="center" prop="cameraGroupIndication" />
-                    <el-table-column label="摄像头应用方向" align="center" prop="cameraApplicationType">
+                    <el-table-column label="摄像头组号" align="center" prop="cameraGroupIndication" width="100"/>
+                    <el-table-column label="摄像头应用方向" align="center" prop="cameraApplicationType" width="120">
                         <template slot-scope="scope">
                             <dict-tag :options="dict.type.tob_camera_orientation"
                                 :value="scope.row.cameraApplicationType" />
@@ -150,7 +150,7 @@
                             <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.status" />
                         </template>
                     </el-table-column>
-                    <el-table-column label="备注" align="center" prop="remark" />
+                    <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true"/>
                     <el-table-column label="所属地区" align="center" prop="districtId">
                         <template slot-scope="scope">
                             <!-- 使用一个方法来通过districtId找到对应的districtName -->

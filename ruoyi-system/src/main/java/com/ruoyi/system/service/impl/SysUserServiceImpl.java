@@ -548,7 +548,17 @@ public class SysUserServiceImpl implements ISysUserService
         return successMsg.toString();
     }
 
-    public Long selectUserIdByPhoneNumber(String phone){
-        return userMapper.selectUserIdByPhoneNumber(phone);
+    public Boolean checkPhoneExist(String phone){
+        return userMapper.checkPhoneExist(phone);
     }
+
+    // 根据手机号查询用户
+    public SysUser selectUserByPhone(String phoneNumber) {
+        return userMapper.selectUserByPhone(phoneNumber);
+    }
+
+
+    public SysUser selectUserByLoginName(String userName){
+        return userMapper.selectUserByLoginName(userName);
+   }
 }

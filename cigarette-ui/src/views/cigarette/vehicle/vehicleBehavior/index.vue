@@ -85,7 +85,7 @@
 
         <el-table v-loading="loading" :data="vehicleBehaviorList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="55" align="center" />
-          <el-table-column label="车辆行为序号" align="center" prop="behaviorId" />
+          <el-table-column label="车辆行为序号" align="center" prop="behaviorId" width="100px" />
           <el-table-column label="车辆序号" align="center" prop="carId" />
           <el-table-column label="车牌编号" align="center" prop="licensePlate" width="120px" />
           <el-table-column label="车型" prop="carTypeId">
@@ -122,7 +122,7 @@
           <el-table-column label="同伙id" align="center" prop="accompliceId" />
           <el-table-column label="同伙姓名" align="center" prop="name" min-width="120px" />
           <el-table-column label="记录时间" align="center" prop="createTime" min-width="160px" />
-          <el-table-column label="操作" fixed="right" align="center" class-name="small-padding fixed-width" min-width="250px">
+          <el-table-column label="操作" fixed="right" align="center" class-name="small-padding fixed-width" min-width="350px">
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="addCautionFrom(scope.row)"
                 v-hasPermi="['vehicle:vehicleBehavior:edit']" style="color: red;">一键预警</el-button>
@@ -133,14 +133,21 @@
               <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
                 v-hasPermi="['vehicle:vehicleBehavior:remove']">删除</el-button>
               <!-- 新增预览按钮 -->
-<!--              <el-button size="mini" type="text" icon="el-icon-picture" @click="handlePreview(scope.row)"-->
-<!--                v-hasPermi="['vehicle:vehicleBehavior:view']" style="color: #409EFF;">车辆预览</el-button>-->
+              <el-button size="mini" type="text" icon="el-icon-picture" @click="handlePreview(scope.row)"
+                v-hasPermi="['vehicle:vehicleBehavior:view']" style="color: #409EFF;">车辆预览</el-button>
             </template>
           </el-table-column>
         </el-table>
 
-        <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum"
-          :limit.sync="queryParams.pageSize" @pagination="getList" />
+<!--        <div class="pagination-wrapper">-->
+          <pagination
+            v-show="total > 0"
+            :total="total"
+            :page.sync="queryParams.pageNum"
+            :limit.sync="queryParams.pageSize"
+            @pagination="getList"
+          />
+<!--        </div>-->
       </el-col>
     </el-row>
     <!-- 添加或修改车辆行为记录对话框 -->
@@ -580,42 +587,46 @@ export default {
       console.log('正在获取行为ID为[' + row.behaviorId + ']的媒体文件');
 
       this.loading = true; // 显示加载状态
-      getVehicle(row.carId).then(response => {
-        console.log('获取车辆信息成功:')
-        console.log(response.data.picture);
-        this.previewData.vehicleImageUrl=response.data.picture;
+      // getVehicle(row.carId).then(response => {
+      //   console.log('获取车辆信息成功:')
+      //   console.log(response.data.picture);
+      //   // this.previewData.vehicleImageUrl=response.data.picture;
+      //   this.previewData.vehicleImageUrl='http://127.0.0.1:8000/'+response.data.picture.replace('/profile','')
+      //   console.log('this.previewData.vehicleImageUrl:',this.previewData.vehicleImageUrl)
+      //
+      //   this.previewVisible = true;
+      // });
 
-        console.log('this.previewData.vehicleImageUrl:',this.previewData.vehicleImageUrl)
-        this.previewVisible = true;
-      });
+      getBehaviorMedia(row.behaviorId)
+        .then(response => {
+          if (!response.data) throw new Error("响应数据为空");
 
-      // getBehaviorMedia(row.behaviorId)
-      //   .then(response => {
-      //     if (!response.data) throw new Error("响应数据为空");
-      //
-      //     // 处理路径：确保路径能正确指向文件
-      //     const basePath = process.env.NODE_ENV === 'development' ? '' : '';
-      //
-      //     this.previewData = {
-      //       // plateImageUrl: '../../../../assets/uploads/licensePlate/licensePlate1.png',
-      //       plateImageUrl: response.data.picture,
-      //       vehicleImageUrl: `${basePath}${response.data.vehiclePhotoPath}`,
-      //       behaviorVideoUrl: `${basePath}${response.data.vehicleBehaviorVedioPath}`
-      //     };
-      //
-      //     this.previewVisible = true;
-      //   })
-      //   .catch(error => {
-      //     this.$modal.msgError("获取媒体文件失败: " + (error.message || '未知错误'));
-      //     console.error('获取媒体文件失败:', {
-      //       error: error,
-      //       behaviorId: row.behaviorId,
-      //       rowData: row
-      //     });
-      //   })
-      //   .finally(() => {
-      //     this.loading = false;
-      //   });
+
+          console.log("response.data.vehiclePhotoPath.replace('/profile','')",response.data);
+
+          this.previewData = {
+            // plateImageUrl: '../../../../assets/uploads/licensePlate/licensePlate1.png',
+            plateImageUrl: 'http://127.0.0.1:8000/'+response.data.licnesePlatePhotoPath.replace('/profile',''),
+
+
+            vehicleImageUrl: 'http://127.0.0.1:8000/'+response.data.vehiclePhotoPath.replace('/profile',''),
+            behaviorVideoUrl: 'http://127.0.0.1:8000/'+response.data.vehicleBehaviorVedioPath.replace('/profile',''),
+          };
+
+
+          this.previewVisible = true;
+        })
+        .catch(error => {
+          this.$modal.msgError("获取媒体文件失败: " + (error.message || '未知错误'));
+          console.error('获取媒体文件失败:', {
+            error: error,
+            behaviorId: row.behaviorId,
+            rowData: row
+          });
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     },
     // 加载检测点选项
     loadDetectionOptions() {
@@ -987,6 +998,7 @@ export default {
 </script>
 
 <style>
+
 .preview-item {
   margin-bottom: 20px;
 }

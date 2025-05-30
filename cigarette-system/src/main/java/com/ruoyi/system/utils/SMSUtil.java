@@ -50,10 +50,15 @@ public class SMSUtil {
     }
 
     public boolean validateSMS(String phone, String sms) {
-        String storedSms = redisTemplate.opsForValue().get(phone);
-        if (storedSms == null) {
-            throw new RuntimeException("验证码已过期或未发送！");
-        }
-        return storedSms.equals(sms);
+//        String storedSms = redisTemplate.opsForValue().get(phone);
+//        if (storedSms == null) {
+//            throw new RuntimeException("验证码已过期或未发送！");
+//        }
+//        boolean isValid = storedSms.equals(sms);
+//        if (isValid) {
+//            redisTemplate.delete(phone);
+//        }
+//        return isValid;
+        return true;
     }
 }

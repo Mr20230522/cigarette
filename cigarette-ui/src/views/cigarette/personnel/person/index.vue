@@ -87,8 +87,8 @@
           <image-preview :src="scope.row.picture" :width="50" :height="50" />
         </template>
       </el-table-column>
-      <el-table-column label="电话号码" align="center" prop="phone" min-width="120px" />
-      <el-table-column label="驾驶证号码" align="center" prop="suspectLicenseNumber" min-width="170px" />
+      <el-table-column label="电话号码" align="center" prop="phone" min-width="120px" :show-overflow-tooltip="true"/>
+      <el-table-column label="驾驶证号码" align="center" prop="suspectLicenseNumber" min-width="170px" :show-overflow-tooltip="true"/>
       <el-table-column label="姓名" align="center" prop="name" min-width="120px" />
       <el-table-column label="年龄" align="center" prop="age" />
       <el-table-column label="性别" align="center" prop="gender">
@@ -108,7 +108,7 @@
           <dict-tag :options="dict.type.sys_show_hide" :value="scope.row.status" />
         </template>
       </el-table-column>
-      <el-table-column label="备注" align="center" prop="remark" />
+      <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true"/>
       <el-table-column label="涉案数" align="center" prop="casesInvolved" />
       <el-table-column fixed="right" label="操作" align="center" class-name="small-padding fixed-width" min-width="120px">
         <template slot-scope="scope">
