@@ -105,4 +105,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{districtId}
         </foreach>
     </delete>
+
+    <select id="getDistrictId" parameterType="String" resultType="java.lang.Long">
+        select district_id from tob_district where  district_name=#{districtName}
+    </select>
 </mapper>

@@ -202,4 +202,11 @@ public class TobDistrictServiceImpl implements ITobDistrictService
     {
         return getChildList(list, t).size() > 0;
     }
+
+
+    public Long getDistrictId(String districtName ){
+        System.out.println("!!!districtName!!!");
+        return tobDistrictMapper.getDistrictId(districtName);
+
+    }
 }

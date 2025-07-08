@@ -2,6 +2,8 @@ package com.ruoyi.system.service;
 
 import java.util.List;
 import com.ruoyi.system.domain.TobVehicleBehavior;
+import com.ruoyi.system.domain.undefine.VehicleBehaviorColor;
+import com.ruoyi.system.domain.undefine.VehicleType;
 import com.ruoyi.system.domain.vo.TobVehicleBehaviorVo;
 
 /**
@@ -35,6 +37,24 @@ public interface ITobVehicleBehaviorService
      * @return 车辆行为记录集合
      */
     public List<TobVehicleBehaviorVo> selectTobVehicleBehaviorVoList(TobVehicleBehaviorVo tobVehicleBehaviorVo );
+
+
+    /**
+     * 查询车辆类型数据
+     *
+     * @param voTobVehicleBehavior 车辆行为记录
+     * @return 车辆行为记录集合
+     */
+    public List<VehicleType> getVehicleTypeData(TobVehicleBehaviorVo tobVehicleBehaviorVo );
+
+
+    /**
+     * 查询车辆颜色数据
+     *
+     * @param voTobVehicleBehavior 车辆行为记录
+     * @return 车辆行为记录集合
+     */
+    public VehicleBehaviorColor getVehicleColorData(TobVehicleBehaviorVo tobVehicleBehaviorVo );
 
     /**
      * 新增车辆行为记录

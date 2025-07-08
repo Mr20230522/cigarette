@@ -65,4 +65,9 @@ public interface TobDistrictMapper
      * @return
      */
     public TobDistrict selectTobDistrictByID(Long districtId);
+
+    /**
+     * 根据地区名查询地区ID
+     */
+    public Long getDistrictId(String districtName);
 }
