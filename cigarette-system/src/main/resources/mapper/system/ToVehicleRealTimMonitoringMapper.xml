@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.system.mapper.ToVehicleRealTimMonitoringMapper">
+
+    <resultMap id="ToVehicleResult" type="com.ruoyi.system.domain.ToVehicleRealTimMonitoring">
+        <id column="id" property="id"/>
+        <result column="plate_number" property="plateNumber"/>
+        <result column="plate_color" property="plateColor"/>
+        <result column="plate_type" property="plateType"/>
+        <result column="car_color" property="carColor"/>
+        <result column="vehicle_type" property="vehicleType"/>
+        <result column="brand" property="brand"/>
+        <result column="direction" property="direction"/>
+        <result column="channel_id" property="channelId"/>
+        <result column="authorization_type" property="authorizationType"/>
+        <result column="capture_time" property="captureTime"/>
+        <result column="speed" property="speed"/>
+        <result column="lane_number" property="laneNumber"/>
+        <result column="data_type" property="dataType"/>
+        <result column="violation_type" property="violationType"/>
+        <result column="driver_seatbelt" property="driverSeatbelt"/>
+        <result column="passenger_seatbelt" property="passengerSeatbelt"/>
+        <result column="driver_sunglass" property="driverSunglass"/>
+        <result column="passenger_sunglass" property="passengerSunglass"/>
+        <result column="phone_call" property="phoneCall"/>
+        <result column="sunroof_person" property="sunroofPerson"/>
+        <result column="yellow_label_car" property="yellowLabelCar"/>
+        <result column="hazardous_materials" property="hazardousMaterials"/>
+        <result column="pendant" property="pendant"/>
+        <result column="axle_count" property="axleCount"/>
+        <result column="axle_type" property="axleType"/>
+        <result column="detailed_model" property="detailedModel"/>
+        <result column="video_url" property="videoUrl"/>
+        <result column="plate_image_url" property="plateImageUrl"/>
+        <result column="image_url" property="imageUrl"/>
+    </resultMap>
+
+    <select id="selectToVehicleRealTimMonitoringList" resultMap="ToVehicleResult">
+        SELECT *
+        FROM vehicle_capture_records
+    </select>
+
+</mapper>
