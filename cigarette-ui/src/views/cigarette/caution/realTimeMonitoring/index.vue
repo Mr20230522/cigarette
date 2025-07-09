@@ -38,7 +38,12 @@
     </el-aside>
     <el-container>
       <el-main>
-
+        <div v-if="selectedRows.length > 0" class="batch-actions">
+          <span>已选 {{ selectedRows.length }} 条</span>
+          <el-button @click="handleExport" size="mini">导出</el-button>
+          <el-button @click="handleDelete" size="mini">删除</el-button>
+          <el-button @click="clearSelection" size="mini" type="danger">取消选择</el-button>
+        </div>
         <el-table :data="tableData">
 
           <el-table-column label="选择" width="60">
@@ -100,6 +105,25 @@ export default {
       isChecked: false
     }
   },
+  computed: {
+    // 获取所有被选中的行
+    selectedRows() {
+      return this.tableData.filter(row => row.isChecked);
+    },
+    // 是否全部选中
+    isAllSelected: {
+      get() {
+        return this.selectedRows.length === this.tableData.length && this.tableData.length > 0;
+      },
+      set(value) {
+        this.tableData.forEach(row => (row.isChecked = value));
+      }
+    },
+    // 半选状态（即部分选中）
+    isIndeterminate() {
+      return this.selectedRows.length > 0 && !this.isAllSelected;
+    }
+  },
   methods: {
     fetchData() {
       request({
@@ -133,10 +157,32 @@ export default {
           {key: "车道号:", value: this.imgd.laneNumber}
         ];
       }
+    },
+    // 导出方法
+    handleExport() {
+      console.log('导出的数据为：', this.selectedRows);
+      alert(`共导出 ${this.selectedRows.length} 条记录`);
+    },
+
+    // 删除方法
+    handleDelete() {
+      this.tableData = this.tableData.filter(row => !row.isChecked);
+    },
+
+    // 清除所有选中
+    clearSelection() {
+      this.tableData.forEach(row => (row.isChecked = false));
+    },
+
+    // 全选切换
+    toggleSelectAll(value) {
+      this.tableData.forEach(row => (row.isChecked = value));
     }
-  },
+  }
+  ,
   mounted() {
     this.fetchData();
   }
-};
+}
+;
 </script>
