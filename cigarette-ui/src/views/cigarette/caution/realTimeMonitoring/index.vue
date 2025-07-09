@@ -42,6 +42,7 @@
           <span>已选 {{ selectedRows.length }} 条</span>
           <el-button @click="handleExport" size="mini">导出</el-button>
           <el-button @click="handleDelete" size="mini">删除</el-button>
+          <el-button @click="toggleSelectAll" size="mini">取消选择</el-button>
           <el-button @click="clearSelection" size="mini" type="danger">取消选择</el-button>
         </div>
         <el-table :data="tableData">
