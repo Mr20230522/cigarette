@@ -44,7 +44,7 @@
           <el-table-column prop="" label="">
             <el-checkbox v-model="isChecked"></el-checkbox>
           </el-table-column>
-          <el-table-column prop="" label="序号" width="50">
+          <el-table-column type="index" label="序号" width="50">
           </el-table-column>
           <el-table-column prop="captureTime" label="抓拍时间" width="150">
           </el-table-column>
@@ -107,13 +107,13 @@ export default {
         this.tableData = res.data || [];
         this.imgd = res.data[0];
 
-        console.log('车辆数据列表：');
-        console.log(this.imgd);
+        //console.log('车辆数据列表：');
+        //console.log(this.imgd);
 
         // 动态生成 imgData
         this.generateImgData();
 
-        alert(this.imgd.captureTime);
+        //alert(this.imgd.captureTime);
       });
     },
     generateImgData() {
