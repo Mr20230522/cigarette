@@ -88,6 +88,21 @@
 .el-aside {
   color: #333;
 }
+
+.batch-actions {
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  background-color: #f5f7fa;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.batch-actions span {
+  font-size: 14px;
+  color: #666;
+}
 </style>
 
 <script>
