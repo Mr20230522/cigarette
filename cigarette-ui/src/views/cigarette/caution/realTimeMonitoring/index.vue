@@ -41,8 +41,10 @@
 
         <el-table :data="tableData">
 
-          <el-table-column prop="" label="">
-            <el-checkbox v-model="isChecked"></el-checkbox>
+          <el-table-column label="选择" width="60">
+            <template slot-scope="{row}">
+              <el-checkbox v-model="row.isChecked"></el-checkbox>
+            </template>
           </el-table-column>
           <el-table-column type="index" label="序号" width="50">
           </el-table-column>
