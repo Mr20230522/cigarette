@@ -11,8 +11,7 @@
       <div class="image-container" style="padding: 0">
 
         <!-- 头像图片 -->
-        <img src="../realTimeMonitoring/imgTest/0_2_20250511_000003248_云D6F798_P1.jpg" alt="头像图片"
-             style="max-width: 100%;">
+        <img :src="'./'+this.imgd.picUrl" style="max-width: 100%;">
         <!-- 分割线 -->
         <!--        <el-divider style="padding: 0;"></el-divider>-->
       </div>
@@ -59,9 +58,9 @@
             </el-table-column>
             <el-table-column prop="plate" label="车牌号码" width="120">
             </el-table-column>
-            <el-table-column prop="plateColor" label="车牌颜色">
+            <el-table-column prop="plateColor" label="车牌颜色" width="100">
             </el-table-column>
-            <el-table-column prop="plateType" label="车牌类型" width="100">
+            <el-table-column prop="plateType" label="车牌类型" width="118">
             </el-table-column>
             <el-table-column prop="dataType" label="数据类型">
             </el-table-column>
@@ -117,6 +116,7 @@
 
 <script>
 import request from "@/utils/request";
+
 let i = 1290;
 export default {
 
@@ -157,10 +157,11 @@ export default {
         url: `/toVehicleMonitoring/list?lastId=${i++}`,
         method: 'get'
       }).then(res => {
-        this.tableData = res.data;
+        this.tableData = Array.isArray(res.data) ? res.data : [res.data];
         this.imgd = res.data[0];
         // 动态生成 imgData
-        console.log(this.tableData)
+        //console.log(this.tableData)
+        // console.log(JSON.parse(JSON.stringify(res.data)))
         this.generateImgData();
       });
     },
@@ -172,7 +173,7 @@ export default {
         method: 'get',
         timeout: 30000
       }).then(res => {
-        const newData = res.data || [];
+        const newData = Array.isArray(res.data) ? res.data : [res.data];
         if (newData.length > 0) {
           this.tableData.push(newData[0]);
           if (this.tableData.length > this.maxDataCount) {
@@ -180,6 +181,7 @@ export default {
           }
 
           this.imgd = newData[0];
+          console.log(this.imgd)
           this.generateImgData();
         }
       }).catch(err => {
@@ -200,7 +202,7 @@ export default {
           {key: "方向:", value: this.imgd.direction},
           {key: "速度(km/h):", value: this.imgd.speed},
           {key: "通道号:", value: this.imgd.channelId},
-          {key: "车道号:", value: this.imgd.laneNumber}
+          {key: "车道号:", value: this.imgd.laneNo}
         ];
       }
     },
@@ -227,7 +229,7 @@ export default {
   },
   mounted() {
     this.fetchData(); // 初始加载一次
-    this.timer = setInterval(this.fetchNewData, 1000); // 每0.1秒请求一次
+    this.timer = setInterval(this.fetchNewData, 2000); // 每0.1秒请求一次
   },
   beforeUnmount() {
     if (this.timer) {
