@@ -20,7 +20,7 @@
       <!-- 可滚动部分：菜单和表格 -->
       <div class="scrollable-content">
         <!-- 原始菜单内容保持不变 -->
-        <el-menu :default-openeds="['1', '3']">
+        <el-menu>
 
           <!-- 其他导航项省略，保持原样 -->
           <!-- 可复制原来的 el-submenu 内容 -->
@@ -46,35 +46,38 @@
           <el-button @click="clearSelection" size="mini" type="danger">取消选择</el-button>
         </div>
         <el-table :data="tableData">
+          <div class="table-container" ref="tableContainer" :class="{ 'animate-scroll': animate }">
 
-          <el-table-column label="选择" width="60">
-            <template slot-scope="{row}">
-              <el-checkbox v-model="row.isChecked"></el-checkbox>
-            </template>
-          </el-table-column>
-          <el-table-column type="index" label="序号" width="50">
-          </el-table-column>
-          <el-table-column prop="captureTime" label="抓拍时间" width="150">
-          </el-table-column>
-          <el-table-column prop="plateNumber" label="车牌号码" width="120">
-          </el-table-column>
-          <el-table-column prop="plateColor" label="车牌颜色">
-          </el-table-column>
-          <el-table-column prop="plateType" label="车牌类型" width="100">
-          </el-table-column>
-          <el-table-column prop="dataType" label="数据类型">
-          </el-table-column>
-          <el-table-column prop="violationType" label="违章类型">
-          </el-table-column>
-          <el-table-column prop="direction" label="方向">
-          </el-table-column>
-          <el-table-column prop="speed" label="速度(km/h)" width="120">
-          </el-table-column>
-          <el-table-column prop="channelId" label="通道号">
-          </el-table-column>
-          <el-table-column prop="laneNumber" label="车道号">
-          </el-table-column>
+            <el-table-column label="选择" width="60">
+              <template slot-scope="{row}">
+                <el-checkbox v-model="row.isChecked"></el-checkbox>
+              </template>
+            </el-table-column>
+            <el-table-column type="index" label="序号" width="50">
+            </el-table-column>
+            <el-table-column prop="captureTime" label="抓拍时间" width="150">
+            </el-table-column>
+            <el-table-column prop="plate" label="车牌号码" width="120">
+            </el-table-column>
+            <el-table-column prop="plateColor" label="车牌颜色">
+            </el-table-column>
+            <el-table-column prop="plateType" label="车牌类型" width="100">
+            </el-table-column>
+            <el-table-column prop="dataType" label="数据类型">
+            </el-table-column>
+            <el-table-column prop="violationType" label="违章类型">
+            </el-table-column>
+            <el-table-column prop="direction" label="方向">
+            </el-table-column>
+            <el-table-column prop="speed" label="速度(km/h)" width="120">
+            </el-table-column>
+            <el-table-column prop="channelId" label="通道号">
+            </el-table-column>
+            <el-table-column prop="laneNo" label="车道号">
+            </el-table-column>
+          </div>
         </el-table>
+
       </el-main>
     </el-container>
   </el-container>
@@ -102,6 +105,14 @@
   font-size: 14px;
   color: #666;
 }
+
+.table-container {
+  transition: transform 0.5s ease-in-out;
+}
+
+.table-container.animate-scroll {
+  transform: translateY(-40px);
+}
 </style>
 
 <script>
@@ -111,12 +122,15 @@ import request from "@/utils/request";
 export default {
 
   data() {
-    let obj = this.tableData;
     return {
       imgd: [],
       tableData: [],
       imgData: [],
-      isChecked: false
+      isChecked: false,
+      maxDataCount: 14,
+      timer: null,
+      isFetching: false,
+      animate: false
     }
   },
   computed: {
@@ -146,21 +160,41 @@ export default {
       }).then(res => {
         this.tableData = res.data || [];
         this.imgd = res.data[0];
-
-        //console.log('车辆数据列表：');
-        //console.log(this.imgd);
-
         // 动态生成 imgData
+        console.log(this.tableData)
         this.generateImgData();
+      });
+    },
+    fetchNewData() {
+      if (this.isFetching) return;
+      this.isFetching = true;
 
-        //alert(this.imgd.captureTime);
+      request({
+        url: '/toVehicleMonitoring/list',
+        method: 'get',
+        timeout: 30000
+      }).then(res => {
+        const newData = res.data || [];
+        if (newData.length > 0) {
+          this.tableData.push(newData[0]);
+          if (this.tableData.length > this.maxDataCount) {
+            this.tableData.shift();
+          }
+
+          this.imgd = newData[0];
+          this.generateImgData();
+        }
+      }).catch(err => {
+        console.error('请求失败:', err);
+      }).finally(() => {
+        this.isFetching = false;
       });
     },
     generateImgData() {
       if (this.imgd) {
         this.imgData = [
           {key: "抓拍时间:", value: this.imgd.captureTime},
-          {key: "车牌号码:", value: this.imgd.plateNumber},
+          {key: "车牌号码:", value: this.imgd.plate},
           {key: "车牌颜色:", value: this.imgd.plateColor},
           {key: "车牌类型:", value: this.imgd.plateType},
           {key: "数据类型:", value: this.imgd.dataType},
@@ -192,11 +226,35 @@ export default {
     toggleSelectAll(value) {
       this.tableData.forEach(row => (row.isChecked = value));
     }
-  }
-  ,
+  },
   mounted() {
-    this.fetchData();
-  }
+    this.fetchData(); // 初始加载一次
+    this.timer = setInterval(this.fetchNewData, 1000); // 每0.1秒请求一次
+  },
+  beforeUnmount() {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
+  },
+  watch: {
+    tableData() {
+      this.animate = true;
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this.animate = false;
+        }, 500);
+      });
+
+      // 自动滚动到底部
+      this.$nextTick(() => {
+        const container = this.$refs.tableContainer;
+        if (container) {
+          container.scrollTop = container.scrollHeight;
+        }
+      });
+    }
+  },
 }
 ;
 </script>
