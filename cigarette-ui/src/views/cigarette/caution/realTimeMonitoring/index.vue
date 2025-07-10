@@ -116,9 +116,8 @@
 </style>
 
 <script>
-import axios from "axios";
 import request from "@/utils/request";
-
+let i = 1290;
 export default {
 
   data() {
@@ -155,10 +154,10 @@ export default {
   methods: {
     fetchData() {
       request({
-        url: '/toVehicleMonitoring/list',
+        url: `/toVehicleMonitoring/list?lastId=${i++}`,
         method: 'get'
       }).then(res => {
-        this.tableData = res.data || [];
+        this.tableData = res.data;
         this.imgd = res.data[0];
         // 动态生成 imgData
         console.log(this.tableData)
@@ -168,9 +167,8 @@ export default {
     fetchNewData() {
       if (this.isFetching) return;
       this.isFetching = true;
-
       request({
-        url: '/toVehicleMonitoring/list',
+        url: `/toVehicleMonitoring/list?lastId=${i++}`,
         method: 'get',
         timeout: 30000
       }).then(res => {

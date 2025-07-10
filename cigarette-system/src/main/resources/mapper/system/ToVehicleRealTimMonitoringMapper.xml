@@ -4,38 +4,38 @@
 
 <mapper namespace="com.ruoyi.system.mapper.ToVehicleRealTimMonitoringMapper">
 
-<!--    <resultMap id="ToVehicleResult" type="com.ruoyi.system.domain.ToVehicleRealTimMonitoring">-->
-<!--        <id column="id" property="id"/>-->
-<!--        <result column="plate_number" property="plateNumber"/>-->
-<!--        <result column="plate_color" property="plateColor"/>-->
-<!--        <result column="plate_type" property="plateType"/>-->
-<!--        <result column="car_color" property="vehicleColor"/>-->
-<!--        <result column="vehicle_type" property="vehicleType"/>-->
-<!--        <result column="brand" property="brand"/>-->
-<!--        <result column="direction" property="direction"/>-->
-<!--        <result column="channel_id" property="channelId"/>-->
-<!--        <result column="authorization_type" property="authorizationType"/>-->
-<!--        <result column="capture_time" property="captureTime"/>-->
-<!--        <result column="speed" property="speed"/>-->
-<!--        <result column="lane_number" property="laneNo"/>-->
-<!--        <result column="data_type" property="dataType"/>-->
-<!--        <result column="violation_type" property="violationType"/>-->
-<!--        <result column="driver_seatbelt" property="driverSeatbelt"/>-->
-<!--        <result column="passenger_seatbelt" property="passengerSeatbelt"/>-->
-<!--        <result column="driver_sunglass" property="driverSunglass"/>-->
-<!--        <result column="passenger_sunglass" property="passengerSunglass"/>-->
-<!--        <result column="phone_call" property="phoneCall"/>-->
-<!--        <result column="sunroof_person" property="sunroofPerson"/>-->
-<!--        <result column="yellow_label_car" property="yellowLabelCar"/>-->
-<!--        <result column="hazardous_materials" property="hazardousMaterials"/>-->
-<!--        <result column="pendant" property="pendant"/>-->
-<!--        <result column="axle_count" property="axleCount"/>-->
-<!--        <result column="axle_type" property="axleType"/>-->
-<!--        <result column="detailed_model" property="detailedModel"/>-->
-<!--        <result column="video_url" property="videoUrl"/>-->
-<!--        <result column="plate_image_url" property="plateLicense"/>-->
-<!--        <result column="image_url" property="picUrl"/>-->
-<!--    </resultMap>-->
+    <!--    <resultMap id="ToVehicleResult" type="com.ruoyi.system.domain.ToVehicleRealTimMonitoring">-->
+    <!--        <id column="id" property="id"/>-->
+    <!--        <result column="plate_number" property="plateNumber"/>-->
+    <!--        <result column="plate_color" property="plateColor"/>-->
+    <!--        <result column="plate_type" property="plateType"/>-->
+    <!--        <result column="car_color" property="vehicleColor"/>-->
+    <!--        <result column="vehicle_type" property="vehicleType"/>-->
+    <!--        <result column="brand" property="brand"/>-->
+    <!--        <result column="direction" property="direction"/>-->
+    <!--        <result column="channel_id" property="channelId"/>-->
+    <!--        <result column="authorization_type" property="authorizationType"/>-->
+    <!--        <result column="capture_time" property="captureTime"/>-->
+    <!--        <result column="speed" property="speed"/>-->
+    <!--        <result column="lane_number" property="laneNo"/>-->
+    <!--        <result column="data_type" property="dataType"/>-->
+    <!--        <result column="violation_type" property="violationType"/>-->
+    <!--        <result column="driver_seatbelt" property="driverSeatbelt"/>-->
+    <!--        <result column="passenger_seatbelt" property="passengerSeatbelt"/>-->
+    <!--        <result column="driver_sunglass" property="driverSunglass"/>-->
+    <!--        <result column="passenger_sunglass" property="passengerSunglass"/>-->
+    <!--        <result column="phone_call" property="phoneCall"/>-->
+    <!--        <result column="sunroof_person" property="sunroofPerson"/>-->
+    <!--        <result column="yellow_label_car" property="yellowLabelCar"/>-->
+    <!--        <result column="hazardous_materials" property="hazardousMaterials"/>-->
+    <!--        <result column="pendant" property="pendant"/>-->
+    <!--        <result column="axle_count" property="axleCount"/>-->
+    <!--        <result column="axle_type" property="axleType"/>-->
+    <!--        <result column="detailed_model" property="detailedModel"/>-->
+    <!--        <result column="video_url" property="videoUrl"/>-->
+    <!--        <result column="plate_image_url" property="plateLicense"/>-->
+    <!--        <result column="image_url" property="picUrl"/>-->
+    <!--    </resultMap>-->
     <resultMap id="ToVehicleResult" type="com.ruoyi.system.domain.ToVehicleRealTimMonitoring">
         <id property="id" column="Id"/>
         <result property="cameraId" column="CameraId"/>
@@ -57,14 +57,23 @@
         <result property="startOffset" column="StartOffset"/>
         <result property="srcJson" column="SrcJson"/>
     </resultMap>
-    <select id="selectToVehicleRealTimMonitoringList" resultMap="ToVehicleResult">
+    <select id="selectById" parameterType="Long" resultType="com.ruoyi.system.domain.ToVehicleRealTimMonitoring">
         SELECT *
         FROM trafficdata
-        WHERE Id NOT IN (
-            SELECT used_id FROM used_records_log
-        )
-        ORDER BY RAND()
-        LIMIT 1
+        WHERE Id = #{id}
     </select>
 
+    <select id="selectAll" resultType="com.ruoyi.system.domain.ToVehicleRealTimMonitoring">
+        SELECT *
+        FROM trafficdata
+        ORDER BY Id ASC
+    </select>
+
+    <select id="selectNext" parameterType="map" resultType="com.ruoyi.system.domain.ToVehicleRealTimMonitoring">
+        SELECT *
+        FROM trafficdata
+        WHERE Id > #{lastId}
+        ORDER BY Id ASC
+        LIMIT 1
+    </select>
 </mapper>

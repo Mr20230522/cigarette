@@ -13,13 +13,25 @@ import java.util.List;
 @RequestMapping("/toVehicleMonitoring")
 public class ToVehicleRealTimMonitoringController {
 
+    //    @Autowired
+//    private IToVehicleRealTimMonitoringService monitoringService;
+//
+//    @GetMapping("/list")
+//    public AjaxResult list(ToVehicleRealTimMonitoring query) {
+//        System.out.println("进入 list 接口了");
+//        List<ToVehicleRealTimMonitoring> list = monitoringService.selectToVehicleRealTimMonitoringList(query);
+//        return AjaxResult.success(list);
+//    }
     @Autowired
-    private IToVehicleRealTimMonitoringService monitoringService;
+    private IToVehicleRealTimMonitoringService vehicleService;
 
     @GetMapping("/list")
-    public AjaxResult list(ToVehicleRealTimMonitoring query) {
-        System.out.println("进入 list 接口了");
-        List<ToVehicleRealTimMonitoring> list = monitoringService.selectToVehicleRealTimMonitoringList(query);
-        return AjaxResult.success(list);
+    public AjaxResult getNextRecord(@RequestParam(value = "lastId", defaultValue = "0") Long lastId) {
+        ToVehicleRealTimMonitoring next = vehicleService.getNextRecord(lastId);
+        if (next != null) {
+            return AjaxResult.success(next);
+        } else {
+            return AjaxResult.error("没有更多数据");
+        }
     }
 }

@@ -11,11 +11,18 @@ import java.util.List;
 @Service
 public class ToVehicleRealTimMonitoringServiceImpl implements IToVehicleRealTimMonitoringService {
 
+    //    @Autowired
+//    private ToVehicleRealTimMonitoringMapper mapper;
+//
+//    @Override
+//    public List<ToVehicleRealTimMonitoring> selectToVehicleRealTimMonitoringList(ToVehicleRealTimMonitoring query) {
+//        return mapper.selectToVehicleRealTimMonitoringList(query);
+//    }
     @Autowired
     private ToVehicleRealTimMonitoringMapper mapper;
 
     @Override
-    public List<ToVehicleRealTimMonitoring> selectToVehicleRealTimMonitoringList(ToVehicleRealTimMonitoring query) {
-        return mapper.selectToVehicleRealTimMonitoringList(query);
+    public ToVehicleRealTimMonitoring getNextRecord(Long lastId) {
+        return mapper.selectNext(lastId);
     }
 }
