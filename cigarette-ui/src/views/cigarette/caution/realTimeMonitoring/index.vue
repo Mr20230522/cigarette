@@ -124,6 +124,7 @@ export default {
   data() {
     return {
       imgd: [],
+      imgd2:[],
       tableData: [],
       imgData: [],
       isChecked: false,
@@ -184,6 +185,7 @@ export default {
           //   this.tableData.shift();
           // }
           this.imgd = newData;
+          this.imgd2 = newData[0];
           // console.log("数据")
           // console.log(this.imgd[0])
           // console.log("变量")
@@ -201,16 +203,16 @@ export default {
     generateImgData() {
       if (this.imgd) {
         this.imgData = [
-          {key: "抓拍时间:", value: this.imgd.captureTime},
-          {key: "车牌号码:", value: this.imgd.plate},
-          {key: "车牌颜色:", value: this.imgd.plateColor},
-          {key: "车牌类型:", value: this.imgd.plateType},
-          {key: "数据类型:", value: this.imgd.dataType},
-          {key: "违章类型:", value: this.imgd.violationType},
-          {key: "方向:", value: this.imgd.direction},
-          {key: "速度(km/h):", value: this.imgd.speed},
-          {key: "通道号:", value: this.imgd.channelId},
-          {key: "车道号:", value: this.imgd.laneNo}
+          {key: "抓拍时间:", value: this.imgd2.captureTime},
+          {key: "车牌号码:", value: this.imgd2.plate},
+          {key: "车牌颜色:", value: this.imgd2.plateColor},
+          {key: "车牌类型:", value: this.imgd2.plateType},
+          {key: "数据类型:", value: this.imgd2.dataType},
+          {key: "违章类型:", value: this.imgd2.violationType},
+          {key: "方向:", value: this.imgd2.direction},
+          {key: "速度(km/h):", value: this.imgd2.speed},
+          {key: "通道号:", value: this.imgd2.channelId},
+          {key: "车道号:", value: this.imgd2.laneNo}
         ];
       }
     },
