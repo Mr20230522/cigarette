@@ -8,16 +8,17 @@
   <el-container style="height: 690px; border: 1px solid #eee">
     <el-aside width="360px" style="background-color: rgb(238, 241, 246); overflow-y: auto;">
       <!-- 固定部分：图片区域 -->
+      <!--      <el-divider></el-divider>-->
       <div class="image-container" style="padding: 0">
 
         <!-- 头像图片 -->
-        <img :src="'/'+this.imgd[0].picUrl" style="max-width: 100%;">
+        <img :src="'/'+this.imgd[0].picUrl" style="max-width: 100%;height: 210px">
         <!-- 分割线 -->
-        <!--        <el-divider style="padding: 0;"></el-divider>-->
+
       </div>
 
       <!-- 可滚动部分：菜单和表格 -->
-      <div class="scrollable-content">
+      <div class="scrollable-content" style="padding: 0">
         <!-- 原始菜单内容保持不变 -->
         <el-menu>
 
@@ -36,7 +37,7 @@
       </div>
     </el-aside>
     <el-container>
-      <el-main>
+      <el-main style="padding: 0">
         <div v-if="selectedRows.length > 0" class="batch-actions">
           <span>已选 {{ selectedRows.length }} 条</span>
           <el-button @click="handleExport" size="mini">导出</el-button>
@@ -44,10 +45,10 @@
           <el-button @click="toggleSelectAll" size="mini">取消选择</el-button>
           <el-button @click="clearSelection" size="mini" type="danger">取消选择</el-button>
         </div>
-        <el-table :data="tableData">
+        <el-table :data="tableData" height="663">
           <div class="table-container" ref="tableContainer" :class="{ 'animate-scroll': animate }">
 
-            <el-table-column label="选择" width="60">
+            <el-table-column label="选择" width="50" fixed>
               <template slot-scope="{row}">
                 <el-checkbox v-model="row.isChecked"></el-checkbox>
               </template>
@@ -106,6 +107,7 @@
 }
 
 .table-container {
+  overflow-y: scroll;
   transition: transform 0.5s ease-in-out;
 }
 
@@ -113,6 +115,14 @@
   transform: translateY(-40px);
 }
 
+@keyframes scrollUp {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-40px);
+  }
+}
 </style>
 
 <script>
@@ -124,7 +134,7 @@ export default {
   data() {
     return {
       imgd: [],
-      imgd2:[],
+      imgd2: [],
       tableData: [],
       imgData: [],
       isChecked: false,
