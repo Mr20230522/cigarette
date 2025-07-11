@@ -45,7 +45,7 @@
           <el-button @click="toggleSelectAll" size="mini">取消选择</el-button>
           <el-button @click="clearSelection" size="mini" type="danger">取消选择</el-button>
         </div>
-        <el-table :data="tableData" height="663">
+        <el-table :data="tableData" ref="dataTable" height="663">
           <div class="table-container" ref="tableContainer" :class="{ 'animate-scroll': animate }">
 
             <el-table-column label="选择" width="50" fixed>
@@ -93,6 +93,10 @@
   color: #333;
 }
 
+.el-table__body-wrapper {
+  overflow-y: auto !important;
+}
+
 .batch-actions {
   background-color: #f5f7fa;
   border-radius: 4px;
@@ -106,23 +110,6 @@
   color: #666;
 }
 
-.table-container {
-  overflow-y: scroll;
-  transition: transform 0.5s ease-in-out;
-}
-
-.table-container.animate-scroll {
-  transform: translateY(-40px);
-}
-
-@keyframes scrollUp {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(-40px);
-  }
-}
 </style>
 
 <script>
@@ -268,9 +255,9 @@ export default {
 
       // 自动滚动到底部
       this.$nextTick(() => {
-        const container = this.$refs.tableContainer;
-        if (container) {
-          container.scrollTop = container.scrollHeight;
+        const tableBody = this.$refs.dataTable.$el.querySelector('.el-table__body-wrapper');
+        if (tableBody) {
+          tableBody.scrollTop = tableBody.scrollHeight;
         }
       });
     }
