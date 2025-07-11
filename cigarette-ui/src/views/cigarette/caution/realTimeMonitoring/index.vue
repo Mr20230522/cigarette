@@ -11,7 +11,7 @@
       <div class="image-container" style="padding: 0">
 
         <!-- 头像图片 -->
-        <img :src="'./'+this.tableData.picUrl" style="max-width: 100%;">
+        <img :src="'/'+this.imgd[0].picUrl" style="max-width: 100%;">
         <!-- 分割线 -->
         <!--        <el-divider style="padding: 0;"></el-divider>-->
       </div>
@@ -162,7 +162,7 @@ export default {
         method: 'get'
       }).then(res => {
         this.tableData = Array.isArray(res.data) ? res.data : [res.data];
-        this.imgd = res.data[0];
+        this.imgd = Array.isArray(res.data) ? res.data : [res.data];
         // 动态生成 imgData
         //console.log(this.tableData)
         // console.log(JSON.parse(JSON.stringify(res.data)))
@@ -183,8 +183,13 @@ export default {
           // if (this.tableData.length > this.maxDataCount) {
           //   this.tableData.shift();
           // }
-          this.imgd = newData[0];
-          console.log(this.imgd)
+          this.imgd = newData;
+          // console.log("数据")
+          // console.log(this.imgd[0])
+          // console.log("变量")
+          // console.log(this.imgd[0].picUrl)
+          //alert(this.imgd[0].picUrl)
+          //console.log(this.imgd)
           this.generateImgData();
         }
       }).catch(err => {
@@ -232,7 +237,7 @@ export default {
   },
   mounted() {
     this.fetchData(); // 初始加载一次
-    this.timer = setInterval(this.fetchNewData, 100); // 每5秒请求一次
+    this.timer = setInterval(this.fetchNewData, 3000); // 每5秒请求一次
   },
   beforeUnmount() {
     if (this.timer) {
