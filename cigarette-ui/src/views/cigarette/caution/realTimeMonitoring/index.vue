@@ -114,7 +114,7 @@
 
 <script>
 import request from "@/utils/request";
-
+import * as XLSX from 'xlsx'
 let i = 1290;
 export default {
 
@@ -215,8 +215,34 @@ export default {
     },
     // 导出方法
     handleExport() {
-      console.log('导出的数据为：', this.selectedRows);
-      alert(`共导出 ${this.selectedRows.length} 条记录`);
+      // console.log('导出的数据为：', this.selectedRows);
+      // alert(`共导出 ${this.selectedRows.length} 条记录`);
+      if (!this.selectedRows || this.selectedRows.length === 0) {
+        this.$message.warning('请先选择要导出的数据');
+        return;
+      }
+
+      const exportData = this.selectedRows.map(row => ({
+        抓拍时间: row.captureTime,
+        车牌号码: row.plateNumber,
+        车牌颜色: row.plateColor,
+        车牌类型: row.plateType,
+        数据类型: row.dataType,
+        违章类型: row.violationType,
+        方向: row.direction,
+        速度: row.speed,
+        通道号: row.channelId,
+        车道号: row.laneNo
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, '监控数据');
+
+      const fileName = `车辆监控数据_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+
+      this.$message.success(`成功导出 ${this.selectedRows.length} 条记录`);
     },
 
     // 删除方法
