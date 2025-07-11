@@ -61,7 +61,7 @@
           <el-table-column type="selection" width="55" align="center" />
           <el-table-column label="视频ID" align="center" prop="videoId" />
           <el-table-column label="行为ID" align="center" prop="actionId" />
-          <el-table-column label="视频url" align="center" prop="videoPath" min-width="180px">
+          <el-table-column label="视频" align="center" prop="videoPath" min-width="180px">
             <template slot-scope="scope">
               <video v-if="scope.row.videoPath" width="180px" height="140px" controls>
                 <source :src="scope.row.videoPath" type="video/mp4">
@@ -78,7 +78,7 @@
               {{ scope.row.videoSize }}MB
             </template>
           </el-table-column>
-          <el-table-column label="监测区域" align="center" prop="detectionId">
+          <el-table-column label="监测区域" align="center" prop="detectionId" :show-overflow-tooltip="true">
             <template slot-scope="scope">
               {{ getDetectionName(scope.row.detectionId) }}
             </template>
@@ -88,8 +88,8 @@
               <dict-tag :options="dict.type.tob_illegal_status" :value="scope.row.status" />
             </template>
           </el-table-column>
-          <el-table-column label="备注" align="center" prop="remark" />
-          <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="150px">
+          <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true"/>
+          <el-table-column fixed="right" label="操作" align="center" class-name="small-padding fixed-width" min-width="150px">
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                 v-hasPermi="['multimediaResource:video:edit']">修改</el-button>
@@ -371,9 +371,17 @@ export default {
 
         listVideo(this.queryParams).then(response => {
           this.videoList = response.rows;
+          // 遍历修改每一项
+          this.videoList.forEach(item => {
+            item.videoPath = 'http://127.0.0.1:8000/' + item.videoPath.replace('/profile',''); // 直接修改
+            // 或者 item.videoPath = this.processPath(item.videoPath);
+          });
           this.total = response.total;
           this.loading = false;
+          console.log("videoList:", this.videoList);
         });
+
+
 
         this.buildTreeData();
         this.loading = false;

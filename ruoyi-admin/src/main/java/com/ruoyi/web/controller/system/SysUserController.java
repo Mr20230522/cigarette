@@ -3,20 +3,14 @@ package com.ruoyi.web.controller.system;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.Pattern;
 
 import com.ruoyi.system.service.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
@@ -229,10 +223,17 @@ public class SysUserController extends BaseController {
     /**
      * 手机号是否存在
      */
-    @GetMapping("/phone")
-    public AjaxResult getPhone(String phone) {
-        Long user = userService.selectUserIdByPhoneNumber(phone);
-        return AjaxResult.success(user != null);
+    @GetMapping("/checkPhoneExist")
+    public AjaxResult checkPhoneExist(
+            @RequestParam
+            @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式错误")
+            String phone) {
+
+        Boolean exists = userService.checkPhoneExist(phone);
+        return AjaxResult.success(exists);
     }
+    /**
+     * 通过手机查找用户信息
+     */
 
 }

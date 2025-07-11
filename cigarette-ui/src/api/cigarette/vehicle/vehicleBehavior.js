@@ -51,4 +51,19 @@ export function delVehicleBehavior(behaviorId) {
   })
 }
 
+export function getVehicleTypeData(query){
+  return request({
+    url:'/cigarette/vehicle/vehicleBehavior/getVehicleTypeData',
+    method:'get',
+    params:query
+  })
+}
+
+export function getVehicleColorData(query){
+  return request({
+    url:'/cigarette/vehicle/vehicleBehavior/getVehicleColorData',
+    method:'get',
+    params:query
+  })
+}
 

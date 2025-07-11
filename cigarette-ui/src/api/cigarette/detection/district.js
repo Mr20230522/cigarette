@@ -44,9 +44,20 @@ export function delDistrict(districtId) {
 }
 
 //查询地区下拉树结构
-export function districtTreeSelect() { 
-  return request({ 
-    url: '/cigarette/detection/district/districtTree', 
-    method: 'get' 
-  }) 
+export function districtTreeSelect() {
+  return request({
+    url: '/cigarette/detection/district/districtTree',
+    method: 'get'
+  })
+}
+
+
+// 这里有个bug，要是名字一样我就没有办法获得唯一的districtId了，先实现
+export function getDistrictId(districtName) {
+  console.log('@#@#@#@#@#@#@#@#@#@#@#@#@#@#')
+  return request({
+    url: '/cigarette/detection/district/getDistrictId',
+    method: 'get',
+    params:{districtName}
+  })
 }

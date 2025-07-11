@@ -206,11 +206,17 @@ public interface ISysUserService
 
 
     /**
-     * 通过手机号判断用户是否存在并返回用户id
+     * 通过手机号判断用户是否存在
      * @param phone 手机号
-     * @return 用户id
      */
-    public Long selectUserIdByPhoneNumber(String phone);
+    public Boolean checkPhoneExist(String phone);
+
+
+    // 根据手机号查询用户
+    public SysUser selectUserByPhone(String phoneNumber);
+
+
+    public SysUser selectUserByLoginName(String userName);
 }
 
 

@@ -17,7 +17,7 @@
       <el-col :span="20" :xs="24">
         <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch"
           label-width="68px">
-          <el-form-item label="监测点id" prop="detectionId">
+          <el-form-item label="监测点id" prop="detectionId" >
             <el-input v-model="queryParams.detectionId" placeholder="请输入监测点id" clearable
               @keyup.enter.native="handleQuery" />
           </el-form-item>
@@ -60,7 +60,7 @@
         <el-table v-loading="loading" :data="cautionList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="55" align="center" />
           <el-table-column label="警示记录id" align="center" prop="cautionId" />
-          <el-table-column label="检测点" align="center" prop="detectionId">
+          <el-table-column label="检测点" align="center" prop="detectionId" :show-overflow-tooltip="true">
             <template slot-scope="scope">
               {{ getDetectionName(scope.row.detectionId) }}
             </template>
@@ -72,8 +72,8 @@
               <dict-tag :options="dict.type.tob_caution_status" :value="scope.row.status" />
             </template>
           </el-table-column>
-          <el-table-column label="备注" align="center" prop="remark" />
-          <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+          <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true" />
+          <el-table-column fixed="right" label="操作" align="center" class-name="small-padding fixed-width" >
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                 v-hasPermi="['caution:cautionLog:edit']">修改</el-button>
@@ -90,7 +90,7 @@
     <!-- 添加或修改预警记录对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="检测点" prop="detectionId">
+        <el-form-item label="检测点" prop="detectionId" >
                     <el-select v-model="form.detectionId" placeholder="请选择所管理的监测点" filterable
                         @change="handleDetectionChange">
                         <el-option v-for="item in detectionOptions" :key="item.detectionId"
@@ -217,7 +217,7 @@ export default {
         console.error("Failed to load detection options:", error);
       });
     },
-    
+
         // 当检测点变更时触发，自动填充地区ID
         handleDetectionChange(newValue) {
       // 通过检测点ID找到对应的地区ID

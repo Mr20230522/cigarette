@@ -24,7 +24,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      
+
       <el-form-item label="摄像头ID" prop="cameraId">
         <el-select v-model="queryParams.cameraId" placeholder="请选择摄像头编号" clearable>
           <!-- <el-option v-for="camersId in camersIds" :key="camersId.Id" :label="camersId.label" :value="camersId.Id" /> -->
@@ -104,20 +104,20 @@
       <el-table-column label="视频名称" align="center" prop="videoName" />
       <el-table-column label="摄像头id" align="center" prop="cameraId" />
       <el-table-column label="视频大小" align="center" prop="videoSize" />
-      <el-table-column label="监测区域id" align="center" prop="detectionId" >
+      <el-table-column label="监测区域id" align="center" prop="detectionId" :show-overflow-tooltip="true">
         <template slot-scope="scope">
               {{ getDetectionName(scope.row.detectionId) }}
             </template>
           </el-table-column>
 =
-      <el-table-column label="备注" align="center" prop="remark" />
+      <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true"/>
       <el-table-column label="状态" align="center" prop="status" >
         <template slot-scope="scope">
               <dict-tag :options="dict.type.tob_illegal_status" :value="scope.row.status" />
-            </template> 
+            </template>
       </el-table-column>
-      
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="150px">
+
+      <el-table-column fixed="right" label="操作" align="center" class-name="small-padding fixed-width" min-width="150px">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -136,7 +136,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -182,7 +182,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-       
+
         <el-form-item label="搜索设备">
           <el-input v-model="searchInput" @input="filterCameras" placeholder="请输入用户名称、邮箱或电话号码" clearable
             suffix-icon="el-icon-search"></el-input>
@@ -311,7 +311,7 @@ export default {
   },
   created() {
     this.getList();
-    
+
     this.loadDetectionOptions(); // 加载检测点选项
     this.loadDistrictOptions(); // 加载地区选项
     this.getCameraList();
@@ -376,7 +376,7 @@ export default {
         this.videoList = response.rows;
         this.total = response.total;
         this.loading = false;
-      
+
       });
 
         this.buildTreeData();
@@ -578,7 +578,7 @@ export default {
           camera.cameraDetectionId.toString().includes(searchInput) ||
           camera.cameraIp.toString().includes(searchInput) ||
           camera.cameraId.toString().includes(searchInput)
-          
+
         );
       }).slice(0, 10);
     },
@@ -619,7 +619,7 @@ export default {
       }
       console.log("beforeUploadVideo");
       console.log("视频符合要求");
-      
+
       this.videoFlag = false;
     },
     uploadVideoProcess(event, file, fileList) {

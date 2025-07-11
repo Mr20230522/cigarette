@@ -92,4 +92,7 @@ public interface ITobDistrictService
      */
     public List<TobDistrict> buildTobDistrictTree(List<TobDistrict> districts);
 
+
+    public Long getDistrictId(String districtName );
+
 }

@@ -1,9 +1,15 @@
 package com.ruoyi.system.service.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.system.domain.TobPerson;
 import com.ruoyi.system.domain.TobVehicle;
+import com.ruoyi.system.domain.undefine.VehicleBehaviorColor;
+import com.ruoyi.system.domain.undefine.VehicleType;
 import com.ruoyi.system.domain.vo.TobVehicleBehaviorVo;
 import com.ruoyi.system.mapper.TobPersonMapper;
 import com.ruoyi.system.mapper.TobVehicleMapper;
@@ -64,6 +70,51 @@ public class TobVehicleBehaviorServiceImpl implements ITobVehicleBehaviorService
 
         return tobVehicleBehaviorMapper.selectTobVehicleBehaviorVoList(tobVehicleBehaviorVo);
     }
+
+    /**
+     * 查询车辆类型列表
+     *
+     * @param tobVehicleBehaviorVo 查询条件对象，用于构建SQL查询语句的条件
+     * @return 返回一个List集合，包含查询到的车辆类型统计分析数据
+     */
+    @Override
+    public List<VehicleType> getVehicleTypeData(TobVehicleBehaviorVo tobVehicleBehaviorVo) {
+
+        List<TobVehicleBehaviorVo> lists=tobVehicleBehaviorMapper.selectTobVehicleBehaviorVoList(tobVehicleBehaviorVo);
+        Map<String, Integer> carTypeCountMap = new HashMap<>();
+        List<VehicleType> vt=new ArrayList<>();
+        for(TobVehicleBehaviorVo vo:lists){
+            String carTypeId = vo.getCarTypeId().toString();
+            carTypeCountMap.put(carTypeId, carTypeCountMap.getOrDefault(carTypeId, 0) + 1);
+        }
+        for (Map.Entry<String, Integer> entry : carTypeCountMap.entrySet()) {
+            System.out.println(entry.getKey()+"+"+entry.getValue());
+            vt.add(new VehicleType( entry.getValue(),entry.getKey()));
+        }
+        return vt;
+    }
+
+    /**
+     * 查询车辆颜色数据
+     *
+     * @param voTobVehicleBehavior 车辆行为记录
+     * @return 车辆行为记录集合
+     */
+    public VehicleBehaviorColor getVehicleColorData(TobVehicleBehaviorVo tobVehicleBehaviorVo ){
+        List<TobVehicleBehaviorVo> lists=tobVehicleBehaviorMapper.selectTobVehicleBehaviorVoList(tobVehicleBehaviorVo);
+        Map<String, Integer> carColorCountMap = new HashMap<>();
+        for(TobVehicleBehaviorVo vo:lists){
+            carColorCountMap.put(vo.getCarColor(), carColorCountMap.getOrDefault(vo.getCarColor(), 0) + 1);
+        }
+
+        return new VehicleBehaviorColor(new ArrayList<>(carColorCountMap.keySet()),new ArrayList<>(carColorCountMap.values()));
+    }
+
+
+
+
+
+
 
     /**
      * 新增车辆行为记录

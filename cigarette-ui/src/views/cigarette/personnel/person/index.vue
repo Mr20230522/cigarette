@@ -82,8 +82,13 @@
 <!--          </el-button>-->
 <!--        </template>-->
 <!--      </el-table-column>-->
-      <el-table-column label="电话号码" align="center" prop="phone" min-width="120px" />
-      <el-table-column label="驾驶证号码" align="center" prop="suspectLicenseNumber" min-width="170px" />
+      <el-table-column label="车员图片" align="center" prop="picture" width="100">
+        <template slot-scope="scope">
+          <image-preview :src="scope.row.picture" :width="50" :height="50" />
+        </template>
+      </el-table-column>
+      <el-table-column label="电话号码" align="center" prop="phone" min-width="120px" :show-overflow-tooltip="true"/>
+      <el-table-column label="驾驶证号码" align="center" prop="suspectLicenseNumber" min-width="170px" :show-overflow-tooltip="true"/>
       <el-table-column label="姓名" align="center" prop="name" min-width="120px" />
       <el-table-column label="年龄" align="center" prop="age" />
       <el-table-column label="性别" align="center" prop="gender">
@@ -92,7 +97,7 @@
         </template>
       </el-table-column>
       <el-table-column label="地址" align="center" prop="address" min-width="140px" />
-      <el-table-column label="出现次数" align="center" prop="occurrenceNumber" />
+<!--      <el-table-column label="出现次数" align="center" prop="occurrenceNumber" />-->
       <el-table-column label="违法状态" align="center" prop="illegalStatus">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.tob_illegal_status" :value="scope.row.illegalStatus" />
@@ -103,14 +108,9 @@
           <dict-tag :options="dict.type.sys_show_hide" :value="scope.row.status" />
         </template>
       </el-table-column>
-      <el-table-column label="备注" align="center" prop="remark" />
+      <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true"/>
       <el-table-column label="涉案数" align="center" prop="casesInvolved" />
-      <el-table-column label="车员图片" align="center" prop="picture" width="100">
-        <template slot-scope="scope">
-          <image-preview :src="scope.row.picture" :width="50" :height="50" />
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="120px">
+      <el-table-column fixed="right" label="操作" align="center" class-name="small-padding fixed-width" min-width="120px">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
             v-hasPermi="['personnel:person:edit']">修改</el-button>
@@ -288,16 +288,16 @@ export default {
       form: {},
       // 表单校验
       rules: {
-        identityCard: [{
-          required: true,
-          message: "身份证ID不能为空",
-          trigger: "blur"
-        }],
-        name: [{
-          required: true,
-          message: "姓名不能为空",
-          trigger: "blur"
-        }],
+        // identityCard: [{
+        //   required: true,
+        //   message: "身份证ID不能为空",
+        //   trigger: "blur"
+        // }],
+        // name: [{
+        //   required: true,
+        //   message: "姓名不能为空",
+        //   trigger: "blur"
+        // }],
         status: [{
           required: true,
           message: "状态不能为空",
@@ -308,16 +308,16 @@ export default {
           message: "删除标记不能为空",
           trigger: "blur"
         }],
-        createTime: [{
-          required: true,
-          message: "创建时间不能为空",
-          trigger: "blur"
-        }],
-        updateTime: [{
-          required: true,
-          message: "更新时间不能为空",
-          trigger: "blur"
-        }],
+        // createTime: [{
+        //   required: true,
+        //   message: "创建时间不能为空",
+        //   trigger: "blur"
+        // }],
+        // updateTime: [{
+        //   required: true,
+        //   message: "更新时间不能为空",
+        //   trigger: "blur"
+        // }],
       }
     };
   },

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobAiChatRecordMapper">
+    <resultMap type="com.ruoyi.system.domain.TobAiChatRecord" id="AiChatRecordResult">
+        <result property="id" column="id"/>
+        <result property="sessionId" column="session_id"/>
+        <result property="userInput" column="user_input"/>
+        <result property="aiResponse" column="ai_response"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+    </resultMap>
+
+    <sql id="selectAiChatRecordVo">
+        select id, session_id, user_input, ai_response, create_time, create_by
+        from tob_ai_chat_records  <!-- ✅ 修正表名 -->
+    </sql>
+
+    <insert id="insertAiChatRecord" parameterType="com.ruoyi.system.domain.TobAiChatRecord">
+        insert into tob_ai_chat_records  <!-- ✅ 修正表名 -->
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sessionId != null">session_id,</if>
+            <if test="userInput != null">user_input,</if>
+            <if test="aiResponse != null">ai_response,</if>
+            <if test="createBy != null">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sessionId != null">#{sessionId},</if>
+            <if test="userInput != null">#{userInput},</if>
+            <if test="aiResponse != null">#{aiResponse},</if>
+            <if test="createBy != null">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <select id="selectAiChatRecordList" parameterType="com.ruoyi.system.domain.TobAiChatRecord" resultMap="AiChatRecordResult">
+        <include refid="selectAiChatRecordVo"/>
+        <where>
+            <if test="sessionId != null and sessionId != ''"> and session_id = #{sessionId}</if>
+            <if test="userInput != null and userInput != ''"> and user_input like concat('%', #{userInput}, '%')</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <!-- 按会话ID查询最近的N条记录 -->
+    <select id="selectRecentBySessionId" resultMap="AiChatRecordResult">
+        SELECT * FROM tob_ai_chat_records  <!-- ✅ 修正表名 -->
+        WHERE session_id = #{sessionId}
+        ORDER BY create_time DESC
+        LIMIT #{limit}
+    </select>
+</mapper>

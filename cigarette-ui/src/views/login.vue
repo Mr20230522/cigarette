@@ -161,7 +161,7 @@ export default {
             Cookies.remove('rememberMe')
           }
           this.$store.dispatch('Login', this.loginForm).then(() => {
-            this.$router.push({path:  '/cigaretteIndex'}).then(()=>{
+            this.$router.push({path:  '/Index'}).then(()=>{
               this.$store.dispatch('GetUserInfoList')
             }).catch(() => {
             })

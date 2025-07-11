@@ -19,7 +19,7 @@
              WHERE behavior_id = #{behaviorId} LIMIT 1) AS vehicle_image,
 
             (SELECT video_path FROM tob_key_video
-            WHERE action_id = #{behaviorId} LIMIT 1) AS behavior_video
+            WHERE behavior_id = #{behaviorId} LIMIT 1) AS behavior_video
         FROM dual
     </select>
 </mapper>

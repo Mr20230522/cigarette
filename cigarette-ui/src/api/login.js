@@ -19,6 +19,20 @@ export function login(username, password, code, uuid) {
   })
 }
 
+// 手机号登录（修正：统一参数结构）
+export function loginByPhone(phone, code) {
+  return request({
+    url: '/loginByPhone',  // 保持与后端一致（原为/auth/loginByPhone）
+    headers: {
+      isToken: false
+    },
+    method: 'post',
+    data: {
+      phone: phone,
+    }
+  });
+}
+
 // 注册方法
 export function register(data) {
   return request({

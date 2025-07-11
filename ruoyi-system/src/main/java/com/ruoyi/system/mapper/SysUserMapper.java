@@ -131,5 +131,10 @@ public interface SysUserMapper
      * @param phone 手机号
      * @return 用户id
      */
-    public Long selectUserIdByPhoneNumber(String phone);
+    public Boolean checkPhoneExist(String phone);
+
+
+    public SysUser selectUserByPhone(String phoneNumber);
+
+    public SysUser selectUserByLoginName(String userName);
 }

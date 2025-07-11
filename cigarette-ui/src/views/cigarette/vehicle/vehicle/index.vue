@@ -54,6 +54,11 @@
     <el-table v-loading="loading" :data="vehicleList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="车辆编号" align="center" prop="carId" />
+      <el-table-column label="车辆图片" align="center" prop="picture" width="100">
+        <template slot-scope="scope">
+          <image-preview :src="scope.row.picture" :width="50" :height="50"/>
+        </template>
+      </el-table-column>
       <el-table-column label="车牌编号" align="center" prop="licensePlate" min-width="120px" />
       <el-table-column label="车牌类型" align="center" prop="licensePlateType" min-width="160px">
         <template slot-scope="scope">
@@ -85,13 +90,8 @@
           <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.status" />
         </template>
       </el-table-column>
-      <el-table-column label="备注" align="center" prop="remark" />
-      <el-table-column label="车辆图片" align="center" prop="picture" width="100">
-        <template slot-scope="scope">
-          <image-preview :src="scope.row.picture" :width="50" :height="50"/>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="120px">
+      <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true"/>
+      <el-table-column label="操作" fixed="right" align="center" class-name="small-padding fixed-width" min-width="120px">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
             v-hasPermi="['vehicle:vehicle:edit']">修改</el-button>
@@ -292,11 +292,11 @@
             message: "车身颜色不能为空",
             trigger: "blur"
           }],
-          carOwnerId: [{
-            required: true,
-            message: "车主id不能为空",
-            trigger: "blur"
-          }],
+          // carOwnerId: [{
+          //   required: true,
+          //   message: "车主id不能为空",
+          //   trigger: "blur"
+          // }],
           status: [{
             required: true,
             message: "状态不能为空",
@@ -316,6 +316,7 @@
           this.vehicleList = response.rows;
           this.total = response.total;
           this.loading = false;
+          console.log(this.vehicleList)
         });
       },
       // 取消按钮
@@ -458,7 +459,7 @@
         this.$set(this.form, "phone", user.phonenumber);
       },
       vehicleUser(){
-        this.open = false; 
+        this.open = false;
         this.$router.push({ path: "/cigarette/vehicle/person"});
       }
     }

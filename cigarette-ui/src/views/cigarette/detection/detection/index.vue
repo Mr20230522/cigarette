@@ -63,11 +63,11 @@
 
         <el-table v-loading="loading" :data="detectionList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="55" align="center" />
-          <el-table-column label="监测区域id" align="center" prop="detectionId" />
-          <el-table-column label="监测点顺序" align="center" prop="orderNum" />
-          <el-table-column label="监测点名称" align="center" prop="detectionName" />
+          <el-table-column label="监测区域id" align="center" prop="detectionId" width="100"/>
+          <el-table-column label="监测点顺序" align="center" prop="orderNum" width="100"/>
+          <el-table-column label="监测点名称" align="center" prop="detectionName" width="100" :show-overflow-tooltip="true"/>
           <!-- 监测点所属地区 -->
-          <el-table-column label="监测点所属地区" align="center" prop="districtId">
+          <el-table-column label="监测点所属地区" align="center" prop="districtId" width="120">
             <template slot-scope="scope">
               <!-- 使用一个方法来通过districtId找到对应的districtName -->
               {{ getDistrictName(scope.row.districtId) }}
@@ -85,7 +85,7 @@
           </el-table-column>
 
           <el-table-column label="经度" align="center" prop="longitude" min-width="120" >
-            <template slot-scope="scope"> 
+            <template slot-scope="scope">
               <el-button size="mini" type="text" @click="longitudeAndLatitude(scope.row)">{{ scope.row.longitude }}</el-button>
             </template>
           </el-table-column>
@@ -94,8 +94,8 @@
               <el-button size="mini" type="text" @click="longitudeAndLatitude(scope.row)">{{ scope.row.latitude }}</el-button>
             </template>
           </el-table-column>
-          <el-table-column label="备注" align="center" prop="remark" max-width="200" />
-          <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="120">
+          <el-table-column label="备注" align="center" prop="remark" max-width="200" :show-overflow-tooltip="true"/>
+          <el-table-column fixed="right" label="操作" align="center" class-name="small-padding fixed-width" min-width="130">
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                 v-hasPermi="['cigarette:detection:edit']">修改</el-button>
@@ -490,12 +490,12 @@ export default {
     //获取经纬度
     getLocation() {
       if (navigator.geolocation) {
-        
+
         navigator.geolocation.getCurrentPosition(
           position => {
             this.form.longitude = position.coords.longitude;
             this.form.latitude = position.coords.latitude;
-            
+
           },
           error => {
             console.error('Error getting location:', error);

@@ -2,6 +2,11 @@ package com.ruoyi.web.controller.system;
 
 import java.util.List;
 import java.util.Set;
+
+import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.framework.manager.AsyncManager;
+import com.ruoyi.framework.manager.factory.AsyncFactory;
+import com.ruoyi.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +21,7 @@ import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.framework.web.service.SysLoginService;
 import com.ruoyi.framework.web.service.SysPermissionService;
 import com.ruoyi.system.service.ISysMenuService;
+import com.ruoyi.framework.web.service.TokenService;
 
 /**
  * 登录验证
@@ -33,6 +39,10 @@ public class SysLoginController
 
     @Autowired
     private SysPermissionService permissionService;
+    @Autowired
+    private ISysUserService userService;
+    @Autowired
+    TokenService tokenService;
 
     /**
      * 登录方法
@@ -50,6 +60,17 @@ public class SysLoginController
         ajax.put(Constants.TOKEN, token);
         return ajax;
     }
+
+    @PostMapping("/loginByPhone")
+    public AjaxResult loginByPhone(@RequestBody LoginBody loginBody) {
+        // 1. 通过手机号查询用户
+        SysUser user = userService.selectUserByPhone(loginBody.getPhone());
+
+        // 2. 强制走原生登录流程（关键改动）
+        String token = loginService.login(user.getUserName(), null, null, null);
+
+        // 3. 返回统一格式的响应
+        return AjaxResult.success().put(Constants.TOKEN, token);    }
 
     /**
      * 获取用户信息

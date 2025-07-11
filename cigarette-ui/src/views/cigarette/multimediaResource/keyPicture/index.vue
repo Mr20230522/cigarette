@@ -18,7 +18,7 @@
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="图片名称" prop="imageName">
         <el-input v-model="queryParams.imageName" placeholder="请输入图片名称" clearable @keyup.enter.native="handleQuery" />
-      </el-form-item> 
+      </el-form-item>
       <el-form-item label="摄像头ID" prop="cameraId">
         <el-select v-model="queryParams.cameraId" placeholder="请选择摄像头编号" clearable>
           <el-option v-for="camersId in cameraIdList" :key="camersId.cameraId" :label="camersId.cameraId" :value="camersId.cameraId" />
@@ -64,22 +64,22 @@
           <image-preview :src="scope.row.image" :width="50" :height="50" />
         </template>
       </el-table-column>
-      <el-table-column label="图片名称" align="center" prop="imageName" />
+      <el-table-column label="图片名称" align="center" prop="imageName" :show-overflow-tooltip="true"/>
       <el-table-column label="摄像头id" align="center" prop="cameraId" />
       <el-table-column label="坐标" align="center" prop="coordinate" />
 
-      <el-table-column label="违法状态" align="center" prop="status" > 
+      <el-table-column label="违法状态" align="center" prop="status" >
             <template slot-scope="scope">
               <dict-tag :options="dict.type.tob_illegal_status" :value="scope.row.status" />
-            </template> 
+            </template>
       </el-table-column>
-      <el-table-column label="监测点" align="center" prop="detectionId">
+      <el-table-column label="监测点" align="center" prop="detectionId" :show-overflow-tooltip="true">
             <template slot-scope="scope">
               {{ getDetectionName(scope.row.detectionId) }}
             </template>
           </el-table-column>
-          <el-table-column label="备注" align="center" prop="remark" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="150px">
+          <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true"/>
+      <el-table-column label="操作"fixed="right" align="center" class-name="small-padding fixed-width" min-width="150px">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
             v-hasPermi="['cigarette:picture:edit']">修改</el-button>
@@ -110,15 +110,15 @@
           <el-form-item label="坐标" prop="coordinate">
           <el-input v-model="form.coordinate" placeholder="请输入坐标" />
         </el-form-item>
-        
+
         <el-form-item label="违法状态" prop="status">
             <el-select v-model="form.status" placeholder="请选择违法状态" clearable>
               <el-option v-for="dict in dict.type.tob_illegal_status" :key="dict.value" :label="dict.label"
                 :value="dict.value" />
             </el-select>
           </el-form-item>
-            </el-col>        
-        </el-row>    
+            </el-col>
+        </el-row>
         <el-form-item label="搜索设备">
           <el-input v-model="searchInput" @input="filterCameras" placeholder="请输入用户名称、邮箱或电话号码" clearable
             suffix-icon="el-icon-search"></el-input>
@@ -134,7 +134,7 @@
               </el-row>
             </el-card>
           </el-scrollbar>
-        </el-form-item> 
+        </el-form-item>
         <el-row>
           <el-col :span="12">
             <el-form-item label="设备IP" prop="cameraIp">
@@ -242,7 +242,7 @@ export default {
   },
   created() {
     this.getList();
-    
+
     this.loadDetectionOptions(); // 加载检测点选项
     this.loadDistrictOptions(); // 加载地区选项
     this.getCameraList();
@@ -508,7 +508,7 @@ export default {
           camera.cameraDetectionId.toString().includes(searchInput) ||
           camera.cameraIp.toString().includes(searchInput) ||
           camera.cameraId.toString().includes(searchInput)
-          
+
         );
       }).slice(0, 10);
     },

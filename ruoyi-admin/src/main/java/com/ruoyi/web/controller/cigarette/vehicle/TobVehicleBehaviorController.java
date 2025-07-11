@@ -3,6 +3,8 @@ package com.ruoyi.web.controller.cigarette.vehicle;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ruoyi.system.domain.undefine.VehicleBehaviorColor;
+import com.ruoyi.system.domain.undefine.VehicleType;
 import com.ruoyi.system.domain.vo.TobVehicleBehaviorVo;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +74,7 @@ public class TobVehicleBehaviorController extends BaseController
         List<TobVehicleBehaviorVo> list = tobVehicleBehaviorService.selectTobVehicleBehaviorVoList(tobVehicleBehaviorVo);
         return getDataTable(list);
     }
+
     /**
      * 获取车辆行为记录详细信息
      */
@@ -113,5 +116,25 @@ public class TobVehicleBehaviorController extends BaseController
     public AjaxResult remove(@PathVariable Long[] behaviorIds)
     {
         return toAjax(tobVehicleBehaviorService.deleteTobVehicleBehaviorByBehaviorIds(behaviorIds));
+    }
+
+    /**
+     * 获取车辆类型统计和类型
+     */
+    @GetMapping("/getVehicleTypeData")
+    public List<VehicleType> getVehicleTypeData(TobVehicleBehaviorVo tobVehicleBehaviorVo)
+    {
+        return tobVehicleBehaviorService.getVehicleTypeData(tobVehicleBehaviorVo);
+    }
+
+
+    /**
+     * 获取车辆颜色统计和类型
+     */
+    @GetMapping("/getVehicleColorData")
+    public VehicleBehaviorColor getVehicleColorData(TobVehicleBehaviorVo tobVehicleBehaviorVo)
+    {
+        System.out.println("controller");
+        return tobVehicleBehaviorService.getVehicleColorData(tobVehicleBehaviorVo);
     }
 }

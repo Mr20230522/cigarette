@@ -79,6 +79,7 @@
 import Cookies from 'js-cookie'
 import { encrypt, decrypt } from '@/utils/jsencrypt'
 import { sendSmsCode,verifySmsCode} from '@/api/cigarette/sms/sms.js'
+import {checkPhoneExist} from '@/api/system/user'
 export default {
 
   name: 'LoginPhone',
@@ -104,7 +105,7 @@ export default {
         ],
         smsCode: [
           { required: true, trigger: 'blur', message: '请输入验证码' },
-          { pattern: /^\d{6}$/, message: '验证码为6位数字', trigger: 'blur' }
+          { pattern: /^\d{4}$/, message: '验证码为6位数字', trigger: 'blur' }
         ]
       },
       loading: false,
@@ -134,49 +135,76 @@ export default {
     sendCode() {
       this.$refs.loginForm.validateField('phone', valid => {
         if (!valid) {
-          this.codeSendDisabled = true
-          const timer = setInterval(() => {
-            if (this.countdown <= 0) {
-              clearInterval(timer)
-              this.codeSendText = '重新获取'
-              this.codeSendDisabled = false
-              this.countdown = 60
+          // 先检查手机号是否已注册
+          checkPhoneExist(this.loginForm.phone).then(response => {
+            if (response.data) {
+              // 手机号存在，开始发送验证码
+              this.startCountdown();
+              sendSmsCode(this.loginForm.phone).then(() => {
+                this.$message.success('验证码已发送');
+              }).catch(() => {
+                this.resetCountdown();
+              });
             } else {
-              this.codeSendText = `${this.countdown}秒后重试`
-              this.countdown--
+              this.$message.error('该手机号未注册');
+              this.codeSendDisabled = false;
             }
-          }, 1000)
-
-          // 这里调用发送验证码接口
-          // sendSmsCode(this.loginForm.phone).then(...)
+          }).catch(error => {
+            this.$message.error('验证手机号失败');
+            this.codeSendDisabled = false;
+          });
         }
-      })
+      });
+    },
+    // 倒计时控制方法
+    startCountdown() {
+      this.codeSendDisabled = true;
+      const timer = setInterval(() => {
+        if (this.countdown <= 0) {
+          clearInterval(timer);
+          this.resetCountdown();
+        } else {
+          this.codeSendText = `${this.countdown}秒后重试`;
+          this.countdown--;
+        }
+      }, 1000);
+    },
+    // 重置倒计时
+    resetCountdown() {
+      this.codeSendText = '获取验证码';
+      this.codeSendDisabled = false;
+      this.countdown = 60;
     },
 
     // 处理登录
+
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.loading = true
-          if (this.loginForm.rememberMe) {
-            Cookies.set('phone', encrypt(this.loginForm.phone), { expires: 30 })
-            Cookies.set('rememberMe', this.loginForm.rememberMe, { expires: 30 })
-          } else {
-            Cookies.remove('phone')
-            Cookies.remove('rememberMe')
-          }
-
-          // 修改为调用短信登录接口
-          this.$store.dispatch('SmsLogin', {
+          this.loading = true;
+          const loginData = {
             phone: this.loginForm.phone,
             code: this.loginForm.smsCode
-          }).then(() => {
-            this.$router.push({ path: '/cigaretteIndex' })
-          }).catch(() => {
-            this.loading = false
-          })
+          };
+
+          verifySmsCode(loginData).then(response => {
+            if (response.success) {
+              this.$message.success('验证成功');
+              return this.$store.dispatch('LoginByPhone', {
+                phone: this.loginForm.phone
+              }).then(() => {
+                this.$router.push({ path: this.redirect || '/' })
+              });
+            } else {
+              this.$message.error(response.data?.message || '验证码错误');
+            }
+          }).catch(error => {
+            this.$message.error(error.response?.data?.message || '登录失败');
+          }).finally(() => {
+            this.loading = false;
+          });
         }
-      })
+      });
     }
   }
 }
