@@ -11,7 +11,7 @@
       <div class="image-container" style="padding: 0">
 
         <!-- 头像图片 -->
-        <img :src="'./'+this.imgd.picUrl" style="max-width: 100%;">
+        <img :src="'./'+this.tableData.picUrl" style="max-width: 100%;">
         <!-- 分割线 -->
         <!--        <el-divider style="padding: 0;"></el-divider>-->
       </div>
@@ -112,6 +112,7 @@
 .table-container.animate-scroll {
   transform: translateY(-40px);
 }
+
 </style>
 
 <script>
@@ -149,6 +150,9 @@ export default {
     // 半选状态（即部分选中）
     isIndeterminate() {
       return this.selectedRows.length > 0 && !this.isAllSelected;
+    },
+    displayedTableData() {
+      return this.tableData.slice(-this.maxDataCount); // 只显示最后 maxDataCount 条
     }
   },
   methods: {
@@ -176,10 +180,9 @@ export default {
         const newData = Array.isArray(res.data) ? res.data : [res.data];
         if (newData.length > 0) {
           this.tableData.push(newData[0]);
-          if (this.tableData.length > this.maxDataCount) {
-            this.tableData.shift();
-          }
-
+          // if (this.tableData.length > this.maxDataCount) {
+          //   this.tableData.shift();
+          // }
           this.imgd = newData[0];
           console.log(this.imgd)
           this.generateImgData();
@@ -229,7 +232,7 @@ export default {
   },
   mounted() {
     this.fetchData(); // 初始加载一次
-    this.timer = setInterval(this.fetchNewData, 2000); // 每0.1秒请求一次
+    this.timer = setInterval(this.fetchNewData, 100); // 每5秒请求一次
   },
   beforeUnmount() {
     if (this.timer) {
