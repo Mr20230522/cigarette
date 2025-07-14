@@ -24,7 +24,8 @@ target/
 *.iws
 *.iml
 *.ipr
-
+.fastRequest
+.github
 ### JRebel ###
 rebel.xml
 
