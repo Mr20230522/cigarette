@@ -23,7 +23,7 @@
           <div class="table-container">
             <!-- 使用 el-table 渲染表格 -->
             <el-table :data="imgData" border style="width: 100%" :show-header="false">
-              <el-table-column prop="key" label="" width="130"></el-table-column>
+              <el-table-column prop="key" label="" width="110"></el-table-column>
               <el-table-column prop="value" label=""></el-table-column>
               <el-table-column prop="degreeofSuspicion" label=""></el-table-column>
             </el-table>
