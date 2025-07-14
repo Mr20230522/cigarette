@@ -1,4 +1,3 @@
-
 <template>
   <el-container style="height: 690px; border: 1px solid #eee">
     <el-aside width="360px" style="background-color: rgb(238, 241, 246); overflow-y: auto;">
@@ -26,6 +25,7 @@
             <el-table :data="imgData" border style="width: 100%" :show-header="false">
               <el-table-column prop="key" label="" width="130"></el-table-column>
               <el-table-column prop="value" label=""></el-table-column>
+              <el-table-column prop="degreeofSuspicion" label=""></el-table-column>
             </el-table>
           </div>
         </el-menu>
@@ -110,6 +110,7 @@
 <script>
 import request from "@/utils/request";
 import * as XLSX from 'xlsx'
+
 let i = 1290;
 export default {
 
@@ -195,16 +196,16 @@ export default {
     generateImgData() {
       if (this.imgd) {
         this.imgData = [
-          {key: "抓拍时间:", value: this.imgd2.captureTime},
-          {key: "车牌号码:", value: this.imgd2.plate},
-          {key: "车牌颜色:", value: this.imgd2.plateColor},
-          {key: "车牌类型:", value: this.imgd2.plateType},
-          {key: "数据类型:", value: this.imgd2.dataType},
-          {key: "违章类型:", value: this.imgd2.violationType},
-          {key: "方向:", value: this.imgd2.direction},
-          {key: "速度(km/h):", value: this.imgd2.speed},
-          {key: "通道号:", value: this.imgd2.channelId},
-          {key: "车道号:", value: this.imgd2.laneNo}
+          {key: "抓拍时间:", value: this.imgd2.captureTime, degreeofSuspicion: 15},
+          {key: "车牌号码:", value: this.imgd2.plate, degreeofSuspicion: 15},
+          {key: "车牌颜色:", value: this.imgd2.plateColor, degreeofSuspicion: 15},
+          {key: "车牌类型:", value: this.imgd2.plateType, degreeofSuspicion: 15},
+          {key: "数据类型:", value: this.imgd2.dataType, degreeofSuspicion: 15},
+          {key: "违章类型:", value: this.imgd2.violationType, degreeofSuspicion: 15},
+          {key: "方向:", value: this.imgd2.direction, degreeofSuspicion: 15},
+          {key: "速度(km/h):", value: this.imgd2.speed, degreeofSuspicion: 15},
+          {key: "通道号:", value: this.imgd2.channelId, degreeofSuspicion: 15},
+          {key: "车道号:", value: this.imgd2.laneNo, degreeofSuspicion: 15}
         ];
       }
     },
