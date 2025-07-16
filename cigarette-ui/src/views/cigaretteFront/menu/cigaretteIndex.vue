@@ -3,9 +3,11 @@
   <div class="header">
 
   </div>
-  <div class="hero">
-    <!-- <h1>腾讯公司</h1> -->
-  </div>
+<!--  <div class="hero">-->
+<!--    &lt;!&ndash; <h1>腾讯公司</h1> &ndash;&gt;-->
+<!--  </div>-->
+    <BigScreen/>
+
   <ul class="tabs">
     <li class="tab highlight" @click="selectTab('intro')">简介</li>
     <li class="tab" @click="selectTab('vision')">愿景及使命</li>
@@ -23,10 +25,11 @@
 
 <script>
 import FeedBack from "@/components/FeedBack/feedback.vue";
+import BigScreen from "@/modules/big_screen/views/indexs/index.vue"
 
 export default {
   name: 'TencentProfile',
-  components: {FeedBack},
+  components: {FeedBack,BigScreen},
   data() {
     return {
       tabs: [
