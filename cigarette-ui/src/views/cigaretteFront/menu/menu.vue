@@ -64,24 +64,24 @@
       </el-main>
     </el-container>
     <!-- 底部区域 -->
-    <el-footer style="height: 100px;">
-      <!-- 第一行 -->
-      <!-- 第二行 -->
-      <div class="tworow">
-        <div>
-          占位
-        </div>
-        <div>
-          隐私
-        </div>
-        <div>备案</div>
-        <div>法律</div>
-      </div>
-      <!-- 第三行 -->
-      <div class="threerow">
-        （版权号）
-      </div>
-    </el-footer>
+<!--    <el-footer style="height: 100px;">-->
+<!--      &lt;!&ndash; 第一行 &ndash;&gt;-->
+<!--      &lt;!&ndash; 第二行 &ndash;&gt;-->
+<!--      <div class="tworow">-->
+<!--        <div>-->
+<!--          占位-->
+<!--        </div>-->
+<!--        <div>-->
+<!--          隐私-->
+<!--        </div>-->
+<!--        <div>备案</div>-->
+<!--        <div>法律</div>-->
+<!--      </div>-->
+<!--      &lt;!&ndash; 第三行 &ndash;&gt;-->
+<!--      <div class="threerow">-->
+<!--        （版权号）-->
+<!--      </div>-->
+<!--    </el-footer>-->
   </el-container>
 </template>
 

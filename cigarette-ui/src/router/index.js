@@ -109,6 +109,7 @@ export const constantRoutes = [
     name: 'showMapLocation',
     component: () => import('@/views/component/showMapLocation')
   },
+
   {
     path: '/cigaretteFront',
     component: () => import('@/views/cigaretteFront/menu/menu'),
