@@ -3,6 +3,8 @@ import Vue from 'vue'
 import Cookies from 'js-cookie'
 
 import Element from 'element-ui'
+import { Radio,Button,RadioGroup } from 'element-ui'
+
 import './assets/styles/element-variables.scss'
 
 import '@/assets/styles/index.scss' // global css
@@ -38,6 +40,19 @@ import VueMeta from 'vue-meta'
 // 字典数据组件
 import DictData from '@/components/DictData'
 
+import {loading, borderBox13, borderBox8, digitalFlop, capsuleChart} from '@jiaminghi/data-view'
+import Message from '@/components/scn-message/message.vue'
+import Messages from '@/components/scn-message/message'
+
+
+//大屏样式
+import  '@/assets/scn-css/public.scss'
+import "@/assets/scn-css/index.scss"
+
+//大屏过滤器
+import * as filters from '@/directive/scnFilters'
+
+
 // 全局方法挂载
 Vue.prototype.getDicts = getDicts
 Vue.prototype.getConfigKey = getConfigKey
@@ -48,6 +63,8 @@ Vue.prototype.selectDictLabel = selectDictLabel
 Vue.prototype.selectDictLabels = selectDictLabels
 Vue.prototype.download = download
 Vue.prototype.handleTree = handleTree
+Vue.prototype.$Message =  Messages
+
 
 // 全局组件挂载
 Vue.component('DictTag', DictTag)
@@ -57,6 +74,21 @@ Vue.component('Editor', Editor)
 Vue.component('FileUpload', FileUpload)
 Vue.component('ImageUpload', ImageUpload)
 Vue.component('ImagePreview', ImagePreview)
+Vue.component("Message",Message)
+
+
+//dataV组件
+Vue.use(loading)
+Vue.use(borderBox13)
+Vue.use(borderBox8)
+Vue.use(digitalFlop)
+Vue.use(capsuleChart)
+
+// element组件
+Vue.use(Radio);
+Vue.use(Button);
+Vue.use(RadioGroup)
+
 
 Vue.use(directive)
 Vue.use(plugins)
@@ -77,6 +109,7 @@ Vue.use(Element, {
 })
 
 Vue.config.productionTip = false
+Object.keys(filters).forEach(k => Vue.filter(k, filters[k]));
 
 new Vue({
   el: '#app',

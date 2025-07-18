@@ -6,7 +6,9 @@
 <!--  <div class="hero">-->
 <!--    &lt;!&ndash; <h1>腾讯公司</h1> &ndash;&gt;-->
 <!--  </div>-->
-    <BigScreen/>
+    <div>
+          <BigScreen/>
+    </div>
 
   <ul class="tabs">
     <li class="tab highlight" @click="selectTab('intro')">简介</li>
@@ -25,7 +27,7 @@
 
 <script>
 import FeedBack from "@/components/FeedBack/feedback.vue";
-import BigScreen from "@/modules/big_screen/views/indexs/index.vue"
+import BigScreen from "@/views/cigaretteFront/menu/big-screen/scnHome.vue"
 
 export default {
   name: 'TencentProfile',
@@ -72,10 +74,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-.nav {
-  display: flex;
-  gap: 20px;
 }
 .hero {
   background-image: url('../../../assets/images/tu.png');

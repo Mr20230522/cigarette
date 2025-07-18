@@ -11,6 +11,7 @@ const name = process.env.VUE_APP_TITLE || '无证运输烟叶违法行为监管�
 
 const port = process.env.port || process.env.npm_config_port || 80 // 端口
 
+
 // vue.config.js 配置说明
 //官方vue.config.js 参考文档 https://cli.vuejs.org/zh/config/#css-loaderoptions
 // 这里只列一部分，具体配置参考文档
@@ -44,10 +45,12 @@ module.exports = {
     },
     disableHostCheck: true
   },
+
   css: {
     loaderOptions: {
       sass: {
-        sassOptions: { outputStyle: "expanded" }
+        additionalData: `@import "@/assets/scn-css/variable.scss";`,
+        sassOptions: { outputStyle: "expanded" },
       }
     }
   },
