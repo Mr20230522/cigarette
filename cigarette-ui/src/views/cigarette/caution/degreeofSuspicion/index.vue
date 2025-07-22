@@ -112,6 +112,144 @@ import request from "@/utils/request";
 import * as XLSX from 'xlsx'
 
 let i = 1290;
+const weights = {
+  frequency_factor: 0.10,
+  LPN_factor: 0.20,
+  car_film_factor: 0.05,
+  brand_factor: 0.05,
+  car_type_factor: 0.05,
+  face_factor: 0.30,
+  time_factor: 0.10,
+  month_factor: 0.10,
+  location_factor: 0.05,
+};
+
+const riskValues = {
+  high: 0.9,
+  mid: 0.5,
+  low: 0.3,
+};
+
+function getRiskLevel(value, category) {
+  const levels = {
+    car_type: {
+      high: ['棚栏货车', '小型客车', 'MPV'],
+      mid: ['轻型货车', '物流车'],
+      low: ['小轿车', '摩托车'],
+    },
+    car_film: {
+      high: ['深色膜'],
+      mid: ['浅色膜'],
+      low: ['无车膜'],
+    },
+    brand: {
+      high: ['金杯', '江铃', '五菱', '福特', '依维柯', '福田'],
+      mid: ['解放', '长安'],
+      low: [],
+    },
+    time: {
+      high: [0, 6], // 00:00 - 06:00
+      mid: [18, 24],
+      low: [6, 18],
+    },
+    month: {
+      high: [9, 10, 11],
+      mid: [8, 12],
+      low: [6, 7],
+    },
+    location: {
+      high: ['偏僻农村道路', '高速公路'],
+      mid: ['物流集散地'],
+      low: ['城市主干道'],
+    },
+    face: {
+      high: true, // 有案底
+      mid: false,
+      low: null,
+    },
+  };
+
+  const riskCategory = levels[category];
+
+  if (category === 'time') {
+    const hour = parseInt(value.split(':')[0]);
+    if (hour >= riskCategory.high[0] && hour < riskCategory.high[1]) return 'high';
+    if (hour >= riskCategory.mid[0] && hour < riskCategory.mid[1]) return 'mid';
+    return 'low';
+  }
+
+  if (category === 'month') {
+    if (riskCategory.high.includes(value)) return 'high';
+    if (riskCategory.mid.includes(value)) return 'mid';
+    return 'low';
+  }
+
+  if (category === 'face') {
+    return value ? 'high' : 'mid';
+  }
+
+  if (Array.isArray(riskCategory.high) && riskCategory.high.includes(value)) return 'high';
+  if (Array.isArray(riskCategory.mid) && riskCategory.mid.includes(value)) return 'mid';
+  if (Array.isArray(riskCategory.low) && riskCategory.low.includes(value)) return 'low';
+  return 'low';
+}
+
+// 计算并打印每项风险
+function calculateDetailedRisk(data) {
+  const results = [];
+  let totalRisk = 0;
+
+  const categories = {
+    car_type: 'car_type_factor',
+    car_film: 'car_film_factor',
+    brand: 'brand_factor',
+    face: 'face_factor',
+    time: 'time_factor',
+    month: 'month_factor',
+    location: 'location_factor',
+  };
+
+  for (let [key, factorKey] of Object.entries(categories)) {
+    const level = getRiskLevel(data[key], key);
+    const risk = riskValues[level];
+    const weight = weights[factorKey];
+    const contribution = risk * weight;
+
+    results.push({
+      属性: key,
+      值: data[key],
+      风险等级: level,
+      风险值: risk,
+      权重: weight,
+      贡献值: contribution,
+    });
+
+    totalRisk += contribution;
+  }
+
+  return { results, totalRisk };
+}
+
+// 示例数据
+const data = {
+  car_type: '小型客车',
+  car_film: '深色膜',
+  brand: '金杯',
+  face: true,
+  time: '01:00',
+  month: 10,
+  location: '高速公路',
+};
+
+const { results, totalRisk } = calculateDetailedRisk(data);
+
+console.log('【各项风险详情】：');
+results.forEach(item => {
+  console.log(
+    `${item.属性}（值: ${item.值}） → ${item.风险等级}风险，风险值 ${item.风险值} × 权重 ${item.权重} = 贡献 ${item.贡献值.toFixed(4)}`
+  );
+});
+console.log(`\n【总风险值】：${totalRisk.toFixed(4)}`);
 
 export default {
 
