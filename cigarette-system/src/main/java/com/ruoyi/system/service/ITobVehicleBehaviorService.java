@@ -33,7 +33,7 @@ public interface ITobVehicleBehaviorService
     /**
      * 查询车辆行为记录列表
      *
-     * @param voTobVehicleBehavior 车辆行为记录
+     * @param tobVehicleBehaviorVo 车辆行为记录
      * @return 车辆行为记录集合
      */
     public List<TobVehicleBehaviorVo> selectTobVehicleBehaviorVoList(TobVehicleBehaviorVo tobVehicleBehaviorVo );
@@ -42,7 +42,7 @@ public interface ITobVehicleBehaviorService
     /**
      * 查询车辆类型数据
      *
-     * @param voTobVehicleBehavior 车辆行为记录
+     * @param tobVehicleBehaviorVo 车辆行为记录
      * @return 车辆行为记录集合
      */
     public List<VehicleType> getVehicleTypeData(TobVehicleBehaviorVo tobVehicleBehaviorVo );
@@ -51,7 +51,7 @@ public interface ITobVehicleBehaviorService
     /**
      * 查询车辆颜色数据
      *
-     * @param voTobVehicleBehavior 车辆行为记录
+     * @param tobVehicleBehaviorVo 车辆行为记录
      * @return 车辆行为记录集合
      */
     public VehicleBehaviorColor getVehicleColorData(TobVehicleBehaviorVo tobVehicleBehaviorVo );

@@ -5,7 +5,7 @@
       <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect"
         style="width: 100%;">
 
-        <el-menu-item index="1" @click="goto('cigaretteIndex')" style="margin-left: 25%;font-size: 30px;">logo</el-menu-item>
+        <el-menu-item index="1" class ="logo-item" @click="goto('cigaretteIndex')" style="margin-left: 25%;"></el-menu-item>
         <el-submenu index="2" style="margin-left: 20%;font-size: 22px;">
           <template slot="title"  style="font-size: 22px;"> 智慧监控 </template>
           <el-menu-item index="2-1" @click="goto('dataVisualization')" >数据可视化</el-menu-item>
@@ -313,6 +313,16 @@ export default {
       font-size: 12px;
     }
   }
+}
+
+.logo-item {
+  height: 70px; /* 根据需要调整高度 */
+  width:180px;
+  line-height: 150px; /* 保持文字垂直居中 */
+  background-image: url('~@/assets/logo/cigaretteLogo.jpg'); /* 替换为你的图片路径 */
+  background-size:  100% 100%; /* 使图片自适应 */
+  background-repeat: no-repeat; /* 防止图片重复 */
+  background-position: center; /* 图片水平和垂直居中 */
 }
 
 </style>
