@@ -16,33 +16,33 @@
                 <!-- 第一行：设备ID和型号 -->
                 <div class="text-row">
                   <div class="info">
-                    <span class="labels">设备ID：</span>
-                    <span class="contents zhuyao">{{ item.gatewayno }}</span>
+                    <span class="labels">车牌号：</span>
+                    <span class="contents zhuyao">{{ item.licensePlate }}</span>
                   </div>
                   <div class="info">
-                    <span class="labels">型号：</span>
-                    <span class="contents">{{ item.terminalno }}</span>
+                    <span class="labels">车辆类型：</span>
+                    <span class="contents">{{ item.carTypeId }}</span>
                   </div>
                 </div>
                 <!-- 第二行：告警值和时间 -->
                 <div class="text-row">
                   <div class="info">
-                    <span class="labels">告警值：</span>
-                    <span class="contents warning">{{ item.alertvalue | montionFilter }}</span>
+                    <span class="labels">嫌疑程度：</span>
+                    <span class="contents warning">{{ item.degreeSuspicion | montionFilter }}</span>
                   </div>
                   <div class="info">
                     <span class="labels">时间：</span>
-                    <span class="contents" style="font-size:12px">{{ item.createtime }}</span>
+                    <span class="contents" style="font-size:12px">{{ item.createTime }}</span>
                   </div>
                 </div>
                 <div class="text-row address-alert">
                   <div class="info address">
-                    <span class="labels">地址：</span>
-                    <span class="contents ciyao">{{ item.provinceName }}/{{ item.cityName }}/{{ item.countyName }}</span>
+                    <span class="labels">监测点：</span>
+                    <span class="contents ciyao">{{ item.detectionId }}</span>
                   </div>
                   <div class="info alert">
-                    <span class="labels">报警内容：</span>
-                    <span class="contents ciyao" :class="{ warning: item.alertdetail }">{{ item.alertdetail || '无' }}</span>
+                    <span class="labels">备注：</span>
+                    <span class="contents ciyao" :class="{ warning: item.alertdetail }">{{ item.remark || '无' }}</span>
                   </div>
                 </div>
               </div>
@@ -60,6 +60,7 @@ import { currentGET } from '@/api/scn-modules'
 import vueSeamlessScroll from 'vue-seamless-scroll'
 import Kong from '@/components/scnKong.vue'
 import Reacquire from "@/components/scn-reacquire/reacquire.vue";
+import {listVehicleBehaviorVo} from '@/api/cigarette/vehicle/vehicleBehavior'
 
 
 export default {
@@ -67,113 +68,20 @@ export default {
   data() {
     return {
       list: [
-        {
-          gatewayno: "DEV-001",
-          terminalno: "TX-1000",
-          alertvalue: 85,
-          provinceName: "浙江省",
-          cityName: "杭州市",
-          countyName: "西湖区",
-          createtime: "2023-07-20 10:30:45",
-          alertdetail: "温度过高",
-          image: "http://127.0.0.1:8081/01/01.jpg"
-        },
-        {
-          gatewayno: "DEV-002",
-          terminalno: "TX-2000",
-          alertvalue: 45,
-          provinceName: "江苏省",
-          cityName: "南京市",
-          countyName: "鼓楼区",
-          createtime: "2023-07-20 11:15:22",
-          alertdetail: "电压异常",
-          image: "http://127.0.0.1:8081/01/02.jpg"
-        },
-        {
-          gatewayno: "DEV-003",
-          terminalno: "TX-3000",
-          alertvalue: 92,
-          provinceName: "广东省",
-          cityName: "深圳市",
-          countyName: "南山区",
-          createtime: "2023-07-20 09:45:18",
-          alertdetail: "湿度超标",
-          image: "http://127.0.0.1:8081/01/03.jpg"
-        },
-        {
-          gatewayno: "DEV-004",
-          terminalno: "TX-4000",
-          alertvalue: 30,
-          provinceName: "北京市",
-          cityName: "北京市",
-          countyName: "海淀区",
-          createtime: "2023-07-20 14:20:33",
-          alertdetail: "",
-          image: "http://127.0.0.1:8081/01/04.jpg"
-        },
-        {
-          gatewayno: "DEV-005",
-          terminalno: "TX-5000",
-          alertvalue: 78,
-          provinceName: "上海市",
-          cityName: "上海市",
-          countyName: "浦东新区",
-          createtime: "2023-07-20 13:10:57",
-          alertdetail: "信号中断",
-          image: "http://127.0.0.1:8081/01/05.jpg"
-        },
-        {
-          gatewayno: "DEV-005",
-          terminalno: "TX-5000",
-          alertvalue: 80,
-          provinceName: "上海市",
-          cityName: "上海市",
-          countyName: "浦东新区",
-          createtime: "2023-07-20 13:10:57",
-          alertdetail: "信号中断",
-          image: "http://127.0.0.1:8081/01/05.jpg"
-        },
-        {
-          gatewayno: "DEV-005",
-          terminalno: "TX-5000",
-          alertvalue: 20,
-          provinceName: "上海市",
-          cityName: "上海市",
-          countyName: "浦东新区",
-          createtime: "2023-07-20 13:10:57",
-          alertdetail: "信号中断",
-          image: "http://127.0.0.1:8081/01/05.jpg"
-        },
-        {
-          gatewayno: "DEV-005",
-          terminalno: "TX-5000",
-          alertvalue: 28,
-          provinceName: "上海市",
-          cityName: "上海市",
-          countyName: "浦东新区",
-          createtime: "2023-07-20 13:10:57",
-          alertdetail: "信号中断",
-          image: "http://127.0.0.1:8081/01/05.jpg"
-        },
-        {
-          gatewayno: "DEV-005",
-          terminalno: "TX-5000",
-          alertvalue: 74,
-          provinceName: "上海市",
-          cityName: "上海市",
-          countyName: "浦东新区",
-          createtime: "2023-07-20 13:10:57",
-          alertdetail: "信号中断",
-          image: "http://127.0.0.1:8081/01/05.jpg"
-        }
-      ],
-      pageflag: true,
-      defaultOption: {
-        ...this.$store.state.scnSettings.defaultOption,
-        limitMoveNum: 3,
-        singleHeight: 270, // 微调高度以适应图片
-        step: 0,
-      }
+        ],
+      queryParams: {
+        pageNum: 1,
+        pageSize: 10,
+        carId: null,
+        carTypeId: null,
+        carColor: null,
+        degreeSuspicion: null,
+        driverId: null,
+        drivingDirection: null,
+        illegalStatus: null,
+        status: null,
+        accompliceId: null
+      },
     };
   },
   computed: {
@@ -188,9 +96,22 @@ export default {
     }
   },
   created() {
+    this.getList()
     this.getData()
   },
   methods: {
+    getList(){
+      listVehicleBehaviorVo(this.queryParams).then(response=>{
+        // 这里需要先得到前10条违法程度高于10的数据
+        // this.list=response.rows.reduce((arr,item)=>{
+        //   if(item.degreeSuspicion>=60){
+        //
+        //   }
+        // })
+        this.list=response.rows
+      })
+      console.log('this.list',this.list)
+    },
     getData() {
       this.pageflag = true
       // 模拟原接口请求延迟效果

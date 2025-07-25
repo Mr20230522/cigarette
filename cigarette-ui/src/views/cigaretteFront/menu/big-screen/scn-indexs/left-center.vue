@@ -339,6 +339,7 @@ export default {
     getList(){
       listVehicleBehaviorVo(this.queryParams).then(response=>{
         if(response.code===200&&response.rows){
+          console.log('response.rows',response.rows)
           this.processData(response.rows)
           switch(this.activeType){
             case 'quarter':
