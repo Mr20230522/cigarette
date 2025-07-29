@@ -76,4 +76,16 @@
         ORDER BY Id ASC
         LIMIT 1
     </select>
+    <select id="selectAfterId" resultType="com.ruoyi.system.domain.ToVehicleRealTimMonitoring">
+        SELECT * FROM trafficdata
+        WHERE id > #{lastId}
+        ORDER BY id ASC
+        LIMIT #{limit}
+    </select>
+
+    <update id="updateLevel">
+        UPDATE trafficdata
+        SET level = #{level}
+        WHERE id = #{id}
+    </update>
 </mapper>
