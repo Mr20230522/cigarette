@@ -197,6 +197,10 @@ export default {
         this.isFetching = false;
       });
     },
+    handleBeforeUnload() {
+      // 保存变量到 localStorage
+      localStorage.setItem('counter', i);
+    },
     generateImgData() {
       if (this.imgd) {
         this.imgData = [
@@ -261,14 +265,23 @@ export default {
     }
   },
   mounted() {
-    this.fetchData(); // 初始加载一次
-    this.timer = setInterval(this.fetchNewData, 3000); // 每5秒请求一次
+    const count = localStorage.getItem("counter");
+
+    //this.fetchData(); // 初始加载一次
+    if(count!=null){
+      i = parseInt(count);
+      localStorage.removeItem('counter');
+    }
+    //this.fetchNewData();
+    this.timer = setInterval(this.fetchNewData, 3000);// 每3秒请求一次
+    window.addEventListener('beforeunload', this.handleBeforeUnload);
   },
   beforeUnmount() {
     if (this.timer) {
       clearInterval(this.timer);
       this.timer = null;
     }
+    window.removeEventListener('beforeunload', this.handleBeforeUnload);
   },
   watch: {
     tableData() {
@@ -278,7 +291,6 @@ export default {
           this.animate = false;
         }, 500);
       });
-
       // 自动滚动到底部
       this.$nextTick(() => {
         const tableBody = this.$refs.dataTable.$el.querySelector('.el-table__body-wrapper');
