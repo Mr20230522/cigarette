@@ -15,5 +15,5 @@ public interface ToVehicleRealTimMonitoringMapper {
 
     List<ToVehicleRealTimMonitoring> selectAfterId(@Param("lastId") Long lastId, @Param("limit") int limit);
 
-    int updateLevel(@Param("id") Long id, @Param("level") Integer level);
+    int updateLevel(@Param("id") Long id, @Param("level") Double level);
 }

@@ -17,12 +17,12 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
     private static final String POSITION_FILE = "risk_position.txt";
 
     @Autowired
-    private ToVehicleRealTimMonitoringMapper vehicleCaptureMapper;
+    private ToVehicleRealTimMonitoringMapper toVehicleRealTimMonitoringMapper;
 
     @Override
     public void processNextBatch() {
         long lastId = readLastProcessedId();
-        List<ToVehicleRealTimMonitoring> list = vehicleCaptureMapper.selectAfterId(lastId, BATCH_SIZE);
+        List<ToVehicleRealTimMonitoring> list = toVehicleRealTimMonitoringMapper.selectAfterId(lastId, BATCH_SIZE);
 
         if (list.isEmpty()) return;
 
@@ -32,11 +32,11 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
             double score = 0;
 
             // 1. 车型风险（5%）
-            List<String> highTypes = Arrays.asList("栏板货车", "小型客车", "MPV");
+            List<String> highTypes = Arrays.asList("栏板货车", "小型客车", "SUV/MPV");
             score += highTypes.contains(data.getVehicleType()) ? 5 : 0;
 
             // 2. 车膜风险（5%）
-            score += "深色膜".equals(data.getPlateColor()) ? 5 : 0;
+            //score += "深色膜".equals(data.getPlateColor()) ? 5 : 0;
 
             // 3. 品牌风险（5%）
             List<String> brands = Arrays.asList("金杯", "江铃", "五菱", "福特", "依维柯", "福田");
@@ -64,7 +64,7 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
             score += data.getDirection() != null &&
                     (data.getDirection().contains("农村") || data.getDirection().contains("高速")) ? 5 : 0;
 
-            vehicleCaptureMapper.updateLevel(data.getId(), (int) score);
+            toVehicleRealTimMonitoringMapper.updateLevel(data.getId(),  score);
 
             if (data.getId() > maxId) {
                 maxId = data.getId();
