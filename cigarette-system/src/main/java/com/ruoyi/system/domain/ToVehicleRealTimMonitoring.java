@@ -50,6 +50,9 @@ public class ToVehicleRealTimMonitoring extends BaseEntity {
     private String srcJson;
     //嫌疑程度
     private Integer Level;
+
+
+
 //    // 主键ID
 //    private Long id;
 //    //相机ID
