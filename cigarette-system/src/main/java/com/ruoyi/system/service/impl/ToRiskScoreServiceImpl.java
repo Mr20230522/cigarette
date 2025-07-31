@@ -40,13 +40,13 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
 
             // 3. 品牌风险（5%）
             List<String> brands = Arrays.asList("金杯", "江铃", "五菱", "福特", "依维柯", "福田");
-            score += data.getVehicleLogoAll() != null && brands.stream().anyMatch(b -> data.getVehicleLogoAll().contains(b)) ? 5 : 0;
+            score += data.getVehicleLogoAll() != null && brands.stream().anyMatch(b -> data.getVehicleLogoAll().contains(b)) ? 30 : 0;
             //测试1392
             if (data.getVehicleLogoAll() != null) {
                 String[] parts = data.getVehicleLogoAll().split("-");
                 System.out.println("品牌:"+data.getVehicleLogo()+"\nv"+"型号:"+parts[1]);
                 List<String> brandList = Arrays.asList("全顺", "聚星", "图雅诺", "SUV", "栅栏货车");
-                score += brandList.contains(parts[1]) ? 5 : 0;
+                score += brandList.contains(parts[1]) ? 30 : 0;
             }
             else{
                 System.out.println("空");
