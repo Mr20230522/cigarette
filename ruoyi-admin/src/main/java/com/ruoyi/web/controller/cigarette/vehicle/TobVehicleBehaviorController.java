@@ -134,7 +134,24 @@ public class TobVehicleBehaviorController extends BaseController
     @GetMapping("/getVehicleColorData")
     public VehicleBehaviorColor getVehicleColorData(TobVehicleBehaviorVo tobVehicleBehaviorVo)
     {
-        System.out.println("controller");
         return tobVehicleBehaviorService.getVehicleColorData(tobVehicleBehaviorVo);
     }
+
+    @GetMapping("getUpToDataDegreeSuspicion")
+    public List<TobVehicleBehaviorVo> getUpToDataDegreeSuspicion(TobVehicleBehaviorVo tobVehicleBehaviorVo){
+        System.out.println("tobVehicleBehaviorService.getUpToDataDegreeSuspicion(tobVehicleBehaviorVo)"+tobVehicleBehaviorService.getUpToDataDegreeSuspicion(tobVehicleBehaviorVo));
+        return tobVehicleBehaviorService.getUpToDataDegreeSuspicion(tobVehicleBehaviorVo);
+    }
+
+    /**
+     * 获取所有车辆行为记录列表
+     */
+    @PreAuthorize("@ss.hasPermi('vehicle:vehicleBehavior:list')")
+    @GetMapping("/listVoAll")
+    public List<TobVehicleBehaviorVo> listVoAll(TobVehicleBehaviorVo tobVehicleBehaviorVo)
+    {
+        return tobVehicleBehaviorService.selectTobVehicleBehaviorVoList(tobVehicleBehaviorVo);
+
+    }
+
 }

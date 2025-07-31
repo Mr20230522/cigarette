@@ -92,6 +92,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     </select>
 
+    <select id="getUpToDataDegreeSuspicion" parameterType="TobVehicleBehaviorVo" resultMap="TobVehicleBehaviorVoResult">
+        SELECT a.*, b.license_plate, b.picture, c.name
+        FROM tob_vehicle_behavior AS a
+        INNER JOIN tob_vehicle AS b ON a.car_id = b.car_id
+        LEFT JOIN tob_person AS c ON a.driver_id = c.suspect_id
+        <where>
+            <if test="degreeSuspicion!=null">and a.degree_suspicion >= #{degreeSuspicion}</if>
+            <if test="behaviorId!=null">and a.behavior_id > #{behaviorId}</if>
+        </where>
+        ORDER BY a.behavior_id DESC
+        LIMIT 10
+    </select>
+
 
     <select id="selectTobVehicleBehaviorByBehaviorId" parameterType="Long" resultMap="TobVehicleBehaviorResult">
         <include refid="selectTobVehicleBehaviorVo"/>

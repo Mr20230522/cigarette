@@ -97,7 +97,7 @@ public class TobVehicleBehaviorServiceImpl implements ITobVehicleBehaviorService
     /**
      * 查询车辆颜色数据
      *
-     * @param voTobVehicleBehavior 车辆行为记录
+     * @param tobVehicleBehaviorVo 车辆行为记录
      * @return 车辆行为记录集合
      */
     public VehicleBehaviorColor getVehicleColorData(TobVehicleBehaviorVo tobVehicleBehaviorVo ){
@@ -210,4 +210,15 @@ public class TobVehicleBehaviorServiceImpl implements ITobVehicleBehaviorService
     {
         return tobVehicleBehaviorMapper.deleteTobVehicleBehaviorByBehaviorId(behaviorId);
     }
+
+    /**
+     * 删除车辆行为记录信息
+     *
+     * @param tobVehicleBehaviorVo 车辆行为记录
+     * @return 结果
+     */
+    public List<TobVehicleBehaviorVo> getUpToDataDegreeSuspicion(TobVehicleBehaviorVo tobVehicleBehaviorVo){
+        return tobVehicleBehaviorMapper.getUpToDataDegreeSuspicion(tobVehicleBehaviorVo);
+    }
+
 }

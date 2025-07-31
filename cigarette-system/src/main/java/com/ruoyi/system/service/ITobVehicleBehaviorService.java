@@ -87,4 +87,7 @@ public interface ITobVehicleBehaviorService
      * @return 结果
      */
     public int deleteTobVehicleBehaviorByBehaviorId(Long behaviorId);
+
+
+    public List<TobVehicleBehaviorVo> getUpToDataDegreeSuspicion(TobVehicleBehaviorVo tobVehicleBehaviorVo);
 }

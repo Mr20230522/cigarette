@@ -54,8 +54,6 @@ export default {
         { name: '车辆类型', value: 'vehicleType' },
         { name: '车辆颜色', value: 'vehicleColor' },
         { name: '站点出现频率', value: 'detection' },
-        { name: '操作行为预警', value: 'operation' },
-        { name: '综合预警分析', value: 'comprehensive' }
       ],
       activeType: 'quarter', // 当前选中的预警类型
       // 模拟数据
@@ -87,22 +85,6 @@ export default {
           total: 0,
           categories: []
         },
-        operation: {
-          total: 134,
-          categories: [
-            { name: "违规操作", value: 45, color: "#FF6B6B" },
-            { name: "高风险操作", value: 67, color: "#ECA444" },
-            { name: "异常登录", value: 22, color: "#33A1DB" }
-          ]
-        },
-        comprehensive: {
-          total: 387,
-          categories: [
-            { name: "一级预警", value: 56, color: "#FF6B6B" },
-            { name: "二级预警", value: 134, color: "#ECA444" },
-            { name: "三级预警", value: 197, color: "#33A1DB" }
-          ]
-        }
       },
       pageflag: true,
       timer: null,
@@ -339,7 +321,6 @@ export default {
     getList(){
       listVehicleBehaviorVo(this.queryParams).then(response=>{
         if(response.code===200&&response.rows){
-          console.log('response.rows',response.rows)
           this.processData(response.rows)
           switch(this.activeType){
             case 'quarter':
@@ -526,7 +507,6 @@ export default {
         }
         return null
       }).filter(Boolean);
-      console.log('mergeArray',mergeArray)
       mergeArray.forEach((obj,index)=>{
         this.warningData.detection.categories.push({
           name:Object.keys(obj)[0],

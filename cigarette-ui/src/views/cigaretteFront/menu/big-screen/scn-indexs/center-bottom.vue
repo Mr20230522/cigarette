@@ -5,11 +5,11 @@
       <!-- 分屏模式选择 -->
       <div class="mode-control">
         <div
-            v-for="mode in modes"
-            :key="mode.value"
-            class="mode-btn"
-            :class="{ 'active': currentMode === mode.value }"
-            @click="changeMode(mode.value)"
+          v-for="mode in modes"
+          :key="mode.value"
+          class="mode-btn"
+          :class="{ 'active': currentMode === mode.value }"
+          @click="changeMode(mode.value)"
         >
           {{ mode.label }}
         </div>
@@ -18,16 +18,21 @@
       <!-- 摄像头选择 -->
       <div class="camera-control">
         <div
-            v-for="camera in cameras"
-            :key="camera.id"
-            class="camera-btn"
-            :class="{
+          v-for="camera in cameras"
+          :key="camera.id"
+          class="camera-btn"
+          :class="{
             'active': selectedCameras.includes(camera.id),
             'disabled': isCameraDisabled(camera.id)
           }"
-            @click="selectCamera(camera)"
+          @click="selectCamera(camera)"
         >
           {{ camera.name }}
+        </div>
+      </div>
+      <div class="camera-control">
+        <div class="camera-btn" @click="confirmSelection">
+          确定
         </div>
       </div>
     </div>
@@ -49,20 +54,21 @@ export default {
         { value: 4, label: '4分屏' }
       ],
       cameras: [
-        { id: 1, name: '摄像头1', url: 'url1' },
-        { id: 2, name: '摄像头2', url: 'url2' },
-        { id: 3, name: '摄像头3', url: 'url3' },
-        { id: 4, name: '摄像头4', url: 'url4' }
+        { id: 1, name: '摄像头1', url: 'http://127.0.0.1:8000/upload/monitorData/192.168.10.2/卡口数据/20250509/09/0_2_20250328_000536940_云DTH993.mp4' },
+        { id: 2, name: '摄像头2', url: 'http://127.0.0.1:8000/upload/monitorData/192.168.10.2/卡口数据/20250509/09/0_2_20250328_000536940_云DTH993.mp4' },
+        { id: 3, name: '摄像头3', url: 'http://127.0.0.1:8000/upload/monitorData/192.168.10.2/卡口数据/20250509/09/0_2_20250328_000536940_云DTH993.mp4' },
+        { id: 4, name: '摄像头4', url: 'http://127.0.0.1:8000/upload/monitorData/192.168.10.2/卡口数据/20250509/09/0_2_20250328_000536940_云DTH993.mp4' },
       ]
     };
   },
   methods: {
     changeMode(mode) {
       this.currentMode = mode;
-      if (this.selectedCameras.length > mode) {
-        this.selectedCameras = this.selectedCameras.slice(0, mode);
+      // 清空已选择的摄像头
+      this.selectedCameras = [];
+      if (mode === 1 && this.cameras.length > 0) {
+        this.selectedCameras.push(this.cameras[0].id);
       }
-      this.updateDisplay();
     },
     selectCamera(camera) {
       const index = this.selectedCameras.indexOf(camera.id);
@@ -73,22 +79,45 @@ export default {
       } else {
         this.selectedCameras.splice(index, 1);
       }
-      this.updateDisplay();
     },
     isCameraDisabled(cameraId) {
       return !this.selectedCameras.includes(cameraId) &&
-          this.selectedCameras.length >= this.currentMode;
+        this.selectedCameras.length >= this.currentMode;
+    },
+    confirmSelection() {
+      // 验证是否选择了足够的摄像头
+      if (this.selectedCameras.length !== this.currentMode) {
+        alert(`请选择 ${this.currentMode} 个摄像头`);
+        return;
+      }
+      // 触发显示逻辑
+      this.updateDisplay();
     },
     updateDisplay() {
       const selectedCameras = this.selectedCameras.map(id =>
-          this.cameras.find(cam => cam.id === id)
+        this.cameras.find(cam => cam.id === id)
       ).filter(Boolean);
 
       ScnEventBus.$emit('video-display-change', {
         mode: this.currentMode,
         cameras: selectedCameras
       });
-    }
+    },
+  },
+  created(){
+    // 初次加载时默认选择“1分屏”
+    this.currentMode = this.modes[0].value;
+  },
+  mounted(){
+    // 确保页面渲染完成后，如果摄像头数组不为空，触发显示逻辑
+    this.$nextTick(() => {
+      if (this.cameras.length > 0) {
+        this.selectedCameras.push(this.cameras[0].id); // 添加第一个摄像头的 id
+        this.updateDisplay(); // 触发显示逻辑
+      } else {
+        console.warn('摄像头列表为空，无法选择默认摄像头');
+      }
+    });
   }
 };
 </script>

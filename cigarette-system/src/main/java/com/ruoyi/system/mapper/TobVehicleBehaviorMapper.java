@@ -67,4 +67,14 @@ public interface TobVehicleBehaviorMapper
      * @return 结果
      */
     public int deleteTobVehicleBehaviorByBehaviorIds(Long[] behaviorIds);
+
+
+    /**
+     * 删除车辆行为记录信息
+     *
+     * @param tobVehicleBehaviorVo 车辆行为记录
+     * @return 结果
+     */
+    public List<TobVehicleBehaviorVo> getUpToDataDegreeSuspicion(TobVehicleBehaviorVo tobVehicleBehaviorVo);
+
 }

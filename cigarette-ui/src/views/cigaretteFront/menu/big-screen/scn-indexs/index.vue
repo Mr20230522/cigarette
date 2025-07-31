@@ -24,7 +24,7 @@
         title="设备提醒"
         style="padding: 0 10px 16px 10px"
       >
-        <LeftBottom />
+<!--        <LeftBottom />-->
       </ItemWrap>
     </div>
     <div class="contetn_center">

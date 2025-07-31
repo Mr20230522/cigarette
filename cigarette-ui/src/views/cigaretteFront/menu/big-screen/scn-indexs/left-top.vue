@@ -17,25 +17,25 @@
     <ul class="user_Overview flex">
       <li class="user_Overview-item" style="color: #00fdfa">
         <div class="user_Overview_nums allnum">
-          <dv-digital-flop v-if="vehicleBehaviorList.length > 0" :config="config" style="width:100%;height:100%;" />
+          <dv-digital-flop :config="config" style="width:100%;height:100%;" />
         </div>
         <p>车辆总数</p>
       </li>
       <li class="user_Overview-item" style="color: #07f7a8">
         <div class="user_Overview_nums online">
-          <dv-digital-flop v-if="vehicleBehaviorList.length > 0" :config="onlineconfig" style="width:100%;height:100%;" />
+          <dv-digital-flop :config="onlineconfig" style="width:100%;height:100%;" />
         </div>
         <p>正常车辆</p>
       </li>
       <li class="user_Overview-item" style="color: #f5023d">
         <div class="user_Overview_nums laramnum">
-          <dv-digital-flop v-if="vehicleBehaviorList.length > 0" :config="laramnumconfig" style="width:100%;height:100%;" />
+          <dv-digital-flop :config="laramnumconfig" style="width:100%;height:100%;" />
         </div>
         <p>嫌疑车辆</p>
       </li>
       <li class="user_Overview-item" style="color: #e3b337">
         <div class="user_Overview_nums offline">
-          <dv-digital-flop v-if="vehicleBehaviorList.length > 0" :config="offlineconfig" style="width:100%;height:100%;" />
+          <dv-digital-flop :config="offlineconfig" style="width:100%;height:100%;" />
         </div>
         <p>嫌疑车辆占比</p>
       </li>
@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { listVehicleBehaviorVo } from "@/api/cigarette/vehicle/vehicleBehavior";
+import { listVehicleBehaviorVoAll, getUpToDataDegreeSuspicion } from "@/api/cigarette/vehicle/vehicleBehavior";
 
 export default {
   data() {
@@ -56,7 +56,8 @@ export default {
         { label: '最近一月', value: 2 },
         { label: '最近一星期', value: 3 }
       ],
-      vehicleBehaviorList: [],
+      allData: [], // 存储所有数据（包括定期获取的新数据）
+      vehicleBehaviorList: [], // 存储计算结果
       queryParams: {
         pageNum: 1,
         pageSize: 1000,
@@ -69,6 +70,12 @@ export default {
         illegalStatus: null,
         status: null,
         accompliceId: null
+      },
+      queryParams2: {
+        pageNum: 1,
+        pageSize: 1000,
+        degreeSuspicion: null,
+        behaviorId: null // 用于获取比此ID更新的数据
       },
       config: {
         number: [0],
@@ -89,62 +96,109 @@ export default {
         number: [0],
         content: '{nt}',
         style: { fontSize: 24, fill: "#f5023d" }
-      }
+      },
+      refreshTimer: null, // 定时器
+      refreshInterval: 5000 // 5秒刷新一次
     }
   },
   created() {
     this.initData();
   },
+  beforeDestroy() {
+    clearInterval(this.refreshTimer);
+  },
   methods: {
     // 初始化数据
     initData() {
       this.calculateTime(this.selectTimeType);
-      this.getList();
+      // 先清除现有定时器
+      clearInterval(this.refreshTimer);
+      this.getInitialData();
+      this.startAutoRefresh();
     },
 
-    // 获取数据
-    getList() {
-      // 添加时间参数到查询条件
-      const params = {
-        ...this.queryParams,
-        startTime: this.selectedTime,
-        endTime: this.formatDate(new Date())
-      };
+    // 获取初始数据（完全替换）
+    async getInitialData() {
+      try {
+        const params = {
+          ...this.queryParams,
+          startTime: this.selectedTime,
+          endTime: this.formatDate(new Date())
+        };
 
-      listVehicleBehaviorVo(params).then(response => {
-        if (response.code === 200 && response.rows) {
-          this.processData(response.rows);
+        const response = await listVehicleBehaviorVoAll(params);
+        console.log('初始数据获取完成:', response);
+
+        if (response && response.length > 0) {
+          // 使用Vue.set确保响应式更新
+          this.$set(this, 'allData', response);
+          this.queryParams2.behaviorId = response[response.length - 1].behaviorId;
+
+          // 数据获取完成后再处理并启动定时器
+          this.processData();
+          this.startAutoRefresh();
         } else {
           console.error("数据格式异常:", response);
           this.setDefaultData();
         }
-      }).catch(error => {
-        console.error("获取数据失败:", error);
+      } catch (error) {
+        console.error("获取初始数据失败:", error);
         this.setDefaultData();
-      });
+      }
     },
 
-    // 处理返回的数据
-    // 处理返回的数据
-    processData(data) {
+    // 开始定时刷新
+    startAutoRefresh() {
+      // 先清除现有定时器
+      clearInterval(this.refreshTimer);
+
+      // 创建新定时器
+      this.refreshTimer = setInterval(async () => {
+        await this.getNewData();
+      }, this.refreshInterval);
+
+      console.log('定时器已启动，间隔:', this.refreshInterval);
+    },
+
+    // 获取新增数据（追加）
+    async getNewData() {
+      try {
+        if (!this.queryParams2.behaviorId) {
+          console.log('无behaviorId，跳过获取新数据');
+          return;
+        }
+
+        console.log('正在获取新增数据...');
+        const response = await getUpToDataDegreeSuspicion(this.queryParams2);
+        console.log('新增数据获取完成:', response);
+
+        if (response && response.length > 0) {
+          // 使用Vue.set确保响应式
+          this.$set(this, 'allData', [...this.allData, ...response]);
+          this.queryParams2.behaviorId = response[response.length - 1].behaviorId;
+
+          // 数据更新完成后再处理
+          this.processData();
+        }
+      } catch (error) {
+        console.error("获取新增数据失败:", error);
+      }
+    },
+
+    // 处理数据并计算统计结果
+    processData() {
+      const selectedDate = new Date(this.selectedTime).getTime();
       let alarmCount = 0;
       let normalCount = 0;
-      let totalInRange = 0; // 新增：统计时间范围内的总数
+      let totalInRange = 0;
 
-      // 将selectedTime转为Date对象（精确到毫秒）
-      const selectedDate = new Date(this.selectedTime).getTime();
-
-      data.forEach(item => {
-        // 确保createTime存在
-        if (item.createTime) {
-          // 将createTime转为时间戳
+      this.allData.forEach(item => {
+        if (item && item.createTime) {
           const itemTime = new Date(item.createTime).getTime();
 
-          // 筛选条件：createTime >= selectedTime
           if (itemTime >= selectedDate) {
-            totalInRange++; // 只在时间范围内计数
+            totalInRange++;
 
-            // 统计嫌疑程度
             const suspicion = Number(item.degreeSuspicion) || 0;
             if (suspicion > 60) {
               alarmCount++;
@@ -156,7 +210,7 @@ export default {
       });
 
       this.vehicleBehaviorList = [{
-        totalNum: totalInRange, // 改为使用时间范围内的总数
+        totalNum: totalInRange,
         onlineNum: normalCount,
         alarmNum: alarmCount
       }];
@@ -166,25 +220,40 @@ export default {
 
     // 更新所有图表
     updateCharts() {
-      if (this.vehicleBehaviorList.length === 0) {
-        this.setDefaultData();
-        return;
-      }
+      const data = this.vehicleBehaviorList[0] || {
+        totalNum: 0,
+        onlineNum: 0,
+        alarmNum: 0
+      };
 
-      const data = this.vehicleBehaviorList[0];
-      this.$set(this.config, 'number', [data.totalNum || 0]);
-      this.$set(this.onlineconfig, 'number', [data.onlineNum || 0]);
-      this.$set(this.laramnumconfig, 'number', [data.alarmNum || 0]);
+      this.config = {
+        ...this.config,
+        number: [data.totalNum]
+      };
 
-      // 计算嫌疑车辆占比
+      this.onlineconfig = {
+        ...this.onlineconfig,
+        number: [data.onlineNum]
+      };
+
+      this.laramnumconfig = {
+        ...this.laramnumconfig,
+        number: [data.alarmNum]
+      };
+
       const alarmRatio = data.totalNum > 0
         ? Math.round((data.alarmNum / data.totalNum) * 100)
         : 0;
-      this.$set(this.offlineconfig, 'number', [alarmRatio]);
+
+      this.offlineconfig = {
+        ...this.offlineconfig,
+        number: [alarmRatio]
+      };
     },
 
     // 设置默认数据
     setDefaultData() {
+      this.allData = [];
       this.vehicleBehaviorList = [{
         totalNum: 0,
         onlineNum: 0,
@@ -196,12 +265,9 @@ export default {
     // 时间范围切换
     setTimeRange(range) {
       this.selectTimeType = range;
-      this.calculateTime(range);
-
-      this.vehicleBehaviorList = [];
-      this.$nextTick(() => {
-        this.getList();
-      });    },
+      // 切换时间时重新初始化数据（会自动清除旧定时器）
+      this.initData();
+    },
 
     // 计算时间范围
     calculateTime(range) {
@@ -210,30 +276,37 @@ export default {
 
       switch (range) {
         case 1: // 最近一天
-          startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+          startTime.setDate(now.getDate() - 1);
           break;
         case 2: // 最近一月
-          startTime = new Date();
           startTime.setMonth(now.getMonth() - 1);
           break;
         case 3: // 最近一周
-          startTime = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          startTime.setDate(now.getDate() - 7);
           break;
+        default:
+          startTime.setDate(now.getDate() - 1);
       }
+
+      startTime.setHours(0, 0, 0, 0);
       this.selectedTime = this.formatDate(startTime);
     },
 
     // 格式化日期
     formatDate(date) {
+      if (!(date instanceof Date)) {
+        date = new Date(date);
+      }
+
       const pad = n => n.toString().padStart(2, '0');
-      const d = new Date(date);
-      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
     }
   }
 };
 </script>
 
 <style lang='scss' scoped>
+/* 保持原有样式不变 */
 .user_Overview {
   li {
     flex: 1;
@@ -324,7 +397,11 @@ export default {
 }
 
 @keyframes rotating {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>
