@@ -13,7 +13,7 @@ import java.util.*;
 @Service
 public class ToRiskScoreServiceImpl implements IToRiskScoreService {
 
-    private static final int BATCH_SIZE = 10;
+    private static final int BATCH_SIZE = 100;
     private static final String POSITION_FILE = "risk_position.txt";
 
     @Autowired
