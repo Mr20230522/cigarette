@@ -82,7 +82,7 @@
             <!--            </el-table-column>-->
             <!--            <el-table-column prop="laneNo" label="车道号">-->
             <!--            </el-table-column>-->
-            <el-table-column prop="level" label="嫌疑度" align="center" >
+            <el-table-column prop="level" label="嫌疑度" align="center">
               <template #default="{ row }">
                 <el-tag
                   :type="row.level >= 60 ? 'danger' : 'info'"

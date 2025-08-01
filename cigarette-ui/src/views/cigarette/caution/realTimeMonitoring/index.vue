@@ -115,6 +115,7 @@
 <script>
 import request from "@/utils/request";
 import * as XLSX from 'xlsx'
+
 let i = 1290;
 export default {
 
@@ -268,7 +269,7 @@ export default {
     const count = localStorage.getItem("counter");
 
     //this.fetchData(); // 初始加载一次
-    if(count!=null){
+    if (count != null) {
       i = parseInt(count);
       localStorage.removeItem('counter');
     }
