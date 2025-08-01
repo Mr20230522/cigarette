@@ -82,11 +82,15 @@
             <!--            </el-table-column>-->
             <!--            <el-table-column prop="laneNo" label="车道号">-->
             <!--            </el-table-column>-->
-            <el-table-column prop="level" label="嫌疑度">
+            <el-table-column prop="level" label="嫌疑度" align="center">
               <template #default="{ row }">
-    <span :style="{ color: row.level >= 60 ? 'red' : 'blue' }">
-      {{ row.level }}
-    </span>
+                <el-tag
+                  :type="row.level >= 60 ? 'danger' : 'info'"
+                  effect="dark"
+                  round
+                >
+                  {{ row.level }}
+                </el-tag>
               </template>
             </el-table-column>
           </div>
