@@ -20,7 +20,10 @@ public class ToRiskScoreRunner implements CommandLineRunner {
                     Thread.sleep(2000); // 每批间隔2秒
                 } catch (Exception e) {
                     e.printStackTrace();
-                    try { Thread.sleep(10000); } catch (InterruptedException ignored) {}
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException ignored) {
+                    }
                 }
             }
         }).start();
