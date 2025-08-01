@@ -23,9 +23,10 @@
           <div class="table-container">
             <!-- 使用 el-table 渲染表格 -->
             <el-table :data="imgData" border style="width: 100%" :show-header="false">
-              <el-table-column prop="key" label="" width="110"></el-table-column>
+              <el-table-column prop="key" label="" width="130"></el-table-column>
               <el-table-column prop="value" label=""></el-table-column>
-              <el-table-column prop="degreeofSuspicion" label=""></el-table-column>
+              <!--              <el-table-column prop="level" label="嫌疑度" >-->
+              <!--              </el-table-column>-->
             </el-table>
           </div>
         </el-menu>
@@ -52,24 +53,35 @@
             </el-table-column>
             <el-table-column prop="captureTime" label="抓拍时间" width="150">
             </el-table-column>
+            <el-table-column prop="" label="月份" width="80">
+              <template slot-scope="scope">
+                {{ scope.row.captureTime.slice(5, 7) }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="" label="小时" width="80">
+              <template slot-scope="scope">
+                {{ scope.row.captureTime.slice(11, 13) }}
+              </template>
+            </el-table-column>
             <el-table-column prop="plate" label="车牌号码" width="120">
             </el-table-column>
             <el-table-column prop="plateColor" label="车牌颜色" width="100">
             </el-table-column>
             <el-table-column prop="plateType" label="车牌类型" width="118">
             </el-table-column>
-<!--            <el-table-column prop="dataType" label="数据类型">-->
-<!--            </el-table-column>-->
-<!--            <el-table-column prop="violationType" label="违章类型">-->
-<!--            </el-table-column>-->
-<!--            <el-table-column prop="direction" label="方向">-->
-<!--            </el-table-column>-->
-<!--            <el-table-column prop="speed" label="速度(km/h)" width="120">-->
-<!--            </el-table-column>-->
-<!--            <el-table-column prop="channelId" label="通道号">-->
-<!--            </el-table-column>-->
-<!--            <el-table-column prop="laneNo" label="车道号">-->
-<!--            </el-table-column>-->
+            <el-table-column prop="cameraName" label="抓拍位置"></el-table-column>
+            <!--            <el-table-column prop="dataType" label="数据类型">-->
+            <!--            </el-table-column>-->
+            <!--            <el-table-column prop="violationType" label="违章类型">-->
+            <!--            </el-table-column>-->
+            <!--            <el-table-column prop="direction" label="方向">-->
+            <!--            </el-table-column>-->
+            <!--            <el-table-column prop="speed" label="速度(km/h)" width="120">-->
+            <!--            </el-table-column>-->
+            <!--            <el-table-column prop="channelId" label="通道号">-->
+            <!--            </el-table-column>-->
+            <!--            <el-table-column prop="laneNo" label="车道号">-->
+            <!--            </el-table-column>-->
             <el-table-column prop="level" label="嫌疑度">
             </el-table-column>
           </div>
@@ -114,145 +126,6 @@ import request from "@/utils/request";
 import * as XLSX from 'xlsx'
 
 let i = 1290;
-const weights = {
-  frequency_factor: 0.10,
-  LPN_factor: 0.20,
-  car_film_factor: 0.05,
-  brand_factor: 0.05,
-  car_type_factor: 0.05,
-  face_factor: 0.30,
-  time_factor: 0.10,
-  month_factor: 0.10,
-  location_factor: 0.05,
-};
-
-const riskValues = {
-  high: 0.9,
-  mid: 0.5,
-  low: 0.3,
-};
-
-function getRiskLevel(value, category) {
-  const levels = {
-    car_type: {
-      high: ['棚栏货车', '小型客车', 'MPV'],
-      mid: ['轻型货车', '物流车'],
-      low: ['小轿车', '摩托车'],
-    },
-    car_film: {
-      high: ['深色膜'],
-      mid: ['浅色膜'],
-      low: ['无车膜'],
-    },
-    brand: {
-      high: ['金杯', '江铃', '五菱', '福特', '依维柯', '福田'],
-      mid: ['解放', '长安'],
-      low: [],
-    },
-    time: {
-      high: [0, 6], // 00:00 - 06:00
-      mid: [18, 24],
-      low: [6, 18],
-    },
-    month: {
-      high: [9, 10, 11],
-      mid: [8, 12],
-      low: [6, 7],
-    },
-    location: {
-      high: ['偏僻农村道路', '高速公路'],
-      mid: ['物流集散地'],
-      low: ['城市主干道'],
-    },
-    face: {
-      high: true, // 有案底
-      mid: false,
-      low: null,
-    },
-  };
-
-  const riskCategory = levels[category];
-
-  if (category === 'time') {
-    const hour = parseInt(value.split(':')[0]);
-    if (hour >= riskCategory.high[0] && hour < riskCategory.high[1]) return 'high';
-    if (hour >= riskCategory.mid[0] && hour < riskCategory.mid[1]) return 'mid';
-    return 'low';
-  }
-
-  if (category === 'month') {
-    if (riskCategory.high.includes(value)) return 'high';
-    if (riskCategory.mid.includes(value)) return 'mid';
-    return 'low';
-  }
-
-  if (category === 'face') {
-    return value ? 'high' : 'mid';
-  }
-
-  if (Array.isArray(riskCategory.high) && riskCategory.high.includes(value)) return 'high';
-  if (Array.isArray(riskCategory.mid) && riskCategory.mid.includes(value)) return 'mid';
-  if (Array.isArray(riskCategory.low) && riskCategory.low.includes(value)) return 'low';
-  return 'low';
-}
-
-// 计算并打印每项风险
-function calculateDetailedRisk(data) {
-  const results = [];
-  let totalRisk = 0;
-
-  const categories = {
-    car_type: 'car_type_factor',
-    car_film: 'car_film_factor',
-    brand: 'brand_factor',
-    face: 'face_factor',
-    time: 'time_factor',
-    month: 'month_factor',
-    location: 'location_factor',
-  };
-
-  for (let [key, factorKey] of Object.entries(categories)) {
-    const level = getRiskLevel(data[key], key);
-    const risk = riskValues[level];
-    const weight = weights[factorKey];
-    const contribution = risk * weight;
-
-    results.push({
-      属性: key,
-      值: data[key],
-      风险等级: level,
-      风险值: risk,
-      权重: weight,
-      贡献值: contribution,
-    });
-
-    totalRisk += contribution;
-  }
-
-  return { results, totalRisk };
-}
-
-// 示例数据
-const data = {
-  car_type: '小型客车',
-  car_film: '深色膜',
-  brand: '金杯',
-  face: true,
-  time: '01:00',
-  month: 10,
-  location: '高速公路',
-};
-
-const { results, totalRisk } = calculateDetailedRisk(data);
-
-console.log('【各项风险详情】：');
-results.forEach(item => {
-  console.log(
-    `${item.属性}（值: ${item.值}） → ${item.风险等级}风险，风险值 ${item.风险值} × 权重 ${item.权重} = 贡献 ${item.贡献值.toFixed(4)}`
-  );
-});
-console.log(`\n【总风险值】：${totalRisk.toFixed(4)}`);
-
 export default {
 
   data() {
@@ -334,19 +207,27 @@ export default {
         this.isFetching = false;
       });
     },
+    handleBeforeUnload() {
+      // 保存变量到 localStorage
+      localStorage.setItem('xy_counter', i);
+    },
     generateImgData() {
       if (this.imgd) {
         this.imgData = [
-          {key: "抓拍时间:", value: this.imgd2.captureTime, degreeofSuspicion: 15},
-          {key: "车牌号码:", value: this.imgd2.plate, degreeofSuspicion: 15},
-          {key: "车牌颜色:", value: this.imgd2.plateColor, degreeofSuspicion: 15},
-          {key: "车牌类型:", value: this.imgd2.plateType, degreeofSuspicion: 15}
-          // {key: "数据类型:", value: this.imgd2.dataType, degreeofSuspicion: 15},
-          // {key: "违章类型:", value: this.imgd2.violationType, degreeofSuspicion: 15},
-          // {key: "方向:", value: this.imgd2.direction, degreeofSuspicion: 15},
-          // {key: "速度(km/h):", value: this.imgd2.speed, degreeofSuspicion: 15},
-          // {key: "通道号:", value: this.imgd2.channelId, degreeofSuspicion: 15},
-          // {key: "车道号:", value: this.imgd2.laneNo, degreeofSuspicion: 15}
+          {key: "抓拍时间:", value: this.imgd2.captureTime,},
+          {key: "月份", value: this.imgd2.captureTime.slice(5, 7)},
+          {key: "小时", value: this.imgd2.captureTime.slice(11, 13)},
+          {key: "车牌号码:", value: this.imgd2.plate},
+          {key: "车牌颜色:", value: this.imgd2.plateColor},
+          {key: "车牌类型:", value: this.imgd2.plateType},
+          {key: "抓拍位置", value: this.imgd2.cameraName},
+          // {key: "数据类型:", value: this.imgd2.dataType},
+          // {key: "违章类型:", value: this.imgd2.violationType},
+          // {key: "方向:", value: this.imgd2.direction},
+          // {key: "速度(km/h):", value: this.imgd2.speed},
+          // {key: "通道号:", value: this.imgd2.channelId},
+          // {key: "车道号:", value: this.imgd2.laneNo},
+          {key: "嫌疑度:", value: this.imgd2.level}
         ];
       }
     },
@@ -398,14 +279,23 @@ export default {
     }
   },
   mounted() {
-    this.fetchData(); // 初始加载一次
-    this.timer = setInterval(this.fetchNewData, 3000); // 每5秒请求一次
+    const count = localStorage.getItem("xy_counter");
+
+    //this.fetchData(); // 初始加载一次
+    if (count != null) {
+      i = parseInt(count);
+      localStorage.removeItem('xy_counter');
+    }
+    //this.fetchNewData();
+    this.timer = setInterval(this.fetchNewData, 3000);// 每3秒请求一次
+    window.addEventListener('beforeunload', this.handleBeforeUnload);
   },
   beforeUnmount() {
     if (this.timer) {
       clearInterval(this.timer);
       this.timer = null;
     }
+    window.removeEventListener('beforeunload', this.handleBeforeUnload);
   },
   watch: {
     tableData() {
@@ -415,7 +305,6 @@ export default {
           this.animate = false;
         }, 500);
       });
-
       // 自动滚动到底部
       this.$nextTick(() => {
         const tableBody = this.$refs.dataTable.$el.querySelector('.el-table__body-wrapper');
