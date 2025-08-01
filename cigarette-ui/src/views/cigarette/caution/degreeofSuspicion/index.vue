@@ -58,17 +58,19 @@
             </el-table-column>
             <el-table-column prop="plateType" label="车牌类型" width="118">
             </el-table-column>
-            <el-table-column prop="dataType" label="数据类型">
-            </el-table-column>
-            <el-table-column prop="violationType" label="违章类型">
-            </el-table-column>
-            <el-table-column prop="direction" label="方向">
-            </el-table-column>
-            <el-table-column prop="speed" label="速度(km/h)" width="120">
-            </el-table-column>
-            <el-table-column prop="channelId" label="通道号">
-            </el-table-column>
-            <el-table-column prop="laneNo" label="车道号">
+<!--            <el-table-column prop="dataType" label="数据类型">-->
+<!--            </el-table-column>-->
+<!--            <el-table-column prop="violationType" label="违章类型">-->
+<!--            </el-table-column>-->
+<!--            <el-table-column prop="direction" label="方向">-->
+<!--            </el-table-column>-->
+<!--            <el-table-column prop="speed" label="速度(km/h)" width="120">-->
+<!--            </el-table-column>-->
+<!--            <el-table-column prop="channelId" label="通道号">-->
+<!--            </el-table-column>-->
+<!--            <el-table-column prop="laneNo" label="车道号">-->
+<!--            </el-table-column>-->
+            <el-table-column prop="level" label="嫌疑度">
             </el-table-column>
           </div>
         </el-table>
@@ -338,13 +340,13 @@ export default {
           {key: "抓拍时间:", value: this.imgd2.captureTime, degreeofSuspicion: 15},
           {key: "车牌号码:", value: this.imgd2.plate, degreeofSuspicion: 15},
           {key: "车牌颜色:", value: this.imgd2.plateColor, degreeofSuspicion: 15},
-          {key: "车牌类型:", value: this.imgd2.plateType, degreeofSuspicion: 15},
-          {key: "数据类型:", value: this.imgd2.dataType, degreeofSuspicion: 15},
-          {key: "违章类型:", value: this.imgd2.violationType, degreeofSuspicion: 15},
-          {key: "方向:", value: this.imgd2.direction, degreeofSuspicion: 15},
-          {key: "速度(km/h):", value: this.imgd2.speed, degreeofSuspicion: 15},
-          {key: "通道号:", value: this.imgd2.channelId, degreeofSuspicion: 15},
-          {key: "车道号:", value: this.imgd2.laneNo, degreeofSuspicion: 15}
+          {key: "车牌类型:", value: this.imgd2.plateType, degreeofSuspicion: 15}
+          // {key: "数据类型:", value: this.imgd2.dataType, degreeofSuspicion: 15},
+          // {key: "违章类型:", value: this.imgd2.violationType, degreeofSuspicion: 15},
+          // {key: "方向:", value: this.imgd2.direction, degreeofSuspicion: 15},
+          // {key: "速度(km/h):", value: this.imgd2.speed, degreeofSuspicion: 15},
+          // {key: "通道号:", value: this.imgd2.channelId, degreeofSuspicion: 15},
+          // {key: "车道号:", value: this.imgd2.laneNo, degreeofSuspicion: 15}
         ];
       }
     },

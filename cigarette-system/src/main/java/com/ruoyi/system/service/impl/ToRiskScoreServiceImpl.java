@@ -44,7 +44,7 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
             //测试1392
             if (data.getVehicleLogoAll() != null) {
                 String[] parts = data.getVehicleLogoAll().split("-");
-                System.out.println("品牌:"+data.getVehicleLogo()+"\nv"+"型号:"+parts[1]);
+                System.out.println("品牌:"+data.getVehicleLogo()+"\n"+"型号:"+parts[1]);
                 List<String> brandList = Arrays.asList("全顺", "聚星", "图雅诺", "SUV", "栅栏货车");
                 score += brandList.contains(parts[1]) ? 30 : 0;
             }
@@ -63,6 +63,7 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
             int hour = Optional.ofNullable(data.getCaptureTime())
                     .map(t -> t.toInstant().atZone(ZoneId.systemDefault()).getHour())
                     .orElse(12);
+            System.out.println("\n时长"+hour);
             score += (hour >= 0 && hour < 6) ? 10 : 0;
 
             // 7. 月份风险（10%）
@@ -70,7 +71,7 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
                     .map(t -> t.toInstant().atZone(ZoneId.systemDefault()).getMonthValue())
                     .orElse(1);
             score += (month >= 9 && month <= 11) ? 10 : 0;
-
+            System.out.println("\n月份"+month);
             // 8. 地点风险（5%）
             score += data.getDirection() != null &&
                     (data.getDirection().contains("农村") || data.getDirection().contains("高速")) ? 5 : 0;
