@@ -55,13 +55,13 @@
             </el-table-column>
             <el-table-column type="index" label="序号" width="50">
             </el-table-column>
-            <el-table-column prop="captureTime" label="抓拍时间" width="150">
+            <el-table-column prop="captureTime" label="抓拍时间" width="150" align="center">
             </el-table-column>
-            <el-table-column prop="plate" label="车牌号码" width="120">
+            <el-table-column prop="plate" label="车牌号码" width="120" align="center">
             </el-table-column>
-            <el-table-column prop="plateColor" label="车牌颜色" width="100">
+            <el-table-column prop="plateColor" label="车牌颜色" width="100" align="center">
             </el-table-column>
-            <el-table-column prop="plateType" label="车牌类型" width="118">
+            <el-table-column prop="plateType" label="车牌类型" width="118" align="center">
             </el-table-column>
             <el-table-column prop="dataType" label="数据类型">
             </el-table-column>

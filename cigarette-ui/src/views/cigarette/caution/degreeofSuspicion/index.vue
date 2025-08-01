@@ -51,25 +51,25 @@
             </el-table-column>
             <el-table-column type="index" label="序号" width="50">
             </el-table-column>
-            <el-table-column prop="captureTime" label="抓拍时间" width="150">
+            <el-table-column prop="captureTime" label="抓拍时间" width="150" align="center">
             </el-table-column>
-            <el-table-column prop="" label="月份" width="80">
+            <el-table-column prop="" label="月份" width="50" align="center">
               <template slot-scope="scope">
                 {{ scope.row.captureTime.slice(5, 7) }}
               </template>
             </el-table-column>
-            <el-table-column prop="" label="小时" width="80">
+            <el-table-column prop="" label="小时" width="50" align="center">
               <template slot-scope="scope">
                 {{ scope.row.captureTime.slice(11, 13) }}
               </template>
             </el-table-column>
-            <el-table-column prop="plate" label="车牌号码" width="120">
+            <el-table-column prop="plate" label="车牌号码" width="120" align="center">
             </el-table-column>
-            <el-table-column prop="plateColor" label="车牌颜色" width="100">
+            <el-table-column prop="plateColor" label="车牌颜色" width="100" align="center">
             </el-table-column>
-            <el-table-column prop="plateType" label="车牌类型" width="118">
+            <el-table-column prop="plateType" label="车牌类型" width="118" align="center">
             </el-table-column>
-            <el-table-column prop="cameraName" label="抓拍位置"></el-table-column>
+            <el-table-column prop="cameraName" label="抓拍位置" align="center"></el-table-column>
             <!--            <el-table-column prop="dataType" label="数据类型">-->
             <!--            </el-table-column>-->
             <!--            <el-table-column prop="violationType" label="违章类型">-->
@@ -82,12 +82,13 @@
             <!--            </el-table-column>-->
             <!--            <el-table-column prop="laneNo" label="车道号">-->
             <!--            </el-table-column>-->
-            <el-table-column prop="level" label="嫌疑度" align="center">
+            <el-table-column prop="level" label="嫌疑度" align="center" >
               <template #default="{ row }">
                 <el-tag
                   :type="row.level >= 60 ? 'danger' : 'info'"
                   effect="dark"
                   round
+                  style="display: inline-block; width: 50px; text-align: center;"
                 >
                   {{ row.level }}
                 </el-tag>
@@ -134,7 +135,7 @@
 import request from "@/utils/request";
 import * as XLSX from 'xlsx'
 
-let i = 1290;
+let j = 1290;
 export default {
 
   data() {
@@ -175,7 +176,7 @@ export default {
   methods: {
     fetchData() {
       request({
-        url: `/toVehicleMonitoring/list?lastId=${i++}`,
+        url: `/toVehicleMonitoring/list?lastId=${j++}`,
         method: 'get'
       }).then(res => {
         this.tableData = Array.isArray(res.data) ? res.data : [res.data];
@@ -190,7 +191,7 @@ export default {
       if (this.isFetching) return;
       this.isFetching = true;
       request({
-        url: `/toVehicleMonitoring/list?lastId=${i++}`,
+        url: `/toVehicleMonitoring/list?lastId=${j++}`,
         method: 'get',
         timeout: 30000
       }).then(res => {
@@ -218,7 +219,7 @@ export default {
     },
     handleBeforeUnload() {
       // 保存变量到 localStorage
-      localStorage.setItem('xy_counter', i);
+      localStorage.setItem('xy_counter', j);
     },
     generateImgData() {
       if (this.imgd) {
@@ -292,7 +293,7 @@ export default {
 
     //this.fetchData(); // 初始加载一次
     if (count != null) {
-      i = parseInt(count);
+      j = parseInt(count);
       localStorage.removeItem('xy_counter');
     }
     //this.fetchNewData();
