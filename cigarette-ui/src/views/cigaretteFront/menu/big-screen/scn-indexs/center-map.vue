@@ -43,7 +43,7 @@ import { ScnEventBus } from '@/utils/scn-event-bus';
 export default {
   data() {
     return {
-      maptitle: "视频监控",
+      maptitle: "",
       displayMode: 1,
       displayedCameras: []
     };

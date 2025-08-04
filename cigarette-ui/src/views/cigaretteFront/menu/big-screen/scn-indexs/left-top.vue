@@ -127,7 +127,6 @@ export default {
         };
 
         const response = await listVehicleBehaviorVoAll(params);
-        console.log('初始数据获取完成:', response);
 
         if (response && response.length > 0) {
           // 使用Vue.set确保响应式更新
@@ -157,21 +156,15 @@ export default {
         await this.getNewData();
       }, this.refreshInterval);
 
-      console.log('定时器已启动，间隔:', this.refreshInterval);
     },
 
     // 获取新增数据（追加）
     async getNewData() {
       try {
         if (!this.queryParams2.behaviorId) {
-          console.log('无behaviorId，跳过获取新数据');
           return;
         }
-
-        console.log('正在获取新增数据...');
         const response = await getUpToDataDegreeSuspicion(this.queryParams2);
-        console.log('新增数据获取完成:', response);
-
         if (response && response.length > 0) {
           // 使用Vue.set确保响应式
           this.$set(this, 'allData', [...this.allData, ...response]);

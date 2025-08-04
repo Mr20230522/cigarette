@@ -19,6 +19,15 @@ public interface TobKeyVideoMapper
      */
     public TobKeyVideo selectTobKeyVideoByVideoId(Long videoId);
 
+
+    /**
+     * 查询关键帧视频
+     *
+     * @param behaviorId 关键帧视频主键
+     * @return 关键帧视频
+     */
+    public TobKeyVideo selectTobKeyVideoByBehaviorId(Long behaviorId);
+
     /**
      * 查询关键帧视频列表
      * 

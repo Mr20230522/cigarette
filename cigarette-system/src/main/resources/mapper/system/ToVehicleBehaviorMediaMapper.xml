@@ -4,7 +4,7 @@
 
     <resultMap id="BehaviorMediaResult" type="com.ruoyi.system.domain.vo.ToVehicleBehaviorMediaVo">
         <result property="behaviorId" column="behavior_id"/>
-        <result property="licnesePlatePhotoPath" column="plate_image"/>
+        <result property="licensePlatePhotoPath" column="plate_image"/>
         <result property="vehiclePhotoPath" column="vehicle_image"/>
         <result property="vehicleBehaviorVedioPath" column="behavior_video"/>
     </resultMap>

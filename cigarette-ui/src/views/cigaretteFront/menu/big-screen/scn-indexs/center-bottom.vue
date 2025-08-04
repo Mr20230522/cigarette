@@ -45,6 +45,7 @@ import { ScnEventBus } from '@/utils/scn-event-bus';
 export default {
   data() {
     return {
+      isSuspectMode: false,
       currentMode: 1,
       selectedCameras: [],
       modes: [

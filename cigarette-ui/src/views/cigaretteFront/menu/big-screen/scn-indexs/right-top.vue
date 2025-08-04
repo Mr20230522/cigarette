@@ -6,6 +6,7 @@
         v-for="(item, i) in visibleList"
         :key="item.id || i"
         :class="{ 'show': item.show }"
+        @click="showSuspectedVideo(item.behaviorId)"
       >
         <span class="orderNum">{{ getDisplayIndex(i) }}</span>
         <div class="inner_right">
@@ -75,17 +76,20 @@
       </div>
     </div>
   </div>
-  <Reacquire v-else @onclick="initData" style="line-height:200px" />
+  <Reacquire v-else @onclick="initData" style="line-height:200px"/>
 </template>
 
 <script>
-import { getUpToDataDegreeSuspicion } from '@/api/cigarette/vehicle/vehicleBehavior'
+import {getUpToDataDegreeSuspicion} from '@/api/cigarette/vehicle/vehicleBehavior'
 import Reacquire from "@/components/scn-reacquire/reacquire.vue"
+import {ScnEventBus} from "@/utils/scn-event-bus";
+import {getVehicleBehaviorVideo} from "@/api/cigarette/multimediaResource/keyVideo"
 
 export default {
-  components: { Reacquire },
+  components: {Reacquire},
   data() {
     return {
+      videoData: [],
       pageflag: true,
       allData: [],           // 所有获取的数据
       visibleList: [],       // 当前显示的数据
@@ -107,7 +111,7 @@ export default {
         pageNum: 1,
         pageSize: 10,        // 每次获取10条数据
         degreeSuspicion: 60,
-        behaviorId:null
+        behaviorId: null
         // 其他查询参数...
       }
     }
@@ -130,6 +134,39 @@ export default {
       this.currentIndex = 0
       await this.fetchData()
     },
+    async showSuspectedVideo(behaviorId) {
+      try {
+        const videoDataTemp = await this.fetchVideoData(behaviorId)
+        if (videoDataTemp && videoDataTemp.videoPath) {
+          this.videoData.push({
+            id: 1,
+            name: videoDataTemp.detectionName,
+            url: 'http://127.0.0.1:8000/' + videoDataTemp.videoPath.replace('/profile/', ''),
+          })
+          ScnEventBus.$emit('suspected-video', {
+            mode:1,
+            cameras:this.videoData
+          })
+        }else{
+          console.warn('未获取到视频数据');
+        }
+      } catch {
+        console.error('处理视频数据失败:', error);
+      }
+    },
+    async fetchVideoData(behaviorId) {
+      try {
+        const response = await getVehicleBehaviorVideo(behaviorId);
+        console.log('视频数据:', response);
+        // 处理视频数据（如赋值给data中的变量）
+        // this.videoUrl = response.data.url;
+        return response.data
+      } catch (error) {
+        console.error('获取视频失败:', error);
+        return null
+      }
+    },
+
 
     // 获取数据
 // 获取数据方法优化
@@ -138,14 +175,10 @@ export default {
         this.loading = true;
         const response = await getUpToDataDegreeSuspicion(this.queryParams);
         response.reverse()
-        console.log('response.reverse()',response)
         // console.log('response.length',)
 
         if (response && response.length > 0) {
-          this.queryParams.behaviorId = response[response.length-1].behaviorId;
-
-          console.log('response[response.length()].behavior_id;',response[response.length-1].behaviorId)
-
+          this.queryParams.behaviorId = response[response.length - 1].behaviorId;
           const newData = response.map(item => ({
             ...item,
             picture: 'http://127.0.0.1:8000/' + item.picture.replace('/profile/', ''),
@@ -214,8 +247,9 @@ export default {
     // 图片加载失败处理
     handleImgError(item) {
       item.picture = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='40'%3E%3Crect fill='%23f5f5f5' width='80' height='40'/%3E%3Ctext x='40' y='20' font-size='10' text-anchor='middle'%3E无图片%3C/text%3E%3C/svg%3E"
-    }
-  },
+    },
+  }
+  ,
   beforeDestroy() {
     clearInterval(this.displayTimer)
     clearTimeout(this.fetchTimer)
@@ -377,8 +411,12 @@ export default {
   }
 
   @keyframes rotating {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   .image-preview-overlay {

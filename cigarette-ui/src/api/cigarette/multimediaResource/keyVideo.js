@@ -52,3 +52,11 @@ export function uploadVideo(data) {
     data: data
   })
 }
+//获取车辆行为视屏
+
+export function getVehicleBehaviorVideo(behaviorId) {
+  return request({
+    url: '/cigarette/multimediaResource/keyVideo/behavior/' + behaviorId,
+    method: 'get'
+  })
+}

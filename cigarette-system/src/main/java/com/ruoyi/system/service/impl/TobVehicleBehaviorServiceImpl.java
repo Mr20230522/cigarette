@@ -212,13 +212,23 @@ public class TobVehicleBehaviorServiceImpl implements ITobVehicleBehaviorService
     }
 
     /**
-     * 删除车辆行为记录信息
+     * 获取超过嫌疑最新前十条数据
      *
      * @param tobVehicleBehaviorVo 车辆行为记录
      * @return 结果
      */
     public List<TobVehicleBehaviorVo> getUpToDataDegreeSuspicion(TobVehicleBehaviorVo tobVehicleBehaviorVo){
         return tobVehicleBehaviorMapper.getUpToDataDegreeSuspicion(tobVehicleBehaviorVo);
+    }
+
+    /**
+     * 获取超过嫌疑所有数据
+     *
+     * @param tobVehicleBehaviorVo 车辆行为记录
+     * @return 结果
+     */
+    public List<TobVehicleBehaviorVo> getUpToDataDegreeSuspicionAll(TobVehicleBehaviorVo tobVehicleBehaviorVo){
+        return tobVehicleBehaviorMapper.getUpToDataDegreeSuspicionAll(tobVehicleBehaviorVo);
     }
 
 }

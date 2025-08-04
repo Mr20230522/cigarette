@@ -137,10 +137,24 @@ public class TobVehicleBehaviorController extends BaseController
         return tobVehicleBehaviorService.getVehicleColorData(tobVehicleBehaviorVo);
     }
 
+    /**
+     *  获取嫌疑度最新前十的数据
+     * @param tobVehicleBehaviorVo
+     * @return
+     */
     @GetMapping("getUpToDataDegreeSuspicion")
     public List<TobVehicleBehaviorVo> getUpToDataDegreeSuspicion(TobVehicleBehaviorVo tobVehicleBehaviorVo){
-        System.out.println("tobVehicleBehaviorService.getUpToDataDegreeSuspicion(tobVehicleBehaviorVo)"+tobVehicleBehaviorService.getUpToDataDegreeSuspicion(tobVehicleBehaviorVo));
         return tobVehicleBehaviorService.getUpToDataDegreeSuspicion(tobVehicleBehaviorVo);
+    }
+
+    /**
+     *  获取有嫌疑的所有数据
+     * @param tobVehicleBehaviorVo
+     * @return
+     */
+    @GetMapping("getUpToDataDegreeSuspicionAll")
+    public List<TobVehicleBehaviorVo> getUpToDataDegreeSuspicionAll(TobVehicleBehaviorVo tobVehicleBehaviorVo){
+        return tobVehicleBehaviorService.getUpToDataDegreeSuspicionAll(tobVehicleBehaviorVo);
     }
 
     /**
