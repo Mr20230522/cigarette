@@ -50,9 +50,11 @@ export default {
   },
   mounted() {
     ScnEventBus.$on('video-display-change', this.updateDisplay);
+    ScnEventBus.$on('suspected-video', this.updateDisplay);
   },
   beforeDestroy() {
     ScnEventBus.$off('video-display-change', this.updateDisplay);
+    ScnEventBus.$off('suspected-video', this.updateDisplay);
   },
   methods: {
     updateDisplay({ mode, cameras }) {

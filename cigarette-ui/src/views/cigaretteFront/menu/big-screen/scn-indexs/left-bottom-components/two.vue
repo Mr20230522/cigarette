@@ -1,4 +1,4 @@
-<template>
+f<template>
   <div class="chart-container" ref="chartDom"></div>
 </template>
 

@@ -48,7 +48,7 @@
               <div class="text-row address-alert">
                 <div class="info address">
                   <span class="labels">监测点：</span>
-                  <span class="contents ciyao">{{ item.detectionId }}</span>
+                  <span class="contents ciyao">{{ getDetectionName(item.detectionId) }}</span>
                 </div>
                 <div class="info alert">
                   <span class="labels">备注：</span>
@@ -84,12 +84,16 @@ import {getUpToDataDegreeSuspicion} from '@/api/cigarette/vehicle/vehicleBehavio
 import Reacquire from "@/components/scn-reacquire/reacquire.vue"
 import {ScnEventBus} from "@/utils/scn-event-bus";
 import {getVehicleBehaviorVideo} from "@/api/cigarette/multimediaResource/keyVideo"
+import {listDetection} from "@/api/cigarette/detection/detection";
+
 
 export default {
   components: {Reacquire},
   data() {
     return {
+      detectionOptions: [],
       videoData: [],
+      vehicleData: null,
       pageflag: true,
       allData: [],           // 所有获取的数据
       visibleList: [],       // 当前显示的数据
@@ -108,12 +112,10 @@ export default {
 
       // 查询参数
       queryParams: {
-        pageNum: 1,
-        pageSize: 10,        // 每次获取10条数据
         degreeSuspicion: 60,
         behaviorId: null
         // 其他查询参数...
-      }
+      },
     }
   },
   filters: {
@@ -133,23 +135,45 @@ export default {
       this.visibleList = []
       this.currentIndex = 0
       await this.fetchData()
+      await this.loadDetectionOptions(); // 加载检测点选项
+
     },
     async showSuspectedVideo(behaviorId) {
       try {
         const videoDataTemp = await this.fetchVideoData(behaviorId)
-        if (videoDataTemp && videoDataTemp.videoPath) {
-          this.videoData.push({
-            id: 1,
-            name: videoDataTemp.detectionName,
-            url: 'http://127.0.0.1:8000/' + videoDataTemp.videoPath.replace('/profile/', ''),
-          })
+        const vehicleDataTemp = await getUpToDataDegreeSuspicion({degreeSuspicion: null, behaviorId: behaviorId})
+
+        if (videoDataTemp) {
+          if (videoDataTemp.videoPath) {
+            this.videoData.push({
+              id: 1,
+              name: videoDataTemp.detectionName,
+              url: 'http://127.0.0.1:8000/' + videoDataTemp.videoPath.replace('/profile/', ''),
+            })
+          } else {
+            this.videoData.push({
+              id: 1,
+              name: videoDataTemp.detectionName,
+              url: null
+            })
+          }
           ScnEventBus.$emit('suspected-video', {
-            mode:1,
-            cameras:this.videoData
+            mode: 1,
+            cameras: this.videoData
           })
-        }else{
+          this.videoData = []
+        } else {
           console.warn('未获取到视频数据');
         }
+        ScnEventBus.$emit('suspected-information', {
+          licensePlate: vehicleDataTemp[0].licensePlate,
+          carType: vehicleDataTemp[0].carTypeId,
+          suspicionLevel: vehicleDataTemp[0].degreeSuspicion,
+          color: vehicleDataTemp[0].carColor,
+          detectionPoint: vehicleDataTemp[0].detectionId,
+          remark: vehicleDataTemp[0].remark
+        })
+
       } catch {
         console.error('处理视频数据失败:', error);
       }
@@ -157,7 +181,6 @@ export default {
     async fetchVideoData(behaviorId) {
       try {
         const response = await getVehicleBehaviorVideo(behaviorId);
-        console.log('视频数据:', response);
         // 处理视频数据（如赋值给data中的变量）
         // this.videoUrl = response.data.url;
         return response.data
@@ -175,7 +198,6 @@ export default {
         this.loading = true;
         const response = await getUpToDataDegreeSuspicion(this.queryParams);
         response.reverse()
-        // console.log('response.length',)
 
         if (response && response.length > 0) {
           this.queryParams.behaviorId = response[response.length - 1].behaviorId;
@@ -196,6 +218,22 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    // 加载检测点选项
+    loadDetectionOptions() {
+      listDetection().then(response => {
+        this.detectionOptions = response.rows.map(item => ({
+          detectionId: item.detectionId,
+          districtId: item.districtId,
+          detectionName: item.detectionName
+        }));
+      }).catch(error => {
+        console.error("Failed to load detection options:", error);
+      });
+    },
+    getDetectionName(detectionId) {
+      const detection = this.detectionOptions.find(item => item.detectionId === detectionId)
+      return detection ? detection.detectionName : '未知监测点';
     },
     // 开始逐条显示数据
     startDisplay() {

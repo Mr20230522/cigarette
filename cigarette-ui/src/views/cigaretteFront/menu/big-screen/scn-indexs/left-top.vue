@@ -74,7 +74,7 @@ export default {
       queryParams2: {
         pageNum: 1,
         pageSize: 1000,
-        degreeSuspicion: null,
+        degreeSuspicion: 0,
         behaviorId: null // 用于获取比此ID更新的数据
       },
       config: {
