@@ -13,7 +13,8 @@ import java.util.List;
 @RequestMapping("/toVehicleMonitoring")
 public class ToVehicleRealTimMonitoringController {
 
-    //    @Autowired
+
+//    @Autowired
 //    private IToVehicleRealTimMonitoringService monitoringService;
 //
 //    @GetMapping("/list")

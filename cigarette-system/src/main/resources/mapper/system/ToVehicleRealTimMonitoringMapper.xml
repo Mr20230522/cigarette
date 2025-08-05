@@ -89,4 +89,9 @@
         SET level = #{level}
         WHERE id = #{id}
     </update>
+    <select id="selectByTime" parameterType="Long" resultType="com.ruoyi.system.domain.ToVehicleRealTimMonitoring">
+        SELECT *
+        FROM trafficdata
+        WHERE captureTime >= #{captureTime}
+    </select>
 </mapper>
