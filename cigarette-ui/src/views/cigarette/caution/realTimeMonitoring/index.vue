@@ -181,9 +181,13 @@ export default {
       }).then(res => {
         const newData = Array.isArray(res.data) ? res.data : [res.data];
         if (newData.length > 0) {
-          this.tableData.push(newData[0]);
+          // this.tableData.push(newData[0]);
+          // if (this.tableData.length > this.maxDataCount) {
+          //   this.tableData.shift();
+          // }
+          this.tableData.unshift(newData[0]);
           if (this.tableData.length > this.maxDataCount) {
-            this.tableData.shift();
+            this.tableData.pop();
           }
           this.imgd = newData;
           this.imgd2 = newData[0];
