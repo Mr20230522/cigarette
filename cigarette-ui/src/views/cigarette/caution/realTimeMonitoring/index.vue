@@ -158,7 +158,8 @@ export default {
   methods: {
     fetchData() {
       request({
-        url: `/toVehicleMonitoring/list?lastId=${i++}`,
+        // url: `/toVehicleMonitoring/list?lastId=${i++}`,
+        url: `/toVehicleMonitoring/list`,
         method: 'get'
       }).then(res => {
         this.tableData = Array.isArray(res.data) ? res.data : [res.data];
@@ -181,9 +182,9 @@ export default {
         const newData = Array.isArray(res.data) ? res.data : [res.data];
         if (newData.length > 0) {
           this.tableData.push(newData[0]);
-          // if (this.tableData.length > this.maxDataCount) {
-          //   this.tableData.shift();
-          // }
+          if (this.tableData.length > this.maxDataCount) {
+            this.tableData.shift();
+          }
           this.imgd = newData;
           this.imgd2 = newData[0];
           // console.log("数据")
@@ -299,7 +300,8 @@ export default {
       this.$nextTick(() => {
         const tableBody = this.$refs.dataTable.$el.querySelector('.el-table__body-wrapper');
         if (tableBody) {
-          tableBody.scrollTop = tableBody.scrollHeight;
+          // tableBody.scrollTop = tableBody.scrollHeight;
+          tableBody.scrollTop = 0;
         }
       });
     }
