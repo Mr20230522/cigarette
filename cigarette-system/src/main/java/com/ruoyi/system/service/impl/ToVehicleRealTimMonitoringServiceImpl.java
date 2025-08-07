@@ -6,6 +6,7 @@ import com.ruoyi.system.service.IToVehicleRealTimMonitoringService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -24,5 +25,9 @@ public class ToVehicleRealTimMonitoringServiceImpl implements IToVehicleRealTimM
     @Override
     public ToVehicleRealTimMonitoring getNextRecord(Long lastId) {
         return mapper.selectNext(lastId);
+    }
+    @Override
+    public ToVehicleRealTimMonitoring getLastedRecord(Date captureTime) {
+        return mapper.selectByTime(captureTime);
     }
 }

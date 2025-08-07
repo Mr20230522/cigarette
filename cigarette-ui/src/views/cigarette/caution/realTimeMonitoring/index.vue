@@ -114,6 +114,7 @@
 
 <script>
 import request from "@/utils/request";
+import dayjs from 'dayjs'
 import * as XLSX from 'xlsx'
 
 let i = 1290;
@@ -172,7 +173,8 @@ export default {
       if (this.isFetching) return;
       this.isFetching = true;
       request({
-        url: `/toVehicleMonitoring/list?lastId=${i++}`,
+        // url: `/toVehicleMonitoring/list?lastId=${i++}`,
+        url: `/toVehicleMonitoring/list`,
         method: 'get',
         timeout: 30000
       }).then(res => {
@@ -267,10 +269,11 @@ export default {
   },
   mounted() {
     const count = localStorage.getItem("counter");
-
+    const now = dayjs().format('YYYY-MM-DD HH:mm:ss')
+    //alert(now);
     //this.fetchData(); // 初始加载一次
     if (count != null) {
-      i = parseInt(count);
+      //i = parseInt(count);
       localStorage.removeItem('counter');
     }
     //this.fetchNewData();

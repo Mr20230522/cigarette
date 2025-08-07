@@ -7,7 +7,8 @@ import com.ruoyi.system.service.IToVehicleRealTimMonitoringService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Date;
+
 
 @RestController
 @RequestMapping("/toVehicleMonitoring")
@@ -26,9 +27,22 @@ public class ToVehicleRealTimMonitoringController {
     @Autowired
     private IToVehicleRealTimMonitoringService vehicleService;
 
+//    @GetMapping("/list")
+//    public AjaxResult getNextRecord(@RequestParam(value = "lastId", defaultValue = "0") Long lastId) {
+//        ToVehicleRealTimMonitoring next = vehicleService.getNextRecord(lastId);
+//        if (next != null) {
+//            return AjaxResult.success(next);
+//        } else {
+//            return AjaxResult.error("没有更多数据");
+//        }
+//    }
+
     @GetMapping("/list")
-    public AjaxResult getNextRecord(@RequestParam(value = "lastId", defaultValue = "0") Long lastId) {
-        ToVehicleRealTimMonitoring next = vehicleService.getNextRecord(lastId);
+    public AjaxResult getNextRecord(@RequestParam(value = "captureTime", required = false) Date captureTime) {
+        if (captureTime == null) {
+            captureTime = new Date();
+        }
+        ToVehicleRealTimMonitoring next = vehicleService.getLastedRecord(captureTime);
         if (next != null) {
             return AjaxResult.success(next);
         } else {
