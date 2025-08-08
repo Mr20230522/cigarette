@@ -1,37 +1,37 @@
 package com.ruoyi.system.service.impl;
 
 
-import com.ruoyi.system.domain.FactorConfig;
-import com.ruoyi.system.mapper.FactorConfigMapper;
-import com.ruoyi.system.service.IFactorConfigService;
+import com.ruoyi.system.domain.ToFactorConfig;
+import com.ruoyi.system.mapper.ToFactorConfigMapper;
+import com.ruoyi.system.service.IToFactorConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class FactorConfigServiceImpl implements IFactorConfigService {
+public class ToFactorConfigServiceImpl implements IToFactorConfigService {
 
     @Autowired
-    private FactorConfigMapper factorConfigMapper;
+    private ToFactorConfigMapper factorConfigMapper;
 
     @Override
-    public List<FactorConfig> selectFactorConfigList(FactorConfig filter) {
+    public List<ToFactorConfig> selectFactorConfigList(ToFactorConfig filter) {
         return factorConfigMapper.selectFactorConfigList(filter);
     }
 
     @Override
-    public FactorConfig selectFactorConfigById(Long id) {
+    public ToFactorConfig selectFactorConfigById(Long id) {
         return factorConfigMapper.selectFactorConfigById(id);
     }
 
     @Override
-    public int insertFactorConfig(FactorConfig factorConfig) {
+    public int insertFactorConfig(ToFactorConfig factorConfig) {
         return factorConfigMapper.insertFactorConfig(factorConfig);
     }
 
     @Override
-    public int updateFactorConfig(FactorConfig factorConfig) {
+    public int updateFactorConfig(ToFactorConfig factorConfig) {
         return factorConfigMapper.updateFactorConfig(factorConfig);
     }
 

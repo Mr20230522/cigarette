@@ -3,8 +3,8 @@ package com.ruoyi.web.controller.cigarette.caution.factor;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.system.domain.FactorTrigger;
-import com.ruoyi.system.service.IFactorTriggerService;
+import com.ruoyi.system.domain.ToFactorTrigger;
+import com.ruoyi.system.service.IToFactorTriggerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,15 +12,15 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/factor/trigger")
-public class FactorTriggerController extends BaseController {
+public class ToFactorTriggerController extends BaseController {
 
     @Autowired
-    private IFactorTriggerService factorTriggerService;
+    private IToFactorTriggerService factorTriggerService;
 
     @GetMapping("/list")
-    public TableDataInfo list(FactorTrigger filter) {
+    public TableDataInfo list(ToFactorTrigger filter) {
         startPage();
-        List<FactorTrigger> list = factorTriggerService.selectFactorTriggerList(filter);
+        List<ToFactorTrigger> list = factorTriggerService.selectFactorTriggerList(filter);
         return getDataTable(list);
     }
 
@@ -30,12 +30,12 @@ public class FactorTriggerController extends BaseController {
     }
 
     @PostMapping
-    public AjaxResult add(@RequestBody FactorTrigger factorTrigger) {
+    public AjaxResult add(@RequestBody ToFactorTrigger factorTrigger) {
         return toAjax(factorTriggerService.insertFactorTrigger(factorTrigger));
     }
 
     @PutMapping
-    public AjaxResult edit(@RequestBody FactorTrigger factorTrigger) {
+    public AjaxResult edit(@RequestBody ToFactorTrigger factorTrigger) {
         return toAjax(factorTriggerService.updateFactorTrigger(factorTrigger));
     }
 

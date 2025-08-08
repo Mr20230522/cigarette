@@ -3,8 +3,8 @@ package com.ruoyi.web.controller.cigarette.caution.factor;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.system.domain.FactorConfig;
-import com.ruoyi.system.service.IFactorConfigService;
+import com.ruoyi.system.domain.ToFactorConfig;
+import com.ruoyi.system.service.IToFactorConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,15 +12,15 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/factor/config")
-public class FactorConfigController extends BaseController {
+public class ToFactorConfigController extends BaseController {
 
     @Autowired
-    private IFactorConfigService factorConfigService;
+    private IToFactorConfigService factorConfigService;
 
     @GetMapping("/list")
-    public TableDataInfo list(FactorConfig filter) {
+    public TableDataInfo list(ToFactorConfig filter) {
         startPage();
-        List<FactorConfig> list = factorConfigService.selectFactorConfigList(filter);
+        List<ToFactorConfig> list = factorConfigService.selectFactorConfigList(filter);
         return getDataTable(list);
     }
 
@@ -30,12 +30,12 @@ public class FactorConfigController extends BaseController {
     }
 
     @PostMapping
-    public AjaxResult add(@RequestBody FactorConfig factorConfig) {
+    public AjaxResult add(@RequestBody ToFactorConfig factorConfig) {
         return toAjax(factorConfigService.insertFactorConfig(factorConfig));
     }
 
     @PutMapping
-    public AjaxResult edit(@RequestBody FactorConfig factorConfig) {
+    public AjaxResult edit(@RequestBody ToFactorConfig factorConfig) {
         return toAjax(factorConfigService.updateFactorConfig(factorConfig));
     }
 

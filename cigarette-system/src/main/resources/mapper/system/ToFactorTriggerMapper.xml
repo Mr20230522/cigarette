@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ruoyi.system.mapper.FactorTriggerMapper">
+<mapper namespace="com.ruoyi.system.mapper.ToFactorTriggerMapper">
 
     <!-- 通用字段映射 -->
-    <resultMap id="BaseResultMap" type="com.ruoyi.system.domain.FactorTrigger">
+    <resultMap id="BaseResultMap" type="com.ruoyi.system.domain.ToFactorTrigger">
         <id property="id" column="id" jdbcType="BIGINT"/>
         <result property="factorId" column="factor_id" jdbcType="BIGINT"/>
         <result property="triggerValue" column="trigger_value" jdbcType="VARCHAR"/>
@@ -24,7 +24,7 @@
     </select>
 
     <!-- 列表查询 -->
-    <select id="selectFactorTriggerList" resultMap="BaseResultMap" parameterType="com.ruoyi.system.domain.FactorTrigger">
+    <select id="selectFactorTriggerList" resultMap="BaseResultMap" parameterType="com.ruoyi.system.domain.ToFactorTrigger">
         SELECT <include refid="Base_Column_List"/>
         FROM factor_trigger
         <where>
@@ -39,7 +39,7 @@
 
     <!-- 插入（动态列） -->
     <insert id="insertFactorTrigger"
-            parameterType="com.ruoyi.system.domain.FactorTrigger"
+            parameterType="com.ruoyi.system.domain.ToFactorTrigger"
             useGeneratedKeys="true" keyProperty="id">
         INSERT INTO factor_trigger
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -53,7 +53,7 @@
     </insert>
 
     <!-- 更新（动态列） -->
-    <update id="updateFactorTrigger" parameterType="com.ruoyi.system.domain.FactorTrigger">
+    <update id="updateFactorTrigger" parameterType="com.ruoyi.system.domain.ToFactorTrigger">
         UPDATE factor_trigger
         <set>
             <if test="factorId != null">factor_id = #{factorId},</if>

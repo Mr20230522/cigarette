@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class FactorConfig extends BaseEntity {
+public class ToFactorConfig extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     /** 主键 */

@@ -1,37 +1,37 @@
 package com.ruoyi.system.service.impl;
 
 
-import com.ruoyi.system.domain.FactorTrigger;
-import com.ruoyi.system.mapper.FactorTriggerMapper;
-import com.ruoyi.system.service.IFactorTriggerService;
+import com.ruoyi.system.domain.ToFactorTrigger;
+import com.ruoyi.system.mapper.ToFactorTriggerMapper;
+import com.ruoyi.system.service.IToFactorTriggerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class FactorTriggerServiceImpl implements IFactorTriggerService {
+public class ToFactorTriggerServiceImpl implements IToFactorTriggerService {
 
     @Autowired
-    private FactorTriggerMapper factorTriggerMapper;
+    private ToFactorTriggerMapper factorTriggerMapper;
 
     @Override
-    public List<FactorTrigger> selectFactorTriggerList(FactorTrigger filter) {
+    public List<ToFactorTrigger> selectFactorTriggerList(ToFactorTrigger filter) {
         return factorTriggerMapper.selectFactorTriggerList(filter);
     }
 
     @Override
-    public FactorTrigger selectFactorTriggerById(Long id) {
+    public ToFactorTrigger selectFactorTriggerById(Long id) {
         return factorTriggerMapper.selectFactorTriggerById(id);
     }
 
     @Override
-    public int insertFactorTrigger(FactorTrigger factorTrigger) {
+    public int insertFactorTrigger(ToFactorTrigger factorTrigger) {
         return factorTriggerMapper.insertFactorTrigger(factorTrigger);
     }
 
     @Override
-    public int updateFactorTrigger(FactorTrigger factorTrigger) {
+    public int updateFactorTrigger(ToFactorTrigger factorTrigger) {
         return factorTriggerMapper.updateFactorTrigger(factorTrigger);
     }
 
