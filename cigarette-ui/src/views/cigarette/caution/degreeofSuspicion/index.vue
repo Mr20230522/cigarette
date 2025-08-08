@@ -293,7 +293,7 @@ export default {
 
     //this.fetchData(); // 初始加载一次
     if (count != null) {
-      j = parseInt(count);
+      //j = parseInt(count);
       localStorage.removeItem('xy_counter');
     }
     //this.fetchNewData();

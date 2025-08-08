@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.system.mapper.FactorTriggerValueMapper">
+
+    <!-- 查询触发值列表 -->
+    <select id="selectFactorTriggerList" parameterType="com.ruoyi.system.domain.FactorTriggerValue" resultType="com.ruoyi.system.domain.FactorTriggerValue">
+        SELECT
+        id,
+        factor_key,
+        trigger_value
+        FROM factor_trigger
+        <where>
+            <if test="factorKey != null and factorKey != ''">
+                AND factor_key = #{factorKey}
+            </if>
+            <if test="triggerValue != null and triggerValue != ''">
+                AND trigger_value LIKE concat('%', #{triggerValue}, '%')
+            </if>
+        </where>
+        ORDER BY id ASC
+    </select>
+
+    <!-- 新增触发值 -->
+    <insert id="insertFactorTrigger" parameterType="com.ruoyi.system.domain.FactorTriggerValue">
+        INSERT INTO factor_trigger_value (factor_key, trigger_value)
+        VALUES (#{factorKey}, #{triggerValue})
+    </insert>
+
+    <!-- 删除触发值 -->
+    <delete id="deleteFactorTriggerById" parameterType="Long">
+        DELETE FROM factor_trigger_value WHERE id = #{id}
+    </delete>
+
+    <!-- 批量删除触发值 -->
+    <delete id="deleteFactorTriggerByIds" parameterType="Long">
+        DELETE FROM factor_trigger WHERE id IN
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

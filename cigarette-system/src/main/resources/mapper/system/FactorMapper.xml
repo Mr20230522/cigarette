@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.system.mapper.FactorMapper">
+
+    <!-- 查询因子列表 -->
+    <select id="selectFactorList" parameterType="com.ruoyi.system.domain.Factor" resultType="com.ruoyi.system.domain.Factor">
+        SELECT *
+        FROM factor
+<!--        <where>-->
+<!--            <if test="factorKey != null and factorKey != ''">-->
+<!--                AND factor_key LIKE concat('%', #{factorKey}, '%')-->
+<!--            </if>-->
+<!--            <if test="description != null and description != ''">-->
+<!--                AND description LIKE concat('%', #{description}, '%')-->
+<!--            </if>-->
+<!--        </where>-->
+        ORDER BY id ASC
+    </select>
+
+    <!-- 查询单个因子 -->
+    <select id="selectFactorById" parameterType="Long" resultType="com.ruoyi.system.domain.Factor">
+        SELECT *
+        FROM factor
+        WHERE id = #{id}
+    </select>
+
+    <!-- 新增因子 -->
+    <insert id="insertFactor" parameterType="com.ruoyi.system.domain.Factor">
+        INSERT INTO factor (factor_key, factor_value, description)
+        VALUES (#{factorKey}, #{factorValue}, #{description})
+    </insert>
+
+    <!-- 修改因子 -->
+    <update id="updateFactor" parameterType="com.ruoyi.system.domain.Factor">
+        UPDATE factor
+        SET factor_value = #{factorValue},
+            description = #{description}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除因子 -->
+    <delete id="deleteFactorById" parameterType="Long">
+        DELETE FROM factor WHERE id = #{id}
+    </delete>
+
+    <!-- 批量删除因子 -->
+    <delete id="deleteFactorByIds" parameterType="Long">
+        DELETE FROM factor WHERE id IN
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>
