@@ -46,3 +46,5 @@ package-lock.json
 !*/build/*.java
 !*/build/*.html
 !*/build/*.xml
+application.yml
+application-druid.yml
