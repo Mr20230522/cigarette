@@ -268,7 +268,7 @@ import java.util.stream.Collectors;
 @Service
 public class ToRiskScoreServiceImpl implements IToRiskScoreService {
 
-    private static final int BATCH_SIZE = 100;
+    private static final int BATCH_SIZE = 5;
     private static final String POSITION_FILE = "risk_position.txt";
 
     @Autowired
@@ -289,10 +289,10 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
         ToFactorTrigger filter2 = null;
         // 读取所有因子配置
         List<ToFactorConfig> factors = factorConfigMapper.selectFactorConfigList(filter1);
-
+        System.out.println("条件"+factors);
         // 读取所有因子触发条件
         List<ToFactorTrigger> triggers = factorTriggerMapper.selectFactorTriggerList(filter2);
-
+        System.out.println("触发条件"+triggers);
         // 按因子ID分组触发条件，方便快速查找
         Map<Long, List<String>> factorTriggersMap = triggers.stream()
                 .collect(Collectors.groupingBy(ToFactorTrigger::getFactorId,
