@@ -155,12 +155,43 @@ export default {
       return this.tableData.slice(-this.maxDataCount); // 只显示最后 maxDataCount 条
     }
   },
+  created() {
+    // 页面加载时生成唯一 pageToken
+    //这是第一版本的生成 UUID 方法
+    // this.pageToken = this.generateUUID();
+    this.pageToken = this.pageToken = Math.random().toString(36).substr(2) + Date.now();
+  },
   methods: {
+    // fetchData() {
+    //   request({
+    //     // url: `/toVehicleMonitoring/list?lastId=${i++}`,
+    //     url: `/toVehicleMonitoring/list`,
+    //     method: 'get'
+    //   }).then(res => {
+    //     this.tableData = Array.isArray(res.data) ? res.data : [res.data];
+    //     this.imgd = Array.isArray(res.data) ? res.data : [res.data];
+    //     // 动态生成 imgData
+    //     //console.log(this.tableData)
+    //     // console.log(JSON.parse(JSON.stringify(res.data)))
+    //     this.generateImgData();
+    //   });
+    // },
+    // 简单 UUID 生成函数
+    generateUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = (Math.random() * 16) | 0;
+        const v = c === 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+      });
+    },
     fetchData() {
       request({
         // url: `/toVehicleMonitoring/list?lastId=${i++}`,
         url: `/toVehicleMonitoring/list`,
-        method: 'get'
+        method: 'get',
+        params: {
+          pageToken: this.pageToken
+        }
       }).then(res => {
         this.tableData = Array.isArray(res.data) ? res.data : [res.data];
         this.imgd = Array.isArray(res.data) ? res.data : [res.data];
@@ -177,6 +208,10 @@ export default {
         // url: `/toVehicleMonitoring/list?lastId=${i++}`,
         url: `/toVehicleMonitoring/list`,
         method: 'get',
+        params: {
+          pageToken: this.pageToken,
+          // lastId: i++ // 如果需要传递 lastId，可以取消注释
+        },
         timeout: 30000
       }).then(res => {
         const newData = Array.isArray(res.data) ? res.data : [res.data];

@@ -92,8 +92,27 @@
     <select id="selectByTime"  resultType="com.ruoyi.system.domain.ToVehicleRealTimMonitoring">
         SELECT *
         FROM trafficdata
-        WHERE captureTime >= #{captureTime}
+        WHERE captureTime > #{captureTime}
         ORDER BY CaptureTime DESC
         LIMIT 1;
     </select>
+<!--    <select id="selectByTime" resultType="com.ruoyi.system.domain.ToVehicleRealTimMonitoring">-->
+<!--        SELECT *-->
+<!--        FROM trafficdata-->
+<!--        WHERE DATE_FORMAT(captureTime, '%Y-%m-%d %H:%i') >= DATE_FORMAT(#{captureTime}, '%Y-%m-%d %H:%i')-->
+<!--        ORDER BY captureTime DESC-->
+<!--        LIMIT 1-->
+<!--    </select>-->
+<!--    <select id="selectByTime" resultType="com.ruoyi.system.domain.ToVehicleRealTimMonitoring">-->
+<!--        SELECT *-->
+<!--        FROM trafficdata-->
+<!--        WHERE (-->
+<!--                  captureTime > #{captureTime}-->
+<!--                      OR (captureTime = #{captureTime} AND id > #{lastId})-->
+<!--                  )-->
+<!--        ORDER BY captureTime DESC, id DESC-->
+<!--        LIMIT 1-->
+<!--    </select>-->
+
+
 </mapper>
