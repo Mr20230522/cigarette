@@ -9,45 +9,50 @@ import lombok.Data;
 @Data
 public class ToVehicleRealTimMonitoring extends BaseEntity {
     private static final long serialVersionUID = 1L;
-
+    //主键
     private Long id;
-
+    //相机ID
     private Integer cameraId;
-
+    //相机名称
     private String cameraName;
-
+    //车道号
     private Integer laneNo;
-
+    //方向
     private String direction;
-
+    //车速
     private Integer speed;
-
+    //车牌
     private String plate;
-
+    //车牌类型
     private String plateType;
-
+    //车牌颜色
     private String plateColor;
-
+    //车身颜色
     private String vehicleColor;
-
+    //车辆类型
     private String vehicleType;
-
+    //车辆品牌
     private String vehicleLogo;
-
+    //车辆品牌-完整信息
     private String vehicleLogoAll;
-
+    //捕获时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date captureTime;
-
+    //捕获图片
     private String picUrl;
-
+    //车牌照片
     private String plateLicense;
-
+    //录像文件编号
     private Integer fileNo;
-
+    //文件偏移
     private Long startOffset;
-
+    //Json
     private String srcJson;
+    //嫌疑程度
+    private Integer Level;
+
+
+
 //    // 主键ID
 //    private Long id;
 //    //相机ID

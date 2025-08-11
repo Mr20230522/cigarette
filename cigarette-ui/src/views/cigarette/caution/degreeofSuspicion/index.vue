@@ -1,9 +1,3 @@
-<!--<template>-->
-<!--  &lt;!&ndash;  <iframe src="https://dg.qjyc.cn/smartzm_web/" width="100%" height="500px" frameborder="0"></iframe>&ndash;&gt;-->
-<!--  &lt;!&ndash;  <iframe src="http://localhost:3000/doc/page/login.asp" width="100%" height="500px" frameborder="0"></iframe>&ndash;&gt;-->
-<!--  &lt;!&ndash;  <iframe src="http://localhost:3000/doc/page/realdata.asp?version=V4.0.1.82806build240719" width="100%" height="500px"&ndash;&gt;-->
-<!--  &lt;!&ndash;          frameborder="0"></iframe>&ndash;&gt;-->
-<!--  <template>-->
 <template>
   <el-container style="height: 690px; border: 1px solid #eee">
     <el-aside width="360px" style="background-color: rgb(238, 241, 246); overflow-y: auto;">
@@ -31,6 +25,8 @@
             <el-table :data="imgData" border style="width: 100%" :show-header="false">
               <el-table-column prop="key" label="" width="130"></el-table-column>
               <el-table-column prop="value" label=""></el-table-column>
+              <!--              <el-table-column prop="level" label="嫌疑度" >-->
+              <!--              </el-table-column>-->
             </el-table>
           </div>
         </el-menu>
@@ -57,23 +53,46 @@
             </el-table-column>
             <el-table-column prop="captureTime" label="抓拍时间" width="150" align="center">
             </el-table-column>
+            <el-table-column prop="" label="月份" width="50" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.captureTime.slice(5, 7) }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="" label="小时" width="50" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.captureTime.slice(11, 13) }}
+              </template>
+            </el-table-column>
             <el-table-column prop="plate" label="车牌号码" width="120" align="center">
             </el-table-column>
             <el-table-column prop="plateColor" label="车牌颜色" width="100" align="center">
             </el-table-column>
             <el-table-column prop="plateType" label="车牌类型" width="118" align="center">
             </el-table-column>
-            <el-table-column prop="dataType" label="数据类型">
-            </el-table-column>
-            <el-table-column prop="violationType" label="违章类型">
-            </el-table-column>
-            <el-table-column prop="direction" label="方向">
-            </el-table-column>
-            <el-table-column prop="speed" label="速度(km/h)" width="120">
-            </el-table-column>
-            <el-table-column prop="channelId" label="通道号">
-            </el-table-column>
-            <el-table-column prop="laneNo" label="车道号">
+            <el-table-column prop="cameraName" label="抓拍位置" align="center"></el-table-column>
+            <!--            <el-table-column prop="dataType" label="数据类型">-->
+            <!--            </el-table-column>-->
+            <!--            <el-table-column prop="violationType" label="违章类型">-->
+            <!--            </el-table-column>-->
+            <!--            <el-table-column prop="direction" label="方向">-->
+            <!--            </el-table-column>-->
+            <!--            <el-table-column prop="speed" label="速度(km/h)" width="120">-->
+            <!--            </el-table-column>-->
+            <!--            <el-table-column prop="channelId" label="通道号">-->
+            <!--            </el-table-column>-->
+            <!--            <el-table-column prop="laneNo" label="车道号">-->
+            <!--            </el-table-column>-->
+            <el-table-column prop="level" label="嫌疑度" align="center">
+              <template #default="{ row }">
+                <el-tag
+                  :type="row.level >= 60 ? 'danger' : 'info'"
+                  effect="dark"
+                  round
+                  style="display: inline-block; width: 50px; text-align: center;"
+                >
+                  {{ row.level }}
+                </el-tag>
+              </template>
             </el-table-column>
           </div>
         </el-table>
@@ -114,10 +133,9 @@
 
 <script>
 import request from "@/utils/request";
-import dayjs from 'dayjs'
 import * as XLSX from 'xlsx'
 
-let i = 1290;
+let j = 1290;
 export default {
 
   data() {
@@ -155,43 +173,11 @@ export default {
       return this.tableData.slice(-this.maxDataCount); // 只显示最后 maxDataCount 条
     }
   },
-  created() {
-    // 页面加载时生成唯一 pageToken
-    //这是第一版本的生成 UUID 方法
-    // this.pageToken = this.generateUUID();
-    this.pageToken = this.pageToken = Math.random().toString(36).substr(2) + Date.now();
-  },
   methods: {
-    // fetchData() {
-    //   request({
-    //     // url: `/toVehicleMonitoring/list?lastId=${i++}`,
-    //     url: `/toVehicleMonitoring/list`,
-    //     method: 'get'
-    //   }).then(res => {
-    //     this.tableData = Array.isArray(res.data) ? res.data : [res.data];
-    //     this.imgd = Array.isArray(res.data) ? res.data : [res.data];
-    //     // 动态生成 imgData
-    //     //console.log(this.tableData)
-    //     // console.log(JSON.parse(JSON.stringify(res.data)))
-    //     this.generateImgData();
-    //   });
-    // },
-    // 简单 UUID 生成函数
-    generateUUID() {
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-        const r = (Math.random() * 16) | 0;
-        const v = c === 'x' ? r : (r & 0x3) | 0x8;
-        return v.toString(16);
-      });
-    },
     fetchData() {
       request({
-        // url: `/toVehicleMonitoring/list?lastId=${i++}`,
-        url: `/toVehicleMonitoring/list`,
-        method: 'get',
-        params: {
-          pageToken: this.pageToken
-        }
+        url: `/toVehicleMonitoring/list?lastId=${j++}`,
+        method: 'get'
       }).then(res => {
         this.tableData = Array.isArray(res.data) ? res.data : [res.data];
         this.imgd = Array.isArray(res.data) ? res.data : [res.data];
@@ -205,25 +191,16 @@ export default {
       if (this.isFetching) return;
       this.isFetching = true;
       request({
-        // url: `/toVehicleMonitoring/list?lastId=${i++}`,
-        url: `/toVehicleMonitoring/list`,
+        url: `/toVehicleMonitoring/list?lastId=${j++}`,
         method: 'get',
-        params: {
-          pageToken: this.pageToken,
-          // lastId: i++ // 如果需要传递 lastId，可以取消注释
-        },
         timeout: 30000
       }).then(res => {
         const newData = Array.isArray(res.data) ? res.data : [res.data];
         if (newData.length > 0) {
-          // this.tableData.push(newData[0]);
+          this.tableData.push(newData[0]);
           // if (this.tableData.length > this.maxDataCount) {
           //   this.tableData.shift();
           // }
-          this.tableData.unshift(newData[0]);
-          if (this.tableData.length > this.maxDataCount) {
-            this.tableData.pop();
-          }
           this.imgd = newData;
           this.imgd2 = newData[0];
           // console.log("数据")
@@ -242,21 +219,25 @@ export default {
     },
     handleBeforeUnload() {
       // 保存变量到 localStorage
-      localStorage.setItem('counter', i);
+      localStorage.setItem('xy_counter', j);
     },
     generateImgData() {
       if (this.imgd) {
         this.imgData = [
-          {key: "抓拍时间:", value: this.imgd2.captureTime},
+          {key: "抓拍时间:", value: this.imgd2.captureTime,},
+          {key: "月份", value: this.imgd2.captureTime.slice(5, 7)},
+          {key: "小时", value: this.imgd2.captureTime.slice(11, 13)},
           {key: "车牌号码:", value: this.imgd2.plate},
           {key: "车牌颜色:", value: this.imgd2.plateColor},
           {key: "车牌类型:", value: this.imgd2.plateType},
-          {key: "数据类型:", value: this.imgd2.dataType},
-          {key: "违章类型:", value: this.imgd2.violationType},
-          {key: "方向:", value: this.imgd2.direction},
-          {key: "速度(km/h):", value: this.imgd2.speed},
-          {key: "通道号:", value: this.imgd2.channelId},
-          {key: "车道号:", value: this.imgd2.laneNo}
+          {key: "抓拍位置", value: this.imgd2.cameraName},
+          // {key: "数据类型:", value: this.imgd2.dataType},
+          // {key: "违章类型:", value: this.imgd2.violationType},
+          // {key: "方向:", value: this.imgd2.direction},
+          // {key: "速度(km/h):", value: this.imgd2.speed},
+          // {key: "通道号:", value: this.imgd2.channelId},
+          // {key: "车道号:", value: this.imgd2.laneNo},
+          {key: "嫌疑度:", value: this.imgd2.level}
         ];
       }
     },
@@ -308,13 +289,12 @@ export default {
     }
   },
   mounted() {
-    const count = localStorage.getItem("counter");
-    const now = dayjs().format('YYYY-MM-DD HH:mm:ss')
-    //alert(now);
+    const count = localStorage.getItem("xy_counter");
+
     //this.fetchData(); // 初始加载一次
     if (count != null) {
-      //i = parseInt(count);
-      localStorage.removeItem('counter');
+      //j = parseInt(count);
+      localStorage.removeItem('xy_counter');
     }
     //this.fetchNewData();
     this.timer = setInterval(this.fetchNewData, 3000);// 每3秒请求一次
@@ -339,8 +319,7 @@ export default {
       this.$nextTick(() => {
         const tableBody = this.$refs.dataTable.$el.querySelector('.el-table__body-wrapper');
         if (tableBody) {
-          // tableBody.scrollTop = tableBody.scrollHeight;
-          tableBody.scrollTop = 0;
+          tableBody.scrollTop = tableBody.scrollHeight;
         }
       });
     }

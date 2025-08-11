@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.ToFactorConfigMapper">
+
+    <!-- 通用字段映射 -->
+    <resultMap id="BaseResultMap" type="com.ruoyi.system.domain.ToFactorConfig">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="factorName" column="factor_name" jdbcType="VARCHAR"/>
+        <result property="factorValue" column="factor_value" jdbcType="INTEGER"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 公共列清单 -->
+    <sql id="Base_Column_List">
+        id, factor_name, factor_value, description, updated_at
+    </sql>
+
+    <!-- 根据ID查询 -->
+    <select id="selectFactorConfigById" resultMap="BaseResultMap" parameterType="long">
+        SELECT <include refid="Base_Column_List"/>
+        FROM factor_config
+        WHERE id = #{id}
+    </select>
+
+    <!-- 列表查询 -->
+    <select id="selectFactorConfigList" resultMap="BaseResultMap" parameterType="com.ruoyi.system.domain.ToFactorConfig">
+        SELECT <include refid="Base_Column_List"/>
+        FROM factor_config
+        <where>
+            <if test="factorName != null and factorName.trim() != ''">
+                AND factor_name LIKE CONCAT('%', #{factorName}, '%')
+            </if>
+            <if test="factorValue != null">
+                AND factor_value = #{factorValue}
+            </if>
+        </where>
+    </select>
+
+    <!-- 插入 -->
+    <insert id="insertFactorConfig"
+            parameterType="com.ruoyi.system.domain.ToFactorConfig"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO factor_config (
+            factor_name,
+            factor_value,
+            description
+        ) VALUES (
+                     #{factorName},
+                     #{factorValue},
+                     #{description}
+                 )
+    </insert>
+
+    <!-- 更新 -->
+    <update id="updateFactorConfig" parameterType="com.ruoyi.system.domain.ToFactorConfig">
+        UPDATE factor_config
+        <set>
+            <if test="factorName != null">factor_name = #{factorName},</if>
+            <if test="factorValue != null">factor_value = #{factorValue},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="updatedAt != null">updated_at = #{updatedAt},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除 -->
+    <delete id="deleteFactorConfigById" parameterType="long">
+        DELETE FROM factor_config WHERE id = #{id}
+    </delete>
+
+</mapper>

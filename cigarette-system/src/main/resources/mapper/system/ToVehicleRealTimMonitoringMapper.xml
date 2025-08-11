@@ -56,6 +56,7 @@
         <result property="fileNo" column="FileNo"/>
         <result property="startOffset" column="StartOffset"/>
         <result property="srcJson" column="SrcJson"/>
+        <result property="level" column="Level"/>
     </resultMap>
     <select id="selectById" parameterType="Long" resultType="com.ruoyi.system.domain.ToVehicleRealTimMonitoring">
         SELECT *
@@ -76,4 +77,42 @@
         ORDER BY Id ASC
         LIMIT 1
     </select>
+    <select id="selectAfterId" resultType="com.ruoyi.system.domain.ToVehicleRealTimMonitoring">
+        SELECT * FROM trafficdata
+        WHERE id > #{lastId}
+        ORDER BY id ASC
+        LIMIT #{limit}
+    </select>
+
+    <update id="updateLevel">
+        UPDATE trafficdata
+        SET level = #{level}
+        WHERE id = #{id}
+    </update>
+    <select id="selectByTime"  resultType="com.ruoyi.system.domain.ToVehicleRealTimMonitoring">
+        SELECT *
+        FROM trafficdata
+        WHERE captureTime > #{captureTime}
+        ORDER BY CaptureTime DESC
+        LIMIT 1;
+    </select>
+<!--    <select id="selectByTime" resultType="com.ruoyi.system.domain.ToVehicleRealTimMonitoring">-->
+<!--        SELECT *-->
+<!--        FROM trafficdata-->
+<!--        WHERE DATE_FORMAT(captureTime, '%Y-%m-%d %H:%i') >= DATE_FORMAT(#{captureTime}, '%Y-%m-%d %H:%i')-->
+<!--        ORDER BY captureTime DESC-->
+<!--        LIMIT 1-->
+<!--    </select>-->
+<!--    <select id="selectByTime" resultType="com.ruoyi.system.domain.ToVehicleRealTimMonitoring">-->
+<!--        SELECT *-->
+<!--        FROM trafficdata-->
+<!--        WHERE (-->
+<!--                  captureTime > #{captureTime}-->
+<!--                      OR (captureTime = #{captureTime} AND id > #{lastId})-->
+<!--                  )-->
+<!--        ORDER BY captureTime DESC, id DESC-->
+<!--        LIMIT 1-->
+<!--    </select>-->
+
+
 </mapper>

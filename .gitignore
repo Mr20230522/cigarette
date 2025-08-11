@@ -24,7 +24,8 @@ target/
 *.iws
 *.iml
 *.ipr
-
+.fastRequest
+.github
 ### JRebel ###
 rebel.xml
 
@@ -41,7 +42,9 @@ nbdist/
 *.log
 *.xml.versionsBackup
 *.swp
-
+package-lock.json
 !*/build/*.java
 !*/build/*.html
 !*/build/*.xml
+application.yml
+application-druid.yml
