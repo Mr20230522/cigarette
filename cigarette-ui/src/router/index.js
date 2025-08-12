@@ -84,64 +84,77 @@ export const constantRoutes = [
   },
   {
     path: '/dataVisualization',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        component: () => import('@/views/cigaretteFront/dataVisualization/dataVisualization'),
-        name: 'DataVisualization',
-        meta: { title: '数据可视化' }
-      }
-    ]
+    name: 'DataVisualization',
+    component: () => import('@/views/cigaretteFront/dataVisualization/dataVisualization'),
+
   },
   {
     path: '/showMapLocation',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        component: () => import('@/views/component/showMapLocation'),
-        name: 'ShowMapLocation',
-        meta: { title: '地图位置' }
-      }
-    ]
+    name: 'ShowMapLocation',
+    component: () => import('@/views/component/showMapLocation')
   },
   {
     path: '/cigaretteFront',
     component: () => import('@/views/cigaretteFront/menu/menu'),
-    redirect: '/cigaretteIndex',
+    hidden: true,
+    redirect: 'noredirect',
     children: [
       {
         path: '/cigaretteIndex',
-        component: () => import('@/views/cigaretteFront/menu/cigaretteIndex'),
-        name: 'CigaretteIndex',
-        meta: { title: '烟草前端首页' }
+        name: 'cigaretteIndex',
+        component: () => import('@/views/cigaretteFront/menu/cigaretteIndex')
       },
       {
         path: '/uploadCase',
-        component: () => import('@/views/cigaretteFront/caution/uploadCase'),
-        name: 'UploadCase',
-        meta: { title: '上传案例' }
-      },
-      {
+        name: 'uploadCase',
+        component: () => import('@/views/cigaretteFront/caution/uploadCase')
+      },{
         path: '/uploadCaution',
-        component: () => import('@/views/cigaretteFront/caution/uploadCaution'),
-        name: 'UploadCaution',
-        meta: { title: '上传警示' }
-      },
-      {
+        name: 'uploadCaution',
+        component: () => import('@/views/cigaretteFront/caution/uploadCaution')
+      },{
         path: '/uploadPersonnel',
-        component: () => import('@/views/cigaretteFront/caution/uploadPersonnel'),
-        name: 'UploadPersonnel',
-        meta: { title: '上传人员' }
+        name: 'uploadPersonnel',
+        component: () => import('@/views/cigaretteFront/caution/uploadPersonnel')
+      },{
+        //这里是我要删除的路由
+        path: '/uploadVehicle',
+        name: 'uploadVehicle',
+        component: () => import('@/views/cigaretteFront/caution/uploadVehicle')
+      },{
+        path: '/carema',
+        name: 'carema',
+        component: () => import('@/views/cigaretteFront/detection/carema')
+      },{
+        path: '/personelInformation',
+        name: 'personelInformation',
+        component: () => import('@/views/cigaretteFront/detection/personelInformation')
+      },{
+        path: '/vehicleInformation',
+        name: 'vehicleInformation',
+        component: () => import('@/views/cigaretteFront/detection/vehicleInformation')
+      },{
+        path: '/clockLog',
+        name: 'clockLog',
+        component: () => import('@/views/cigaretteFront/document/clockLog')
+      },{
+        path: '/document',
+        name: 'document',
+        component: () => import('@/views/cigaretteFront/document/document')
+      },{
+        path: '/dutyLog',
+        name: 'dutyLog',
+        component: () => import('@/views/cigaretteFront/document/dutyLog')
+      },{
+        path: '/notice',
+        name: 'notice',
+        component: () => import('@/views/cigaretteFront/document/notice')
       },
-      // 其他子路由...
       {
         path: '/profile',
+        name: 'profile',
         component: () => import('@/views/cigaretteFront/menu/profile/profile'),
-        name: 'Profile',
-        meta: { title: '个人资料' }
-      }
+      },
     ]
   }
 ]
