@@ -580,13 +580,13 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
             // 更新数据库风险分数（保留原名 updateLevel）
             try {
                 vehicleMapper.updateLevel(data.getId(), score);
-                System.out.println("更新风险分数成功，ID=" + data.getId() + "，score=" + score);
-                // 输出触发详情（可选）
-                if (!triggeredFactors.isEmpty()) {
-                    System.out.println("ID=" + data.getId() + " 触发因子: " + String.join(", ", triggeredFactors) + "，总分=" + score);
-                } else {
-                    System.out.println("ID=" + data.getId() + " 未触发任何因子，总分=0");
-                }
+//                System.out.println("更新风险分数成功，ID=" + data.getId() + "，score=" + score);
+//                // 输出触发详情（可选）
+//                if (!triggeredFactors.isEmpty()) {
+//                    System.out.println("ID=" + data.getId() + " 触发因子: " + String.join(", ", triggeredFactors) + "，总分=" + score);
+//                } else {
+//                    System.out.println("ID=" + data.getId() + " 未触发任何因子，总分=0");
+//                }
             } catch (Exception ex) {
                 // 更新失败记录并继续：避免更新失败导致整个批次停止
                 System.err.println("更新风险分数失败，ID=" + data.getId() + "，score=" + score + "，异常：" + ex.getMessage());
