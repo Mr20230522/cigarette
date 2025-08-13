@@ -453,7 +453,7 @@ import java.util.stream.Collectors;
 @Service
 public class ToRiskScoreServiceImpl implements IToRiskScoreService {
 
-    private static final int BATCH_SIZE = 5;
+    private static final int BATCH_SIZE = 50;
     private static final String POSITION_FILE = "risk_position.txt";
     // 明确默认时区（如需改为服务器默认，可改为 ZoneId.systemDefault()）
     private static final ZoneId DEFAULT_ZONE = ZoneId.systemDefault();
