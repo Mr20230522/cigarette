@@ -620,6 +620,9 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
             case BRAND:
                 return matchBrand(data, triggerValues);
 
+            case Sub_BRAND:
+                return matchSubBrand(data, triggerValues);
+
             case PLATE:
                 return matchPlate(data, triggerValues);
 
@@ -656,6 +659,24 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
         for (String val : triggerValues) {
             if (val.isEmpty()) continue;
             if (brandAll.contains(val)) return true;
+        }
+        return false;
+    }
+
+    private boolean matchSubBrand(ToVehicleRealTimMonitoring data, List<String> triggerValues) {
+        String vehicleLogoAll = data.getVehicleLogoAll();
+        if (vehicleLogoAll == null || vehicleLogoAll.isEmpty()) return false;
+
+        // 提取 sub_brand（假设格式为 "品牌-子品牌"）
+        String[] parts = vehicleLogoAll.split("-");
+        if (parts.length < 2) return false; // 如果没有子品牌部分，直接返回 false
+        String subBrand = parts[1].trim();
+
+        // 检查提取的 sub_brand 是否在触发条件中
+        for (String triggerValue : triggerValues) {
+            if (subBrand.equalsIgnoreCase(triggerValue)) {
+                return true;
+            }
         }
         return false;
     }
