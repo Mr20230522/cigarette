@@ -2,6 +2,7 @@ package com.ruoyi.system.mapper;
 
 import java.util.List;
 import com.ruoyi.system.domain.TobVehicleBehavior;
+import com.ruoyi.system.domain.undefine.Duration;
 import com.ruoyi.system.domain.vo.TobVehicleBehaviorVo;
 
 /**
@@ -85,5 +86,8 @@ public interface TobVehicleBehaviorMapper
      * @return 结果
      */
     public List<TobVehicleBehaviorVo> getUpToDataDegreeSuspicionAll(TobVehicleBehaviorVo tobVehicleBehaviorVo);
+
+
+    public List<TobVehicleBehaviorVo> byDateGetSuspicionVehicleBehavior(Duration duration);
 
 }

@@ -93,6 +93,14 @@ export function listVehicleBehaviorVoAll(query){
   })
 }
 
+export function byDateGetSuspicionVehicleBehavior(query){
+  return request({
+    url:'/cigarette/vehicle/vehicleBehavior/date',
+    method:'get',
+    params:query
+  })
+}
+
 
 
 

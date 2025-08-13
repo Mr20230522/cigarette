@@ -126,6 +126,38 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         ORDER BY a.behavior_id DESC
     </select>
 
+    <select id="byDateGetSuspicionVehicleBehavior" parameterType="Duration" resultMap="TobVehicleBehaviorVoResult">
+        SELECT
+        a.*,
+        b.picture AS vehicle_picture,
+        c.name AS driver_name,
+        b.license_plate  <!-- 确保返回车牌号 -->
+        FROM
+        tob_vehicle_behavior AS a
+        INNER JOIN
+        tob_vehicle AS b ON a.car_id = b.car_id
+        LEFT JOIN
+        tob_person AS c ON a.driver_id = c.suspect_id
+        <where>
+            a.del_flag = '0'  <!-- 确保只查未删除的记录 -->
+            <if test="degreeSuspicion != null">
+                AND a.degree_suspicion >= #{degreeSuspicion}
+            </if>
+            <if test="begin != null and end != null">
+                AND a.create_time BETWEEN #{begin} AND #{end}
+            </if>
+            <if test="begin != null and end == null">
+                AND a.create_time >= #{begin}
+            </if>
+            <if test="begin == null and end != null">
+                AND a.create_time &lt;= #{end}
+            </if>
+        </where>
+        ORDER BY
+        a.degree_suspicion DESC,
+        a.create_time DESC
+    </select>
+
 
     <select id="selectTobVehicleBehaviorByBehaviorId" parameterType="Long" resultMap="TobVehicleBehaviorResult">
         <include refid="selectTobVehicleBehaviorVo"/>

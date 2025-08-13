@@ -2,6 +2,7 @@ package com.ruoyi.system.service;
 
 import java.util.List;
 import com.ruoyi.system.domain.TobVehicleBehavior;
+import com.ruoyi.system.domain.undefine.Duration;
 import com.ruoyi.system.domain.undefine.VehicleBehaviorColor;
 import com.ruoyi.system.domain.undefine.VehicleType;
 import com.ruoyi.system.domain.vo.TobVehicleBehaviorVo;
@@ -92,5 +93,10 @@ public interface ITobVehicleBehaviorService
     public List<TobVehicleBehaviorVo> getUpToDataDegreeSuspicion(TobVehicleBehaviorVo tobVehicleBehaviorVo);
 
     public List<TobVehicleBehaviorVo> getUpToDataDegreeSuspicionAll(TobVehicleBehaviorVo tobVehicleBehaviorVo);
+
+    /**
+     * 获取制定日期的每日嫌疑车辆数据
+     */
+    public List<List<Object>> byDateGetSuspicionVehicleBehavior(Duration duration);
 
 }

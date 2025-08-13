@@ -1,8 +1,10 @@
 package com.ruoyi.web.controller.cigarette.vehicle;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ruoyi.system.domain.undefine.Duration;
 import com.ruoyi.system.domain.undefine.VehicleBehaviorColor;
 import com.ruoyi.system.domain.undefine.VehicleType;
 import com.ruoyi.system.domain.vo.TobVehicleBehaviorVo;
@@ -165,6 +167,19 @@ public class TobVehicleBehaviorController extends BaseController
     public List<TobVehicleBehaviorVo> listVoAll(TobVehicleBehaviorVo tobVehicleBehaviorVo)
     {
         return tobVehicleBehaviorService.selectTobVehicleBehaviorVoList(tobVehicleBehaviorVo);
+
+    }
+
+    /**
+     * 获取制定日期的每日嫌疑车辆数据
+     */
+    @PreAuthorize("@ss.hasPermi('vehicle:vehicleBehavior:list')")
+    @GetMapping("/date")
+    public List<List<Object>> byDateGetSuspicionVehicleBehavior(Duration duration)
+    {
+        List<List<Object>> list = tobVehicleBehaviorService.byDateGetSuspicionVehicleBehavior(duration);
+        System.out.println("!@#$%^&*()"+list);
+        return list;
 
     }
 

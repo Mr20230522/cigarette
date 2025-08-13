@@ -36,6 +36,14 @@ import {
 } from '@/api/cigarette/vehicle/vehicleBehavior';
 import { listDetection } from '@/api/cigarette/detection/detection';
 
+// 预定义一组丰富的颜色（共24种）
+const COLOR_PALETTE = [
+  '#FF6B6B', '#FFA07A', '#FFD700', '#98FB98', '#87CEFA', '#9370DB',
+  '#FF6347', '#40E0D0', '#FF69B4', '#7B68EE', '#00FA9A', '#1E90FF',
+  '#BA55D3', '#FF4500', '#00CED1', '#FF8C00', '#9932CC', '#8FBC8F',
+  '#E9967A', '#8A2BE2', '#00BFFF', '#FF00FF', '#7CFC00', '#FF1493'
+];
+
 export default {
   components: {
     Reacquire,
@@ -61,7 +69,7 @@ export default {
         vehicleColor: { total: 0, categories: [] },
         detection: { total: 0, categories: [] },
       },
-      rawData: [], // 新增：保存所有原始数据
+      rawData: [],
       pageflag: true,
       timer: null,
       queryParams: {
@@ -88,7 +96,11 @@ export default {
     this.clearRefreshTimer();
   },
   methods: {
-    // 清除定时器
+    // 获取颜色 - 根据索引从调色板中循环获取颜色
+    getColor(index) {
+      return COLOR_PALETTE[index % COLOR_PALETTE.length];
+    },
+
     clearRefreshTimer() {
       if (this.timer) {
         clearInterval(this.timer);
@@ -96,7 +108,6 @@ export default {
       }
     },
 
-    // 启动定时刷新
     startRefreshTimer() {
       this.clearRefreshTimer();
       this.timer = setInterval(() => {
@@ -104,10 +115,9 @@ export default {
           getUpToDataDegreeSuspicionAll(this.queryParams2).then(response => {
             if (response && response.length) {
               response.reverse()
-              console.log('response[response.length - 1].behaviorId',response[response.length - 1].behaviorId)
               this.queryParams2.behaviorId = response[response.length - 1].behaviorId;
-              this.rawData = [...this.rawData, ...response]; // 追加新数据
-              this.processIncrementalData(response); // 只处理新数据
+              this.rawData = [...this.rawData, ...response];
+              this.processIncrementalData(response);
               this.initChart();
             }
           });
@@ -115,15 +125,14 @@ export default {
       }, 2000);
     },
 
-    // 获取初始数据
     getData() {
       this.pageflag = true;
       getUpToDataDegreeSuspicionAll(this.queryParams2).then(response => {
         if (response && response.length) {
           response.reverse()
           this.queryParams2.behaviorId = response[response.length - 1].behaviorId;
-          this.rawData = response; // 保存原始数据
-          this.processFullData(); // 全量计算
+          this.rawData = response;
+          this.processFullData();
           this.initChart();
           this.startRefreshTimer();
         } else {
@@ -134,18 +143,16 @@ export default {
       });
     },
 
-    // 切换预警类型
     selectType(type) {
       if (this.activeType === type) return;
 
       this.clearRefreshTimer();
       this.activeType = type;
-      this.processFullData(); // 切换类型时全量重新计算
+      this.processFullData();
       this.initChart();
       this.startRefreshTimer();
     },
 
-    // 全量数据处理（切换类型时使用）
     processFullData() {
       switch (this.activeType) {
         case 'quarter':
@@ -164,12 +171,11 @@ export default {
           this.warningData.vehicleColor = this.calculateVehicleColorData(this.rawData);
           break;
         case 'detection':
-          this.calculateDetectionData(this.rawData); // 异步处理
+          this.calculateDetectionData(this.rawData);
           break;
       }
     },
 
-    // 增量数据处理（定时刷新时使用）
     processIncrementalData(newData) {
       switch (this.activeType) {
         case 'quarter':
@@ -188,12 +194,11 @@ export default {
           this.mergeVehicleColorData(newData);
           break;
         case 'detection':
-          this.mergeDetectionData(newData); // 异步处理
+          this.mergeDetectionData(newData);
           break;
       }
     },
 
-    // 各类型计算方法（返回计算结果）
     calculateQuarterData(data) {
       let spring = 0, summer = 0, autumn = 0, winter = 0;
       data.forEach(item => {
@@ -206,10 +211,10 @@ export default {
       return {
         total: spring + summer + autumn + winter,
         categories: [
-          {name: '春季', value: spring, color: '#FF6B6B'},
-          {name: '夏季', value: summer, color: '#ECA444'},
-          {name: '秋季', value: autumn, color: '#33A1DB'},
-          {name: '冬季', value: winter, color: '#60ff00'}
+          {name: '春季', value: spring, color: this.getColor(0)},
+          {name: '夏季', value: summer, color: this.getColor(1)},
+          {name: '秋季', value: autumn, color: this.getColor(2)},
+          {name: '冬季', value: winter, color: this.getColor(3)}
         ]
       };
     },
@@ -223,8 +228,8 @@ export default {
       return {
         total: day + night,
         categories: [
-          {name: '白天', value: day, color: '#ff0000'},
-          {name: '夜间', value: night, color: '#62ff00'}
+          {name: '白天', value: day, color: this.getColor(4)},
+          {name: '夜间', value: night, color: this.getColor(5)}
         ]
       };
     },
@@ -237,10 +242,10 @@ export default {
       });
       return {
         total: data.length,
-        categories: hours.map((value, index) => ({
-          name: `${index}:00`,
+        categories: hours.map((value, hour) => ({
+          name: `${hour}:00`,
           value: value,
-          color: index % 2 === 0 ? '#ff0000' : '#62ff00'
+          color: this.getColor(hour)
         })).filter(v => v.value > 0)
       };
     },
@@ -253,7 +258,7 @@ export default {
       return {
         total: data.length,
         categories: Object.entries(typeCounts).map(([key, val], i) => ({
-          name: key, value: val, color: i % 2 === 0 ? '#ff0000' : '#62ff00'
+          name: key, value: val, color: this.getColor(i)
         }))
       };
     },
@@ -266,7 +271,7 @@ export default {
       return {
         total: data.length,
         categories: Object.entries(colorCounts).map(([key, val], i) => ({
-          name: key, value: val, color: i % 2 === 0 ? '#ff0000' : '#62ff00'
+          name: key, value: val, color: this.getColor(i)
         }))
       };
     },
@@ -286,14 +291,13 @@ export default {
           categories: Object.entries(detections).map(([id, count], i) => ({
             name: names[id] || id,
             value: count,
-            color: i % 2 === 0 ? '#ff0000' : '#62ff00'
+            color: this.getColor(i)
           }))
         };
         this.initChart();
       });
     },
 
-    // 各类型数据合并方法
     mergeQuarterData(newData) {
       const newStats = this.calculateQuarterData(newData);
       const current = this.warningData.quarter;
@@ -312,8 +316,8 @@ export default {
       const newStats = this.calculateDayNightData(newData);
       const current = this.warningData.dayAndNight;
       current.total += newStats.total;
-      current.categories[0].value += newStats.categories[0].value; // 白天
-      current.categories[1].value += newStats.categories[1].value; // 夜间
+      current.categories[0].value += newStats.categories[0].value;
+      current.categories[1].value += newStats.categories[1].value;
     },
 
     mergeHoursData(newData) {
@@ -372,7 +376,6 @@ export default {
       });
     },
 
-    // 初始化图表（保持原有逻辑不变）
     initChart() {
       const currentData = this.warningData[this.activeType];
       const colors = currentData.categories.map(item => item.color);
@@ -420,7 +423,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-/* 保持原有样式完全不变 */
 .container {
   display: flex;
   height: 100%;

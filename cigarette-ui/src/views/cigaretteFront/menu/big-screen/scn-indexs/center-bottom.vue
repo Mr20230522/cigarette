@@ -1,6 +1,5 @@
 <template>
   <div class="center_bottom">
-    <!-- 保持原有容器结构 -->
     <div class="control-container">
       <!-- 分屏模式选择 -->
       <div class="mode-control">
@@ -16,18 +15,20 @@
       </div>
 
       <!-- 摄像头选择 -->
-      <div class="camera-control">
-        <div
-          v-for="camera in cameras"
-          :key="camera.id"
-          class="camera-btn"
-          :class="{
-            'active': selectedCameras.includes(camera.id),
-            'disabled': isCameraDisabled(camera.id)
-          }"
-          @click="selectCamera(camera)"
-        >
-          {{ camera.name }}
+      <div class="camera-control-wrapper">
+        <div class="camera-control">
+          <div
+            v-for="camera in cameras"
+            :key="camera.id"
+            class="camera-btn"
+            :class="{
+              'active': selectedCameras.includes(camera.id),
+              'disabled': isCameraDisabled(camera.id)
+            }"
+            @click="selectCamera(camera)"
+          >
+            {{ camera.name }}
+          </div>
         </div>
       </div>
       <div class="camera-control">
@@ -41,10 +42,38 @@
 
 <script>
 import { ScnEventBus } from '@/utils/scn-event-bus';
+import { listCamera } from "@/api/cigarette/detection/camera";
+import { listDetection } from "@/api/cigarette/detection/detection";
 
 export default {
   data() {
     return {
+      detectionOptions: [],
+      detections: [],
+      total: 0,
+      cameraList: [],
+      queryParams: {
+        pageNum: 1,
+        pageSize: 9999,
+        cameraIp: null,
+        cameraModel: null,
+        cameraManufacturer: null,
+        detectionId: null,
+        resolutionRatio: null,
+        frameRate: null,
+        nightVision: null,
+        connectionType: null,
+        installationDate: null,
+        guaranteePeriod: null,
+        longitude: null,
+        latitude: null,
+        cameraType: null,
+        cameraGroupIndication: null,
+        cameraApplicationType: null,
+        status: null,
+        detectionName: null,
+        districtId: null,
+      },
       isSuspectMode: false,
       currentMode: 1,
       selectedCameras: [],
@@ -54,18 +83,12 @@ export default {
         { value: 3, label: '3分屏' },
         { value: 4, label: '4分屏' }
       ],
-      cameras: [
-        { id: 1, name: '摄像头1', url: 'http://127.0.0.1:8000/upload/monitorData/192.168.10.2/卡口数据/20250509/09/0_2_20250328_000536940_云DTH993.mp4' },
-        { id: 2, name: '摄像头2', url: 'http://127.0.0.1:8000/upload/monitorData/192.168.10.2/卡口数据/20250509/09/0_2_20250328_000536940_云DTH993.mp4' },
-        { id: 3, name: '摄像头3', url: 'http://127.0.0.1:8000/upload/monitorData/192.168.10.2/卡口数据/20250509/09/0_2_20250328_000536940_云DTH993.mp4' },
-        { id: 4, name: '摄像头4', url: 'http://127.0.0.1:8000/upload/monitorData/192.168.10.2/卡口数据/20250509/09/0_2_20250328_000536940_云DTH993.mp4' },
-      ]
+      cameras: [] // 初始化为空数组，将通过API数据填充
     };
   },
   methods: {
     changeMode(mode) {
       this.currentMode = mode;
-      // 清空已选择的摄像头
       this.selectedCameras = [];
       if (mode === 1 && this.cameras.length > 0) {
         this.selectedCameras.push(this.cameras[0].id);
@@ -86,12 +109,10 @@ export default {
         this.selectedCameras.length >= this.currentMode;
     },
     confirmSelection() {
-      // 验证是否选择了足够的摄像头
       if (this.selectedCameras.length !== this.currentMode) {
         alert(`请选择 ${this.currentMode} 个摄像头`);
         return;
       }
-      // 触发显示逻辑
       this.updateDisplay();
     },
     updateDisplay() {
@@ -104,27 +125,45 @@ export default {
         cameras: selectedCameras
       });
     },
-  },
-  created(){
-    // 初次加载时默认选择“1分屏”
-    this.currentMode = this.modes[0].value;
-  },
-  mounted(){
-    // 确保页面渲染完成后，如果摄像头数组不为空，触发显示逻辑
-    this.$nextTick(() => {
-      if (this.cameras.length > 0) {
-        this.selectedCameras.push(this.cameras[0].id); // 添加第一个摄像头的 id
-        this.updateDisplay(); // 触发显示逻辑
-      } else {
-        console.warn('摄像头列表为空，无法选择默认摄像头');
+    async getList() {
+      try {
+        // 1. 获取检测点数据
+        const detectionsResponse = await listDetection();
+        this.detections = detectionsResponse.rows;
+
+        // 2. 获取摄像头数据
+        const cameraResponse = await listCamera(this.queryParams);
+        this.cameraList = cameraResponse.rows;
+        this.total = cameraResponse.total;
+
+        // 3. 动态生成cameras数组
+        this.cameras = this.cameraList.map(camera => {
+          const detection = this.detections.find(d => d.detectionId === camera.detectionId);
+          return {
+            id: camera.cameraId,
+            name: `${camera.cameraId}${detection ? '-' + detection.detectionName : ''}`,
+            url: camera.cameraUrl
+          };
+        });
+
+        // 4. 默认选中第一个摄像头
+        if (this.cameras.length > 0) {
+          this.selectedCameras = [this.cameras[0].id];
+          this.updateDisplay();
+        }
+      } catch (error) {
+        console.error("数据加载失败:", error);
       }
-    });
+    }
+  },
+  created() {
+    this.getList();
+    this.currentMode = this.modes[0].value;
   }
 };
 </script>
 
 <style lang="scss" scoped>
-/* 保持原有所有样式不变 */
 .center_bottom {
   width: 100%;
   height: 100%;
@@ -162,11 +201,31 @@ export default {
       }
     }
 
+    /* 新增的摄像头控制容器 */
+    .camera-control-wrapper {
+      max-height: 120px; /* 三行高度（每行约40px） */
+      overflow-y: auto;  /* 垂直滚动 */
+      padding-right: 5px; /* 为滚动条留出空间 */
+
+      /* 自定义滚动条样式 */
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 3px;
+      }
+      &::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.1);
+      }
+    }
+
     .camera-control {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 10px;
+      min-height: 40px; /* 确保至少一行高度 */
 
       .camera-btn {
         padding: 8px 15px;
@@ -176,6 +235,7 @@ export default {
         color: #fff;
         cursor: pointer;
         transition: all 0.3s;
+        flex-shrink: 0; /* 防止按钮被压缩 */
 
         &:hover:not(.disabled) {
           background: rgba(59, 64, 151, 0.4);
