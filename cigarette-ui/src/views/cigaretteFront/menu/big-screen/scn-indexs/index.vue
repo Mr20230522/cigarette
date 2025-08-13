@@ -21,7 +21,7 @@
       </ItemWrap>
       <ItemWrap
         class="contetn_left-bottom contetn_lr-item"
-        title="设备提醒"
+        title="嫌疑车辆每日趋势"
         style="padding: 0 10px 16px 10px"
       >
         <LeftBottom />

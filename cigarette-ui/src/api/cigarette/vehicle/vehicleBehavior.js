@@ -67,3 +67,40 @@ export function getVehicleColorData(query){
   })
 }
 
+//获取最新十条嫌疑车辆
+export function getUpToDataDegreeSuspicion(query) {
+  return request({
+    url: '/cigarette/vehicle/vehicleBehavior/getUpToDataDegreeSuspicion',
+    method: 'get',
+    params: query
+  })
+}
+
+//获取所有嫌疑度车辆
+export function getUpToDataDegreeSuspicionAll(query) {
+  return request({
+    url: '/cigarette/vehicle/vehicleBehavior/getUpToDataDegreeSuspicionAll',
+    method: 'get',
+    params: query
+  })
+}
+
+export function listVehicleBehaviorVoAll(query){
+  return request({
+    url:'/cigarette/vehicle/vehicleBehavior/listVoAll',
+    method:'get',
+    params:query
+  })
+}
+
+export function byDateGetSuspicionVehicleBehavior(query){
+  return request({
+    url:'/cigarette/vehicle/vehicleBehavior/date',
+    method:'get',
+    params:query
+  })
+}
+
+
+
+

@@ -6,54 +6,58 @@
  * @FilePath: \web-pc\src\pages\big-screen\view\scnHome.vue
 -->
 <template>
-  <!-- <div id="index" ref="appRef" class="index_home" :class="{ pageisScale: isScale }"> -->
-  <ScaleScreen
-    :width="1920"
-    :height="1080"
-    class="scale-wrap"
-    :selfAdaption="$store.state.scnSettings.isScale"
-  >
-    <div class="bg">
-      <dv-loading v-if="loading">Loading...</dv-loading>
-      <div v-else class="host-body">
-        <!-- 头部 s -->
-        <div class="d-flex jc-center title_wrap">
-          <div class="zuojuxing"></div>
-          <div class="youjuxing"></div>
-          <div class="guang"></div>
-          <div class="d-flex jc-center">
-            <div class="title">
-              <span class="title-text">曲靖烟草可视化平台</span>
+  <div class="color">
+    <ScaleScreen
+      :width="1920"
+      :height="1080"
+      class="scale-wrap"
+      :selfAdaption="$store.state.scnSettings.isScale"
+    >
+      <div class="bg">
+        <dv-loading v-if="loading">Loading...</dv-loading>
+        <div v-else class="host-body">
+          <!-- 头部 s -->
+          <div class="d-flex jc-center title_wrap">
+            <div class="zuojuxing"></div>
+            <div class="youjuxing"></div>
+            <div class="guang"></div>
+            <div class="d-flex jc-center">
+              <div class="title">
+                <span class="title-text">曲靖烟草可视化平台</span>
+              </div>
+            </div>
+            <div class="timers">
+              {{ dateYear }} {{ dateWeek }} {{ dateDay }}
+              <i
+                class="blq-icon-shezhi02"
+                style="margin-left: 10px"
+                @click="showSetting"
+              ></i>
             </div>
           </div>
-          <div class="timers">
-            {{ dateYear }} {{ dateWeek }} {{ dateDay }}
-            <i
-              class="blq-icon-shezhi02"
-              style="margin-left: 10px"
-              @click="showSetting"
-            ></i>
-          </div>
+          <!-- 头部 e-->
+          <!-- 内容  s-->
+          <Index/>
+          <!--        <router-view></router-view>-->
+          <!-- 内容 e -->
         </div>
-        <!-- 头部 e-->
-        <!-- 内容  s-->
-        <Index />
-<!--        <router-view></router-view>-->
-        <!-- 内容 e -->
       </div>
-    </div>
-    <Setting ref="setting" />
-  </ScaleScreen>
+<!--      <Setting ref="setting"/>-->
+    </ScaleScreen>
+  </div>
+  <!-- <div id="index" ref="appRef" class="index_home" :class="{ pageisScale: isScale }"> -->
+
   <!-- </div> -->
 </template>
 
 <script>
-import { formatTime } from "@/utils/scnIndex.js";
+import {formatTime} from "@/utils/scnIndex.js";
 import Setting from "./scnSetting.vue";
 import ScaleScreen from "@/components/scn-scale-screen/scale-screen.vue";
 import Index from "@/views/cigaretteFront/menu/big-screen/scn-indexs/index.vue"
+
 export default {
-  components: { Setting, ScaleScreen,Index },
+  components: {Setting, ScaleScreen, Index},
   data() {
     return {
       timing: null,
@@ -70,7 +74,8 @@ export default {
     },
   },
   computed: {},
-  created() {},
+  created() {
+  },
   mounted() {
     this.timeFn();
     this.cancelLoading();
@@ -101,4 +106,7 @@ export default {
 
 <style lang="scss">
 @import "scnHome";
+.color{
+  background-color: black;
+}
 </style>

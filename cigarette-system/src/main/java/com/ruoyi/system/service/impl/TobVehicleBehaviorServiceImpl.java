@@ -1,13 +1,13 @@
 package com.ruoyi.system.service.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.system.domain.TobPerson;
 import com.ruoyi.system.domain.TobVehicle;
+import com.ruoyi.system.domain.undefine.Duration;
 import com.ruoyi.system.domain.undefine.VehicleBehaviorColor;
 import com.ruoyi.system.domain.undefine.VehicleType;
 import com.ruoyi.system.domain.vo.TobVehicleBehaviorVo;
@@ -97,7 +97,7 @@ public class TobVehicleBehaviorServiceImpl implements ITobVehicleBehaviorService
     /**
      * 查询车辆颜色数据
      *
-     * @param voTobVehicleBehavior 车辆行为记录
+     * @param tobVehicleBehaviorVo 车辆行为记录
      * @return 车辆行为记录集合
      */
     public VehicleBehaviorColor getVehicleColorData(TobVehicleBehaviorVo tobVehicleBehaviorVo ){
@@ -209,5 +209,66 @@ public class TobVehicleBehaviorServiceImpl implements ITobVehicleBehaviorService
     public int deleteTobVehicleBehaviorByBehaviorId(Long behaviorId)
     {
         return tobVehicleBehaviorMapper.deleteTobVehicleBehaviorByBehaviorId(behaviorId);
+    }
+
+    /**
+     * 获取超过嫌疑最新前十条数据
+     *
+     * @param tobVehicleBehaviorVo 车辆行为记录
+     * @return 结果
+     */
+    public List<TobVehicleBehaviorVo> getUpToDataDegreeSuspicion(TobVehicleBehaviorVo tobVehicleBehaviorVo){
+        return tobVehicleBehaviorMapper.getUpToDataDegreeSuspicion(tobVehicleBehaviorVo);
+    }
+
+    /**
+     * 获取超过嫌疑所有数据
+     *
+     * @param tobVehicleBehaviorVo 车辆行为记录
+     * @return 结果
+     */
+    public List<TobVehicleBehaviorVo> getUpToDataDegreeSuspicionAll(TobVehicleBehaviorVo tobVehicleBehaviorVo){
+        return tobVehicleBehaviorMapper.getUpToDataDegreeSuspicionAll(tobVehicleBehaviorVo);
+    }
+
+    /**
+     * 获取制定日期的每日嫌疑车辆数据
+     */
+    public List<List<Object>> byDateGetSuspicionVehicleBehavior(Duration duration) {
+        // 1. 获取原始数据
+        List<TobVehicleBehaviorVo> records = tobVehicleBehaviorMapper.byDateGetSuspicionVehicleBehavior(duration);
+
+        // 2. 准备返回结构
+        List<Object> dateList = new ArrayList<>();
+        List<Object> countList = new ArrayList<>();
+
+        // 3. 统计每天的记录数（直接用List保持顺序）
+        Map<String, Long> tempMap = new HashMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd");
+        for (TobVehicleBehaviorVo record : records) {
+            String dayKey = sdf.format(record.getCreateTime());
+            tempMap.put(dayKey, tempMap.getOrDefault(dayKey, 0L) + 1);
+        }
+
+        // 4. 生成连续日期序列（严格按时间顺序）
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date startDate = inputFormat.parse(duration.getBegin());
+            Date endDate = inputFormat.parse(duration.getEnd());
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(startDate);
+
+            while (!cal.getTime().after(endDate)) {
+                String dayKey = sdf.format(cal.getTime());
+                dateList.add(dayKey.replaceFirst("^0", "")); // 去掉前导零，例如 12-01 -> 12-1
+                countList.add(tempMap.getOrDefault(dayKey, 0L));
+                cal.add(Calendar.DATE, 1);
+            }
+        } catch (ParseException e) {
+            throw new RuntimeException("日期解析错误", e);
+        }
+
+        return Arrays.asList(dateList, countList);
     }
 }

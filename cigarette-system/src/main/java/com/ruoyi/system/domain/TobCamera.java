@@ -126,11 +126,17 @@ public class TobCamera extends BaseEntity {
      */
     private String delFlag;
 
+
+
     /**
      * 地区id
      */
     @Excel(name = "地区id")
     private Long districtId;
+
+    @Excel(name = "摄像头地址")
+    private String cameraUrl;
+
 
     public void setCameraId(Long cameraId) {
         this.cameraId = cameraId;
@@ -284,6 +290,14 @@ public class TobCamera extends BaseEntity {
         return districtId;
     }
 
+    public String getCameraUrl() {
+        return cameraUrl;
+    }
+
+    public void setCameraUrl(String cameraUrl) {
+        this.cameraUrl = cameraUrl;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
@@ -309,6 +323,7 @@ public class TobCamera extends BaseEntity {
                 .append("createTime", getCreateTime())
                 .append("updateTime", getUpdateTime())
                 .append("districtId", getDistrictId())
+                .append("cameraUrl", getCameraUrl())
                 .toString();
     }
 }

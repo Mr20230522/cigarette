@@ -8,16 +8,18 @@ import { isRelogin } from '@/utils/request'
 
 NProgress.configure({ showSpinner: false })
 
-const whiteList = ['/login', '/register','/login_phone']
+const whiteList = ['/login', '/register','/login_phone','/bigScreen']
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   NProgress.start()
   if (getToken()) {
     to.meta.title && store.dispatch('settings/setTitle', to.meta.title)
     /* has token*/
     if (to.path === '/login') {
-      next({ path: '/cigaretteIndex' })
-      NProgress.done()
+      // next({path: '/cigaretteIndex'})
+      // 关键修改点：先退出再跳转
+      await store.dispatch('LogOut') // 确保先清除所有登录状态
+      return next() // 然后才允许进入登录页
     } else if (whiteList.indexOf(to.path) !== -1) {
       next()
     } else {
@@ -29,14 +31,14 @@ router.beforeEach((to, from, next) => {
           store.dispatch('GenerateRoutes').then(accessRoutes => {
             // 根据roles权限生成可访问的路由表
             router.addRoutes(accessRoutes) // 动态添加可访问路由表
-            next({ ...to, replace: true }) // hack方法 确保addRoutes已完成
+            next({...to, replace: true}) // hack方法 确保addRoutes已完成
           })
         }).catch(err => {
-            store.dispatch('LogOut').then(() => {
-              Message.error(err)
-              next({ path: '/' })
-            })
+          store.dispatch('LogOut').then(() => {
+            Message.error(err)
+            next({path: '/'})
           })
+        })
       } else {
         next()
       }

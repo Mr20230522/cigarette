@@ -33,6 +33,17 @@ public class TobKeyVideoServiceImpl implements ITobKeyVideoService
     }
 
     /**
+     * 查询关键帧视频
+     *
+     * @param behaviorId 关键帧视频主键
+     * @return 关键帧视频
+     */
+    public TobKeyVideo selectTobKeyVideoByBehaviorId(Long behaviorId){
+        System.out.println("!@#$%^&*()behaviorId"+behaviorId);
+        return tobKeyVideoMapper.selectTobKeyVideoByBehaviorId(behaviorId);
+    }
+
+    /**
      * 查询关键帧视频列表
      * 
      * @param tobKeyVideo 关键帧视频

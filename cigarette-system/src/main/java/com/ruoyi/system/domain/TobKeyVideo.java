@@ -55,19 +55,23 @@ public class TobKeyVideo extends BaseEntity {
 
     /** 行为ID */
     @Excel(name = "行为ID")
-    private Long actionId; // 新增的属性
+    private Long behaviorId; // 新增的属性
+
+
+    @Excel(name="监测区域名称")
+    private String detectionName;
 
     /** 状态 */
     @Excel(name = "状态")
     private String status;
 
-    // Getter and Setter for actionId
-    public Long getActionId() {
-        return actionId;
+    // Getter and Setter for behaviorId
+    public Long getBehaviorId() {
+        return behaviorId;
     }
 
-    public void setActionId(Long actionId) {
-        this.actionId = actionId;
+    public void setBehaviorId(Long behaviorId) {
+        this.behaviorId = behaviorId;
     }
 
     // 其他属性的getter和setter...
@@ -144,6 +148,10 @@ public class TobKeyVideo extends BaseEntity {
         return districtId;
     }
 
+    public String getDetectionName() {return detectionName;}
+
+    public void setDetectionName(String detectionName) {this.detectionName = detectionName;}
+
     public void setStatus(String status) {
         this.status = status;
     }
@@ -164,10 +172,12 @@ public class TobKeyVideo extends BaseEntity {
                 .append("videoSize", getVideoSize())
                 .append("detectionId", getDetectionId())
                 .append("districtId", getDistrictId())
-                .append("actionId", getActionId())
+                .append("behaviorId", getBehaviorId())
                 .append("remark", getRemark())
                 .append("status", getStatus())
                 .append("createTime", getCreateTime())
+                .append("detectionName", getDetectionName())
                 .toString();
     }
 }
+

@@ -60,7 +60,7 @@
     <el-dialog :title="noticeDetail.noticeTitle" :visible.sync="showNoticeDetail" width="50%">
       <div v-html="noticeDetail.noticeContent"></div>
     </el-dialog>
-    
+
   </div>
 </template>
 

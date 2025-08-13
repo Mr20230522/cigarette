@@ -1,8 +1,10 @@
 package com.ruoyi.web.controller.cigarette.vehicle;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ruoyi.system.domain.undefine.Duration;
 import com.ruoyi.system.domain.undefine.VehicleBehaviorColor;
 import com.ruoyi.system.domain.undefine.VehicleType;
 import com.ruoyi.system.domain.vo.TobVehicleBehaviorVo;
@@ -134,7 +136,51 @@ public class TobVehicleBehaviorController extends BaseController
     @GetMapping("/getVehicleColorData")
     public VehicleBehaviorColor getVehicleColorData(TobVehicleBehaviorVo tobVehicleBehaviorVo)
     {
-        System.out.println("controller");
         return tobVehicleBehaviorService.getVehicleColorData(tobVehicleBehaviorVo);
     }
+
+    /**
+     *  获取嫌疑度最新前十的数据
+     * @param tobVehicleBehaviorVo
+     * @return
+     */
+    @GetMapping("getUpToDataDegreeSuspicion")
+    public List<TobVehicleBehaviorVo> getUpToDataDegreeSuspicion(TobVehicleBehaviorVo tobVehicleBehaviorVo){
+        return tobVehicleBehaviorService.getUpToDataDegreeSuspicion(tobVehicleBehaviorVo);
+    }
+
+    /**
+     *  获取有嫌疑的所有数据
+     * @param tobVehicleBehaviorVo
+     * @return
+     */
+    @GetMapping("getUpToDataDegreeSuspicionAll")
+    public List<TobVehicleBehaviorVo> getUpToDataDegreeSuspicionAll(TobVehicleBehaviorVo tobVehicleBehaviorVo){
+        return tobVehicleBehaviorService.getUpToDataDegreeSuspicionAll(tobVehicleBehaviorVo);
+    }
+
+    /**
+     * 获取所有车辆行为记录列表
+     */
+    @PreAuthorize("@ss.hasPermi('vehicle:vehicleBehavior:list')")
+    @GetMapping("/listVoAll")
+    public List<TobVehicleBehaviorVo> listVoAll(TobVehicleBehaviorVo tobVehicleBehaviorVo)
+    {
+        return tobVehicleBehaviorService.selectTobVehicleBehaviorVoList(tobVehicleBehaviorVo);
+
+    }
+
+    /**
+     * 获取制定日期的每日嫌疑车辆数据
+     */
+    @PreAuthorize("@ss.hasPermi('vehicle:vehicleBehavior:list')")
+    @GetMapping("/date")
+    public List<List<Object>> byDateGetSuspicionVehicleBehavior(Duration duration)
+    {
+        List<List<Object>> list = tobVehicleBehaviorService.byDateGetSuspicionVehicleBehavior(duration);
+        System.out.println("!@#$%^&*()"+list);
+        return list;
+
+    }
+
 }

@@ -43,16 +43,18 @@ import { ScnEventBus } from '@/utils/scn-event-bus';
 export default {
   data() {
     return {
-      maptitle: "视频监控",
+      maptitle: "",
       displayMode: 1,
       displayedCameras: []
     };
   },
   mounted() {
     ScnEventBus.$on('video-display-change', this.updateDisplay);
+    ScnEventBus.$on('suspected-video', this.updateDisplay);
   },
   beforeDestroy() {
     ScnEventBus.$off('video-display-change', this.updateDisplay);
+    ScnEventBus.$off('suspected-video', this.updateDisplay);
   },
   methods: {
     updateDisplay({ mode, cameras }) {

@@ -27,6 +27,8 @@
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
         <result property="districtId" column="district_id"/>
+        <result property="cameraUrl" column="camera_url"/>
+
     </resultMap>
 
     <sql id="selectTobCameraVo">
@@ -51,7 +53,8 @@
                remark,
                create_time,
                update_time,
-               district_id
+               district_id,
+               camera_url
         from tob_camera
     </sql>
 
