@@ -23,7 +23,7 @@
             <div class="guang"></div>
             <div class="d-flex jc-center">
               <div class="title">
-                <span class="title-text">曲靖烟草可视化平台</span>
+                <span class="title-text">曲靖烟业非法运输监管可视化平台</span>
               </div>
             </div>
             <div class="timers">
