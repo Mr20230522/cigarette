@@ -34,9 +34,9 @@ import Echart from "@/components/scn-echart/index.vue";
 import {
   getUpToDataDegreeSuspicionAll
 } from '@/api/cigarette/vehicle/vehicleBehavior';
-import {listDetection} from '@/api/cigarette/detection/detection';
+import { listDetection } from '@/api/cigarette/detection/detection';
 
-// 预定义颜色调色板
+// 预定义一组丰富的颜色（共24种）
 const COLOR_PALETTE = [
   '#FF6B6B', '#FFA07A', '#FFD700', '#98FB98', '#87CEFA', '#9370DB',
   '#FF6347', '#40E0D0', '#FF69B4', '#7B68EE', '#00FA9A', '#1E90FF',
@@ -49,27 +49,25 @@ export default {
     Reacquire,
     Echart
   },
-  // 声明依赖的字典（必须与sys_dict_type表中的dict_type一致）
-  dicts: ['tob_vehicle_type'],
   data() {
     return {
       options: {},
       earlyWarningTypes: [
-        {name: '季节', value: 'quarter'},
-        {name: '昼夜', value: 'dayAndNight'},
-        {name: '小时', value: 'hours'},
-        {name: '车辆类型', value: 'vehicleType'},
-        {name: '车辆颜色', value: 'vehicleColor'},
-        {name: '站点出现频率', value: 'detection'},
+        { name: '季节', value: 'quarter' },
+        { name: '昼夜', value: 'dayAndNight' },
+        { name: '小时', value: 'hours' },
+        { name: '车辆类型', value: 'vehicleType' },
+        { name: '车辆颜色', value: 'vehicleColor' },
+        { name: '站点出现频率', value: 'detection' },
       ],
       activeType: 'quarter',
       warningData: {
-        quarter: {total: 0, categories: []},
-        dayAndNight: {total: 0, categories: []},
-        hours: {total: 0, categories: []},
-        vehicleType: {total: 0, categories: []},
-        vehicleColor: {total: 0, categories: []},
-        detection: {total: 0, categories: []},
+        quarter: { total: 0, categories: [] },
+        dayAndNight: { total: 0, categories: [] },
+        hours: { total: 0, categories: [] },
+        vehicleType: { total: 0, categories: [] },
+        vehicleColor: { total: 0, categories: [] },
+        detection: { total: 0, categories: [] },
       },
       rawData: [],
       pageflag: true,
@@ -88,58 +86,17 @@ export default {
       queryParams2: {
         degreeSuspicion: 60,
         behaviorId: null
-      },
-      // 车辆类型映射表
-      vehicleTypeMap: {},
-      // 字典加载状态
-      dictLoaded: false
+      }
     };
   },
   created() {
-    // 初始化字典监听
-    this.initDictWatch();
-    // 获取数据
     this.getData();
   },
   beforeDestroy() {
     this.clearRefreshTimer();
   },
   methods: {
-    // 初始化字典监听
-    initDictWatch() {
-      this.$watch(
-        () => this.dict.type.tob_vehicle_type,
-        (newVal) => {
-          if (newVal && newVal.length) {
-            this.buildVehicleTypeMap(newVal);
-            this.dictLoaded = true;
-            // 如果当前正在显示车辆类型图表，立即刷新
-            if (this.activeType === 'vehicleType') {
-              this.processFullData();
-              this.initChart();
-            }
-          }
-        },
-        {immediate: true}
-      );
-    },
-
-    // 构建车辆类型映射关系
-    buildVehicleTypeMap(dictData) {
-      this.vehicleTypeMap = dictData.reduce((map, item) => {
-        map[item.value] = item.label;
-        return map;
-      }, {});
-      console.log('车辆类型映射表构建完成:', this.vehicleTypeMap);
-    },
-
-    // 安全获取车辆类型名称
-    getVehicleTypeName(typeId) {
-      if (!typeId) return '未知类型';
-      return this.vehicleTypeMap[typeId] || `未知类型(${typeId})`;
-    },
-
-    // 获取颜色
+    // 获取颜色 - 根据索引从调色板中循环获取颜色
     getColor(index) {
       return COLOR_PALETTE[index % COLOR_PALETTE.length];
     },
@@ -157,7 +114,7 @@ export default {
         if (this.queryParams2.behaviorId) {
           getUpToDataDegreeSuspicionAll(this.queryParams2).then(response => {
             if (response && response.length) {
-              response.reverse();
+              response.reverse()
               this.queryParams2.behaviorId = response[response.length - 1].behaviorId;
               this.rawData = [...this.rawData, ...response];
               this.processIncrementalData(response);
@@ -172,7 +129,7 @@ export default {
       this.pageflag = true;
       getUpToDataDegreeSuspicionAll(this.queryParams2).then(response => {
         if (response && response.length) {
-          response.reverse();
+          response.reverse()
           this.queryParams2.behaviorId = response[response.length - 1].behaviorId;
           this.rawData = response;
           this.processFullData();
@@ -215,6 +172,29 @@ export default {
           break;
         case 'detection':
           this.calculateDetectionData(this.rawData);
+          break;
+      }
+    },
+
+    processIncrementalData(newData) {
+      switch (this.activeType) {
+        case 'quarter':
+          this.mergeQuarterData(newData);
+          break;
+        case 'dayAndNight':
+          this.mergeDayNightData(newData);
+          break;
+        case 'hours':
+          this.mergeHoursData(newData);
+          break;
+        case 'vehicleType':
+          this.mergeVehicleTypeData(newData);
+          break;
+        case 'vehicleColor':
+          this.mergeVehicleColorData(newData);
+          break;
+        case 'detection':
+          this.mergeDetectionData(newData);
           break;
       }
     },
@@ -272,19 +252,13 @@ export default {
 
     calculateVehicleTypeData(data) {
       const typeCounts = data.reduce((acc, {carTypeId}) => {
-        if (carTypeId) {
-          acc[carTypeId] = (acc[carTypeId] || 0) + 1;
-        }
+        acc[carTypeId] = (acc[carTypeId] || 0) + 1;
         return acc;
       }, {});
-
       return {
         total: data.length,
         categories: Object.entries(typeCounts).map(([key, val], i) => ({
-          name: this.getVehicleTypeName(key),
-          value: val,
-          color: this.getColor(i),
-          originalId: key // 保留原始ID
+          name: key, value: val, color: this.getColor(i)
         }))
       };
     },
@@ -297,16 +271,14 @@ export default {
       return {
         total: data.length,
         categories: Object.entries(colorCounts).map(([key, val], i) => ({
-          name: key,
-          value: val,
-          color: this.getColor(i)
+          name: key, value: val, color: this.getColor(i)
         }))
       };
     },
 
     calculateDetectionData(data) {
       const detections = data.reduce((acc, {detectionId}) => {
-        if (detectionId) acc[detectionId] = (acc[detectionId] || 0) + 1;
+        acc[detectionId] = (acc[detectionId] || 0) + 1;
         return acc;
       }, {});
       listDetection().then(res => {
@@ -326,24 +298,87 @@ export default {
       });
     },
 
-    // ...其他merge方法保持不变...
+    mergeQuarterData(newData) {
+      const newStats = this.calculateQuarterData(newData);
+      const current = this.warningData.quarter;
+      current.total += newStats.total;
+      newStats.categories.forEach(newItem => {
+        const existing = current.categories.find(item => item.name === newItem.name);
+        if (existing) {
+          existing.value += newItem.value;
+        } else {
+          current.categories.push(newItem);
+        }
+      });
+    },
+
+    mergeDayNightData(newData) {
+      const newStats = this.calculateDayNightData(newData);
+      const current = this.warningData.dayAndNight;
+      current.total += newStats.total;
+      current.categories[0].value += newStats.categories[0].value;
+      current.categories[1].value += newStats.categories[1].value;
+    },
+
+    mergeHoursData(newData) {
+      const newStats = this.calculateHoursData(newData);
+      const current = this.warningData.hours;
+      current.total += newStats.total;
+      newStats.categories.forEach(newItem => {
+        const existing = current.categories.find(item => item.name === newItem.name);
+        if (existing) {
+          existing.value += newItem.value;
+        } else {
+          current.categories.push(newItem);
+        }
+      });
+    },
+
+    mergeVehicleTypeData(newData) {
+      const newStats = this.calculateVehicleTypeData(newData);
+      const current = this.warningData.vehicleType;
+      current.total += newStats.total;
+      newStats.categories.forEach(newItem => {
+        const existing = current.categories.find(item => item.name === newItem.name);
+        if (existing) {
+          existing.value += newItem.value;
+        } else {
+          current.categories.push(newItem);
+        }
+      });
+    },
+
+    mergeVehicleColorData(newData) {
+      const newStats = this.calculateVehicleColorData(newData);
+      const current = this.warningData.vehicleColor;
+      current.total += newStats.total;
+      newStats.categories.forEach(newItem => {
+        const existing = current.categories.find(item => item.name === newItem.name);
+        if (existing) {
+          existing.value += newItem.value;
+        } else {
+          current.categories.push(newItem);
+        }
+      });
+    },
+
+    mergeDetectionData(newData) {
+      const newStats = this.calculateDetectionData(newData);
+      const current = this.warningData.detection;
+      current.total += newStats.total;
+      newStats.categories.forEach(newItem => {
+        const existing = current.categories.find(item => item.name === newItem.name);
+        if (existing) {
+          existing.value += newItem.value;
+        } else {
+          current.categories.push(newItem);
+        }
+      });
+    },
 
     initChart() {
       const currentData = this.warningData[this.activeType];
-
-      // 特殊处理车辆类型数据
-      if (this.activeType === 'vehicleType') {
-        currentData.categories = currentData.categories.map(item => {
-          // 如果字典已加载但名称仍未转换，强制转换一次
-          if (this.dictLoaded && /^\d+$/.test(item.name)) {
-            return {
-              ...item,
-              name: this.getVehicleTypeName(item.originalId || item.name)
-            };
-          }
-          return item;
-        });
-      }
+      const colors = currentData.categories.map(item => item.color);
 
       this.options = {
         title: {

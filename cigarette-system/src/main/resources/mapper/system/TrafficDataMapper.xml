@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.system.mapper.TrafficDataMapper">
+    <resultMap type="com.ruoyi.system.domain.TrafficData" id="TrafficDataResult">
+        <id column="Id" property="id" />
+        <result column="CameraId" property="cameraId" />
+        <result column="CameraName" property="cameraName" />
+        <result column="LaneNo" property="laneNo" />
+        <result column="Direction" property="direction" />
+        <result column="Speed" property="speed" />
+        <result column="Plate" property="plate" />
+        <result column="PlateType" property="plateType" />
+        <result column="PlateColor" property="plateColor" />
+        <result column="VehicleColor" property="vehicleColor" />
+        <result column="VehicleType" property="vehicleType" />
+        <result column="VehicleLogo" property="vehicleLogo" />
+        <result column="VehicleLogoAll" property="vehicleLogoAll" />
+        <result column="CaptureTime" property="captureTime" />
+        <result column="PicUrl" property="picUrl" />
+        <result column="PlateLicense" property="plateLicense" />
+        <result column="FileNo" property="fileNo" />
+        <result column="StartOffset" property="startOffset" />
+        <result column="SrcJson" property="srcJson" />
+        <result column="Level" property="level" />
+        <result column="CleanupStatus" property="cleanupStatus" />
+        <result column="CleanupTime" property="cleanupTime" />
+        <result column="CreatedAt" property="createdAt" />
+        <result column="Ctrl" property="ctrl" />
+        <result column="Drive" property="drive" />
+        <result column="Part" property="part" />
+        <result column="PicDownloadStatus" property="picDownloadStatus" />
+        <result column="PicLen" property="picLen" />
+        <result column="PlateDownloadStatus" property="plateDownloadStatus" />
+        <result column="UpdatedAt" property="updatedAt" />
+        <result column="VideoDownloadStatus" property="videoDownloadStatus" />
+        <result column="VideoDownloadTime" property="videoDownloadTime" />
+        <result column="VideoFilePath" property="videoFilePath" />
+    </resultMap>
+    <select id="tenList" parameterType="trafficData" resultMap="TrafficDataResult">
+        select *from trafficData
+        <where>
+            <if test="level!=null">and level>#{level}</if>
+        </where>
+        ORDER BY CaptureTime DESC
+        LIMIT 10
+    </select>
+
+    <select id="allList" parameterType="trafficData" resultMap="TrafficDataResult">
+        select *from trafficData
+        <where>
+            <if test="level!=null">and level>#{level}</if>
+        </where>
+    </select>
+
+
+    <select id="overIdList" parameterType="trafficData" resultMap="TrafficDataResult">
+        select *from trafficData
+        <where>
+            <if test="Id!=null">and Id>#{Id} </if>
+            <if test="level!=null">and level>#{level}</if>
+        </where>
+    </select>
+
+
+    <select id="byIdGetVideoPath" parameterType="trafficData" resultMap="TrafficDataResult">
+        select *from trafficData
+        <where>
+            <if test="Id!=null">and Id=#{Id} </if>
+        </where>
+    </select>
+
+
+
+
+</mapper>

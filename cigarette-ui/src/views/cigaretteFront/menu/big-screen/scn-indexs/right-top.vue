@@ -6,24 +6,21 @@
         v-for="(item, i) in visibleList"
         :key="item.id || i"
         :class="{ 'show': item.show }"
-        @click="showSuspectedVideo(item.behaviorId)"
+        @click="handleItemClick(item)"
       >
         <span class="orderNum">{{ getDisplayIndex(i) }}</span>
         <div class="inner_right">
           <div class="dibu"></div>
           <div class="content-wrapper">
-            <!-- 左侧图片 -->
-            <div class="image-container" @click.stop="enlargeImage(item.picture)">
+            <div class="image-container" @click.stop="enlargeImage(item.image)">
               <img
-                :src="item.picture"
+                :src="item.image"
                 @error="handleImgError(item)"
                 alt="车辆图片"
                 loading="lazy"
               >
             </div>
-            <!-- 右侧文字信息 -->
             <div class="text-container">
-              <!-- 第一行：车牌号和车辆类型 -->
               <div class="text-row">
                 <div class="info">
                   <span class="labels">车牌号：</span>
@@ -31,10 +28,9 @@
                 </div>
                 <div class="info">
                   <span class="labels">车辆类型：</span>
-                  <span class="contents">{{ item.carTypeId }}</span>
+                  <span class="contents">{{ getVehicleTypeName(item.carTypeId) }}</span>
                 </div>
               </div>
-              <!-- 第二行：嫌疑程度和时间 -->
               <div class="text-row">
                 <div class="info">
                   <span class="labels">嫌疑程度：</span>
@@ -63,16 +59,14 @@
       </li>
     </transition-group>
 
-    <!-- 数据加载提示 -->
     <div v-if="loading" class="loading-tip">
       <i class="el-icon-loading"></i>
       数据加载中...
     </div>
 
-    <!-- 图片预览 -->
     <div v-if="enlargedImage" class="image-preview-overlay" @click="enlargedImage = null">
       <div class="image-preview-container">
-        <img :src="enlargedImage" class="enlarged-image">
+        <img :src="enlargedImage" @error="handleImageError" class="enlarged-image">
       </div>
     </div>
   </div>
@@ -85,64 +79,119 @@ import Reacquire from "@/components/scn-reacquire/reacquire.vue"
 import {ScnEventBus} from "@/utils/scn-event-bus";
 import {getVehicleBehaviorVideo} from "@/api/cigarette/multimediaResource/keyVideo"
 import {listDetection} from "@/api/cigarette/detection/detection";
+import {tenList,overIdList,allList} from "@/api/cigarette/trafficData/trafficData"
 
 
 export default {
   components: {Reacquire},
+  // 声明依赖的字典（与第一个组件一致）
+  dicts: ['tob_vehicle_type'],
   data() {
     return {
       detectionOptions: [],
       videoData: [],
       vehicleData: null,
       pageflag: true,
-      allData: [],           // 所有获取的数据
-      visibleList: [],       // 当前显示的数据
-      currentIndex: 0,       // 当前显示的数据索引
-      loading: false,       // 数据加载状态
-      enlargedImage: null,   // 放大查看的图片
-
-      // 配置参数
-      batchSize: 5,          // 每次加载的条数
-      displayInterval: 2000,  // 每条数据显示时间(ms)
-      fetchInterval: 4000,   // 数据获取间隔(ms)
-
-      // 定时器
+      allData: [],
+      visibleList: [],
+      currentIndex: 0,
+      loading: false,
+      enlargedImage: null,
+      batchSize: 5,
+      displayInterval: 2000,
+      fetchInterval: 4000,
       displayTimer: null,
       fetchTimer: null,
-
-      // 查询参数
       queryParams: {
         degreeSuspicion: 60,
         behaviorId: null
-        // 其他查询参数...
       },
+      // 车辆类型映射表
+      vehicleTypeMap: {},
+      // 字典加载状态
+      dictLoaded: false
     }
   },
   filters: {
     montionFilter(value) {
-      // 您的过滤逻辑
       return value
     }
   },
   created() {
+    // 初始化字典监听
+    this.initDictWatch();
     this.initData()
+    this.newData()
   },
+
   methods: {
-    // 初始化数据
+    async newData(){
+      try{
+        
+      }catch{
+
+      }
+    },
+    handleImageError(event) {
+      event.target.src = this.getDefaultImage(); // 强制替换为占位图
+    },
+    getDefaultImage() {
+      // 灰色背景 + 文字提示（可自定义颜色和文字）
+      return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="60"%3E%3Crect fill="%23e0e0e0" width="80" height="60"%3E%3C/rect%3E%3Ctext x="50%" y="50%" font-size="10" text-anchor="middle" dominant-baseline="middle" fill="%23666666"%3E图片加载失败%3C/text%3E%3C/svg%3E';
+    },
+    // 初始化字典监听
+    initDictWatch() {
+      this.$watch(
+        () => this.dict.type.tob_vehicle_type,
+        (newVal) => {
+          if (newVal && newVal.length) {
+            this.buildVehicleTypeMap(newVal);
+            this.dictLoaded = true;
+          }
+        },
+        {immediate: true}
+      );
+    },
+
+    // 构建车辆类型映射关系
+    buildVehicleTypeMap(dictData) {
+      this.vehicleTypeMap = dictData.reduce((map, item) => {
+        map[item.value] = item.label;
+        return map;
+      }, {});
+    },
+
+    // 安全获取车辆类型名称
+    getVehicleTypeName(typeId) {
+      if (!typeId) return '未知类型';
+      return this.vehicleTypeMap[typeId] || `未知类型(${typeId})`;
+    },
+
+    handleItemClick(item) {
+      ScnEventBus.$emit('force-show-item', {
+        licensePlate: item.licensePlate,
+        carType: this.getVehicleTypeName(item.carTypeId), // 修改为显示名称
+        suspicionLevel: item.degreeSuspicion,
+        color: item.carColor,
+        detectionPoint: item.detectionId,
+        remark: item.remark
+      });
+      this.showSuspectedVideo(item.behaviorId);
+    },
+
     async initData() {
       this.pageflag = true
       this.allData = []
       this.visibleList = []
       this.currentIndex = 0
       await this.fetchData()
-      await this.loadDetectionOptions(); // 加载检测点选项
-
+      await this.loadDetectionOptions();
     },
+
     async showSuspectedVideo(behaviorId) {
       try {
         const videoDataTemp = await this.fetchVideoData(behaviorId)
         const vehicleDataTemp = await getUpToDataDegreeSuspicion({degreeSuspicion: null, behaviorId: behaviorId})
-
         if (videoDataTemp) {
           if (videoDataTemp.videoPath) {
             this.videoData.push({
@@ -151,38 +200,25 @@ export default {
               url: 'http://127.0.0.1:8000/' + videoDataTemp.videoPath.replace('/profile/', ''),
             })
           } else {
-            this.videoData.push({
-              id: 1,
-              name: videoDataTemp.detectionName,
-              url: null
-            })
+            this.$message.warning('没有找到该车辆的视频记录');
           }
           ScnEventBus.$emit('suspected-video', {
             mode: 1,
             cameras: this.videoData
           })
           this.videoData = []
-        } else {
-          console.warn('未获取到视频数据');
+        }else{
+          this.$message.warning('没有找到该车辆的行为记录');
         }
-        ScnEventBus.$emit('suspected-information', {
-          licensePlate: vehicleDataTemp[0].licensePlate,
-          carType: vehicleDataTemp[0].carTypeId,
-          suspicionLevel: vehicleDataTemp[0].degreeSuspicion,
-          color: vehicleDataTemp[0].carColor,
-          detectionPoint: vehicleDataTemp[0].detectionId,
-          remark: vehicleDataTemp[0].remark
-        })
 
-      } catch {
+      } catch (error) {
         console.error('处理视频数据失败:', error);
       }
     },
+
     async fetchVideoData(behaviorId) {
       try {
         const response = await getVehicleBehaviorVideo(behaviorId);
-        // 处理视频数据（如赋值给data中的变量）
-        // this.videoUrl = response.data.url;
         return response.data
       } catch (error) {
         console.error('获取视频失败:', error);
@@ -190,9 +226,6 @@ export default {
       }
     },
 
-
-    // 获取数据
-// 获取数据方法优化
     async fetchData() {
       try {
         this.loading = true;
@@ -203,10 +236,11 @@ export default {
           this.queryParams.behaviorId = response[response.length - 1].behaviorId;
           const newData = response.map(item => ({
             ...item,
-            picture: 'http://127.0.0.1:8000/' + item.picture.replace('/profile/', ''),
+            image: item.image
+              ? 'http://127.0.0.1:8000/' + item.image.replace('/profile/', '')
+              : this.getDefaultImage(),
             show: false
           }));
-
           this.allData = [...this.allData, ...newData];
           this.startDisplay();
         } else {
@@ -219,7 +253,7 @@ export default {
         this.loading = false;
       }
     },
-    // 加载检测点选项
+
     loadDetectionOptions() {
       listDetection().then(response => {
         this.detectionOptions = response.rows.map(item => ({
@@ -231,40 +265,38 @@ export default {
         console.error("Failed to load detection options:", error);
       });
     },
+
     getDetectionName(detectionId) {
       const detection = this.detectionOptions.find(item => item.detectionId === detectionId)
       return detection ? detection.detectionName : '未知监测点';
     },
-    // 开始逐条显示数据
+
     startDisplay() {
       clearInterval(this.displayTimer)
 
       this.displayTimer = setInterval(() => {
         if (this.currentIndex < this.allData.length) {
-          // 显示下一条数据
           const newItem = {
             ...this.allData[this.currentIndex],
             show: true
           }
 
-          // 添加到可见列表
           this.visibleList = [...this.visibleList, newItem]
 
-          // 控制可见列表长度
           if (this.visibleList.length > this.batchSize) {
             this.visibleList = this.visibleList.slice(-this.batchSize)
           }
 
+          ScnEventBus.$emit('new-visible-item', newItem)
+
           this.currentIndex++
         } else {
-          // 当前批次数据全部显示完毕
           clearInterval(this.displayTimer)
           this.prepareNextBatch()
         }
       }, this.displayInterval)
     },
 
-    // 准备获取下一批数据
     prepareNextBatch() {
       clearTimeout(this.fetchTimer)
       this.fetchTimer = setTimeout(() => {
@@ -272,22 +304,18 @@ export default {
       }, this.fetchInterval)
     },
 
-    // 计算显示序号
     getDisplayIndex(i) {
       return this.currentIndex - this.visibleList.length + i + 1
     },
 
-    // 图片放大
     enlargeImage(url) {
       this.enlargedImage = url
     },
 
-    // 图片加载失败处理
     handleImgError(item) {
-      item.picture = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='40'%3E%3Crect fill='%23f5f5f5' width='80' height='40'/%3E%3Ctext x='40' y='20' font-size='10' text-anchor='middle'%3E无图片%3C/text%3E%3C/svg%3E"
+      item.image = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg   ' width='80' height='40'%3E%3Crect fill='%23f5f5f5' width='80' height='40'/%3E%3Ctext x='40' y='20' font-size='10' text-anchor='middle'%3E无图片%3C/text%3E%3C/svg%3E"
     },
-  }
-  ,
+  },
   beforeDestroy() {
     clearInterval(this.displayTimer)
     clearTimeout(this.fetchTimer)

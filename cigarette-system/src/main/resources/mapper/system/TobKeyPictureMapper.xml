@@ -15,10 +15,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="status"    column="status"    />
         <result property="detectionId"    column="detection_id"    />
         <result property="districtId"    column="district_id"    />
+        <result property="behaviorId"    column="behavior_id"    />
     </resultMap>
 
     <sql id="selectTobKeyPictureVo">
-        select key_picture_id, image, create_time, image_name, camera_id, coordinate, remark, status, detection_id, district_id from tob_key_picture
+        select key_picture_id, image, create_time, image_name, camera_id, coordinate, remark, status, detection_id, district_id,behavior_id from tob_key_picture
     </sql>
 
     <select id="selectTobKeyPictureList" parameterType="TobKeyPicture" resultMap="TobKeyPictureResult">
@@ -29,6 +30,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="status != null  and status != ''"> and status = #{status}</if>
             <if test="detectionId != null "> and detection_id = #{detectionId}</if>
             <if test="districtId != null "> and district_id = #{districtId}</if>
+            <if test="behaviorId != null "> and behavior_id = #{behaviorId}</if>
+
         </where>
     </select>
     

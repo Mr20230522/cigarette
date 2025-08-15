@@ -42,7 +42,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="accompliceId"    column="accomplice_id"    />
         <result property="detectionId" column="detection_id"/>
         <result property="districtId" column="district_id"/>
-        <result property="picture" column="picture"/> <!-- 新增 picture 映射 -->
+        <result property="image" column="image"/> <!-- 新增 picture 映射 -->
     </resultMap>
 
     <sql id="selectTobVehicleBehaviorVo">
@@ -72,10 +72,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     -->
     <select id="selectTobVehicleBehaviorVoList" parameterType="TobVehicleBehaviorVo" resultMap="TobVehicleBehaviorVoResult">
 
-        SELECT a.*,b.license_plate,b.picture,c.name
-        FROM tob_vehicle_behavior AS a
-                 INNER JOIN tob_vehicle AS b ON a.car_id = b.car_id
-                 LEFT JOIN tob_person AS c ON a.driver_id = c.suspect_id
+        SELECT
+        a.*,
+        b.license_plate,
+        c.name,
+        d.image
+        FROM
+        tob_vehicle_behavior AS a
+        INNER JOIN
+        tob_vehicle AS b ON a.car_id = b.car_id
+        LEFT JOIN
+        tob_person AS c ON a.driver_id = c.suspect_id
+        LEFT JOIN
+        tob_key_picture AS d ON a.behavior_id = d.behavior_id
         <where>
             <if test="carId != null "> and a.car_id = #{carId}</if>
             <if test="carTypeId != null "> and a.car_type_id = #{carTypeId}</if>
@@ -93,10 +102,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <select id="getUpToDataDegreeSuspicion" parameterType="TobVehicleBehaviorVo" resultMap="TobVehicleBehaviorVoResult">
-        SELECT a.*, b.license_plate, b.picture, c.name
-        FROM tob_vehicle_behavior AS a
-        INNER JOIN tob_vehicle AS b ON a.car_id = b.car_id
-        LEFT JOIN tob_person AS c ON a.driver_id = c.suspect_id
+        SELECT
+        a.*,
+        b.license_plate,
+        c.name,
+        d.image
+        FROM
+        tob_vehicle_behavior AS a
+        INNER JOIN
+        tob_vehicle AS b ON a.car_id = b.car_id
+        LEFT JOIN
+        tob_person AS c ON a.driver_id = c.suspect_id
+        LEFT JOIN
+        tob_key_picture AS d ON a.behavior_id = d.behavior_id
         <where>
             <!-- 如果 degreeSuspicion 为 null，则只按 behaviorId 精确匹配 -->
             <choose>
@@ -115,10 +133,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <select id="getUpToDataDegreeSuspicionAll" parameterType="TobVehicleBehaviorVo" resultMap="TobVehicleBehaviorVoResult">
-        SELECT a.*, b.license_plate, b.picture, c.name
-        FROM tob_vehicle_behavior AS a
-        INNER JOIN tob_vehicle AS b ON a.car_id = b.car_id
-        LEFT JOIN tob_person AS c ON a.driver_id = c.suspect_id
+        SELECT
+        a.*,
+        b.license_plate,
+        c.name,
+        d.image
+        FROM
+        tob_vehicle_behavior AS a
+        INNER JOIN
+        tob_vehicle AS b ON a.car_id = b.car_id
+        LEFT JOIN
+        tob_person AS c ON a.driver_id = c.suspect_id
+        LEFT JOIN
+        tob_key_picture AS d ON a.behavior_id = d.behavior_id
         <where>
             <if test="degreeSuspicion!=null">and a.degree_suspicion >= #{degreeSuspicion}</if>
             <if test="behaviorId!=null">and a.behavior_id > #{behaviorId}</if>
@@ -129,15 +156,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="byDateGetSuspicionVehicleBehavior" parameterType="Duration" resultMap="TobVehicleBehaviorVoResult">
         SELECT
         a.*,
-        b.picture AS vehicle_picture,
-        c.name AS driver_name,
-        b.license_plate  <!-- 确保返回车牌号 -->
+        b.license_plate,
+        c.name,
+        d.image
         FROM
         tob_vehicle_behavior AS a
         INNER JOIN
         tob_vehicle AS b ON a.car_id = b.car_id
         LEFT JOIN
         tob_person AS c ON a.driver_id = c.suspect_id
+        LEFT JOIN
+        tob_key_picture AS d ON a.behavior_id = d.behavior_id
         <where>
             a.del_flag = '0'  <!-- 确保只查未删除的记录 -->
             <if test="degreeSuspicion != null">

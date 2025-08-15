@@ -21,7 +21,7 @@ public class TobVehicleBehaviorVo extends TobVehicleBehavior {
     private String driverName;
 
     @Excel(name = "车辆图片")
-    private String picture; // 新增字段
+    private String image; // 新增字段
 
     public String getLicensePlate() {
         return licensePlate;
@@ -38,11 +38,11 @@ public class TobVehicleBehaviorVo extends TobVehicleBehavior {
     public void setDriverName(String driverName) {
         this.driverName = driverName;
     }
-    public String getPicture() {
-        return picture;
+    public String getImage() {
+        return image;
     }
-    public void setPicture(String picture) {
-        this.picture = picture;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     @Override
@@ -64,7 +64,7 @@ public class TobVehicleBehaviorVo extends TobVehicleBehavior {
                 .append("createTime", getCreateTime())
                 .append("updateTime", getUpdateTime())
                 .append("accompliceId", getAccompliceId())
-                .append("picture", getPicture())
+                .append("image", getImage())
                 .toString();
     }
 

@@ -142,7 +142,7 @@ export default {
           return {
             id: camera.cameraId,
             name: `${camera.cameraId}${detection ? '-' + detection.detectionName : ''}`,
-            url: camera.cameraUrl
+            url: 'http://127.0.0.1:8000/'+camera.cameraUrl.replace('/profile/', '')
           };
         });
 

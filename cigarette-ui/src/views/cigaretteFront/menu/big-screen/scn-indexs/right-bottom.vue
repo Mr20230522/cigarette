@@ -1,11 +1,9 @@
 <template>
   <div class="vehicle-info-container" ref="container">
-    <!-- 标题 -->
     <div class="info-header">
       <h3>嫌疑车辆详细信息</h3>
     </div>
 
-    <!-- 动态数据绑定的网格 -->
     <div class="info-grid">
       <div
         v-for="(item, index) in displayItems"
@@ -36,7 +34,6 @@ import {getDicts} from "@/api/system/dict/data";
 export default {
   data() {
     return {
-      // 默认数据，防止未传值时显示空白
       vehicleData: {
         licensePlate: '暂无数据',
         carType: '暂无数据',
@@ -47,7 +44,6 @@ export default {
       },
       detectionOptions: [],
       vehicleType: [],
-      // 显示配置项
       displayItems: [
         {label: '车牌号', field: 'licensePlate', highlight: true},
         {label: '车辆类型', field: 'carType'},
@@ -55,35 +51,31 @@ export default {
         {label: '颜色', field: 'color'},
         {label: '监测点', field: 'detectionPoint', fullRow: true,},
         {label: '备注', field: 'remark', fullRow: true, warning: true}
-      ]
+      ],
+      lastClickTime: 0
     };
   },
   created() {
     this.loadDetectionOptions()
     this.loadDict()
-  },
-  mounted() {
-    // 绑定事件监听
-    ScnEventBus.$on('suspected-information', this.updateData);
+    ScnEventBus.$on('new-visible-item', this.handleNewVisibleItem)
+    ScnEventBus.$on('force-show-item', this.handleForceShowItem)
   },
   beforeDestroy() {
-    // 移除事件监听，防止内存泄漏
-    ScnEventBus.$off('suspected-information', this.updateData);
+    ScnEventBus.$off('new-visible-item', this.handleNewVisibleItem)
+    ScnEventBus.$off('force-show-item', this.handleForceShowItem)
   },
   methods: {
-    // 更新数据（确保响应式）
     updateData(newData) {
-      // 使用 Object.assign 确保 Vue 能检测到变化
       this.vehicleData = Object.assign({}, this.vehicleData, newData);
       this.vehicleData.detectionPoint = this.getDetectionName(this.vehicleData.detectionPoint)
-      this.vehicleData.carType=this.getVehicleTypeName(this.vehicleData.carType)
-      // 调试日志（可选）
+      this.vehicleData.carType = this.getVehicleTypeName(this.vehicleData.carType)
     },
 
-    // 安全获取字段值，防止 undefined
     getFieldValue(field) {
       return this.vehicleData[field] || '暂无数据';
     },
+
     loadDict() {
       getDicts('tob_vehicle_type').then(response => {
         this.vehicleType = response.data.map(item => ({
@@ -94,7 +86,7 @@ export default {
         console.error("Failed to load vehicleType options:", error);
       });
     },
-    // 加载检测点选项
+
     loadDetectionOptions() {
       listDetection().then(response => {
         this.detectionOptions = response.rows.map(item => ({
@@ -106,14 +98,34 @@ export default {
         console.error("Failed to load detection options:", error);
       });
     },
+
     getVehicleTypeName(carTypeId) {
       const vType = this.vehicleType.find(item => String(item.carTypeId) === String(carTypeId))
       return vType ? vType.carType : '未知车型';
     },
+
     getDetectionName(detectionId) {
       const detection = this.detectionOptions.find(item => item.detectionId === detectionId)
       return detection ? detection.detectionName : '未知监测点';
     },
+
+    handleForceShowItem(data) {
+      this.updateData(data);
+      this.lastClickTime = Date.now();
+    },
+
+    handleNewVisibleItem(newItem) {
+      if (Date.now() - this.lastClickTime > 2000) {
+        this.updateData({
+          licensePlate: newItem.licensePlate,
+          carType: newItem.carTypeId,
+          suspicionLevel: newItem.degreeSuspicion,
+          color: newItem.carColor,
+          detectionPoint: newItem.detectionId,
+          remark: newItem.remark
+        });
+      }
+    }
   }
 };
 </script>
