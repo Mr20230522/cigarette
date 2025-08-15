@@ -56,8 +56,6 @@ export default {
     };
   },
   created() {
-    this.loadDetectionOptions()
-    this.loadDict()
     ScnEventBus.$on('new-visible-item', this.handleNewVisibleItem)
     ScnEventBus.$on('force-show-item', this.handleForceShowItem)
   },
@@ -68,46 +66,13 @@ export default {
   methods: {
     updateData(newData) {
       this.vehicleData = Object.assign({}, this.vehicleData, newData);
-      this.vehicleData.detectionPoint = this.getDetectionName(this.vehicleData.detectionPoint)
-      this.vehicleData.carType = this.getVehicleTypeName(this.vehicleData.carType)
     },
 
     getFieldValue(field) {
       return this.vehicleData[field] || '暂无数据';
     },
 
-    loadDict() {
-      getDicts('tob_vehicle_type').then(response => {
-        this.vehicleType = response.data.map(item => ({
-          carTypeId: item.dictValue,
-          carType: item.dictLabel,
-        }))
-      }).catch(error => {
-        console.error("Failed to load vehicleType options:", error);
-      });
-    },
 
-    loadDetectionOptions() {
-      listDetection().then(response => {
-        this.detectionOptions = response.rows.map(item => ({
-          detectionId: item.detectionId,
-          districtId: item.districtId,
-          detectionName: item.detectionName
-        }));
-      }).catch(error => {
-        console.error("Failed to load detection options:", error);
-      });
-    },
-
-    getVehicleTypeName(carTypeId) {
-      const vType = this.vehicleType.find(item => String(item.carTypeId) === String(carTypeId))
-      return vType ? vType.carType : '未知车型';
-    },
-
-    getDetectionName(detectionId) {
-      const detection = this.detectionOptions.find(item => item.detectionId === detectionId)
-      return detection ? detection.detectionName : '未知监测点';
-    },
 
     handleForceShowItem(data) {
       this.updateData(data);
@@ -119,7 +84,7 @@ export default {
         this.updateData({
           // 映射发送方的原始键名
           licensePlate: data.plate || '无车牌',
-          carType: data.cameraName || '未知类型',
+          carType: data.vehicleType || '未知类型',
           suspicionLevel: data.level || 0,
           color: data.vehicleColor || '未知颜色',
           detectionPoint: data.cameraId || null,

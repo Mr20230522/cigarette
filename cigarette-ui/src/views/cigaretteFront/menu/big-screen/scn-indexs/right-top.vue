@@ -121,24 +121,10 @@ export default {
     // 初始化字典监听
     this.initDictWatch();
     this.initData()
-    this.newData()
   },
 
   methods: {
-    async newData(){
-      try{
-        const data1=await tenList({level:null})
-        const data2=await overIdList({level:null})
-        const data3=await allList({level:null,Id:null})
-        console.log('!!!data1',data1)
-        console.log('@@@data2',data2)
-        console.log('###data1',data3)
 
-
-      }catch{
-
-      }
-    },
     handleImageError(event) {
       event.target.src = this.getDefaultImage(); // 强制替换为占位图
     },
@@ -174,13 +160,19 @@ export default {
       return this.vehicleTypeMap[typeId] || `未知类型(${typeId})`;
     },
 
+    formatItemData(item) {
+      return {
+        licensePlate: item.plate || '无车牌',
+        carType: item.vehicleType || '未知类型',  // 确保使用vehicleType
+        suspicionLevel: item.level || 0,
+        color: item.vehicleColor || '未知颜色',
+        detectionPoint: item.cameraName,
+        remark: item.remark || '无'
+      }
+    },
     handleItemClick(item) {
-      ScnEventBus.$emit('force-show-item', {
-        licensePlate: item.plate,
-        carType: item.cameraName, // 修改为显示名称
-        suspicionLevel: item.level,
-        color: item.vehicleColor,
-      });
+      console.log('item',this.formatItemData(item))
+      ScnEventBus.$emit('force-show-item', this.formatItemData(item));
       this.showSuspectedVideo(item.id);
     },
 
@@ -236,6 +228,7 @@ export default {
       try {
         this.loading = true;
         const response = await tenList(this.queryParams);
+        console.log('response',response)
         response.reverse()
 
         if (response && response.length > 0) {

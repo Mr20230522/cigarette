@@ -36,6 +36,9 @@ import {
 } from '@/api/cigarette/vehicle/vehicleBehavior';
 import { listDetection } from '@/api/cigarette/detection/detection';
 
+import {tenList, overIdList, allList, byIdGetVideoPath} from "@/api/cigarette/trafficData/trafficData"
+
+
 // 预定义一组丰富的颜色（共24种）
 const COLOR_PALETTE = [
   '#FF6B6B', '#FFA07A', '#FFD700', '#98FB98', '#87CEFA', '#9370DB',
@@ -84,8 +87,8 @@ export default {
         accompliceId: null
       },
       queryParams2: {
-        degreeSuspicion: 60,
-        behaviorId: null
+        level: null,
+        Id: null
       }
     };
   },
@@ -111,11 +114,12 @@ export default {
     startRefreshTimer() {
       this.clearRefreshTimer();
       this.timer = setInterval(() => {
-        if (this.queryParams2.behaviorId) {
-          getUpToDataDegreeSuspicionAll(this.queryParams2).then(response => {
+        if (this.queryParams2.Id) {
+          overIdList(this.queryParams2).then(response => {
+            console.log('11111response',response)
             if (response && response.length) {
               response.reverse()
-              this.queryParams2.behaviorId = response[response.length - 1].behaviorId;
+              this.queryParams2.Id = response[response.length - 1].Id;
               this.rawData = [...this.rawData, ...response];
               this.processIncrementalData(response);
               this.initChart();
@@ -127,10 +131,10 @@ export default {
 
     getData() {
       this.pageflag = true;
-      getUpToDataDegreeSuspicionAll(this.queryParams2).then(response => {
+      overIdList(this.queryParams2).then(response => {
         if (response && response.length) {
           response.reverse()
-          this.queryParams2.behaviorId = response[response.length - 1].behaviorId;
+          this.queryParams2.Id = response[response.length - 1].Id;
           this.rawData = response;
           this.processFullData();
           this.initChart();
@@ -202,7 +206,7 @@ export default {
     calculateQuarterData(data) {
       let spring = 0, summer = 0, autumn = 0, winter = 0;
       data.forEach(item => {
-        const month = new Date(item.createTime).getMonth();
+        const month = new Date(item.captureTime).getMonth();
         if (month >= 0 && month <= 2) spring++;
         else if (month >= 3 && month <= 5) summer++;
         else if (month >= 6 && month <= 8) autumn++;
@@ -222,7 +226,7 @@ export default {
     calculateDayNightData(data) {
       let day = 0, night = 0;
       data.forEach(item => {
-        const hour = new Date(item.createTime).getHours();
+        const hour = new Date(item.captureTime).getHours();
         hour < 18 ? day++ : night++;
       });
       return {
@@ -237,7 +241,7 @@ export default {
     calculateHoursData(data) {
       const hours = Array(24).fill(0);
       data.forEach(item => {
-        const hour = new Date(item.createTime).getHours();
+        const hour = new Date(item.captureTime).getHours();
         hours[hour]++;
       });
       return {
@@ -251,8 +255,8 @@ export default {
     },
 
     calculateVehicleTypeData(data) {
-      const typeCounts = data.reduce((acc, {carTypeId}) => {
-        acc[carTypeId] = (acc[carTypeId] || 0) + 1;
+      const typeCounts = data.reduce((acc, {vehicleType}) => {
+        acc[vehicleType] = (acc[vehicleType] || 0) + 1;
         return acc;
       }, {});
       return {
@@ -264,8 +268,8 @@ export default {
     },
 
     calculateVehicleColorData(data) {
-      const colorCounts = data.reduce((acc, {carColor}) => {
-        if (carColor) acc[carColor] = (acc[carColor] || 0) + 1;
+      const colorCounts = data.reduce((acc, {vehicleColor}) => {
+        if (vehicleColor) acc[vehicleColor] = (acc[vehicleColor] || 0) + 1;
         return acc;
       }, {});
       return {
@@ -277,25 +281,33 @@ export default {
     },
 
     calculateDetectionData(data) {
-      const detections = data.reduce((acc, {detectionId}) => {
-        acc[detectionId] = (acc[detectionId] || 0) + 1;
-        return acc;
-      }, {});
-      listDetection().then(res => {
-        const names = res.rows.reduce((acc, item) => {
-          acc[item.detectionId] = item.detectionName;
-          return acc;
-        }, {});
-        this.warningData.detection = {
-          total: data.length,
-          categories: Object.entries(detections).map(([id, count], i) => ({
-            name: names[id] || id,
-            value: count,
-            color: this.getColor(i)
-          }))
-        };
-        this.initChart();
+      // 1. 统计每个cameraName出现的次数
+      const detectionStats = {};
+      let total = 0;
+
+      data.forEach(item => {
+        if (item.cameraName) {
+          detectionStats[item.cameraName] = (detectionStats[item.cameraName] || 0) + 1;
+          total++;
+        }
       });
+
+      // 2. 转换为图表需要的格式
+      const categories = Object.entries(detectionStats)
+        .map(([name, count], index) => ({
+          name: name,
+          value: count,
+          color: this.getColor(index)
+        }))
+        .sort((a, b) => b.value - a.value); // 按数量降序排序
+
+      // 3. 更新数据并渲染图表
+      this.warningData.detection = {
+        total: total,
+        categories: categories
+      };
+
+      this.initChart();
     },
 
     mergeQuarterData(newData) {
