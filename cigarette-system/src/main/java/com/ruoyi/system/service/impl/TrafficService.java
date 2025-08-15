@@ -37,7 +37,10 @@ public class TrafficService implements ITrafficDataService {
      */
     @Override
     public List<TrafficData> byIdGetVideoPath(TrafficData trafficData){
-        return trafficDataMapper.byIdGetVideoPath(trafficData);
+        System.out.println("!@!@!@!@!@!@!@!@trafficData"+trafficData);
+        List<TrafficData> tra=trafficDataMapper.byIdGetVideoPath(trafficData);
+        System.out.println("tra))))))))))))))))))"+tra);
+        return tra;
     }
 
 }

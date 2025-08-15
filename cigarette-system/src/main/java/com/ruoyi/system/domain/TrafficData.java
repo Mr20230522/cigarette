@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 public class TrafficData {
 
 
-    private BigInteger Id;
+    private Long Id;
 
     private Integer cameraId;
 
@@ -74,11 +74,11 @@ public class TrafficData {
 
     // Getters and Setters
 
-    public BigInteger getId() {
+    public Long getId() {
         return Id;
     }
 
-    public void setId(BigInteger Id) {
+    public void setId(Long Id) {
         this.Id = Id;
     }
 

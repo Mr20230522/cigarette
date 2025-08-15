@@ -51,7 +51,4 @@ public class TrafficDataControl extends BaseController {
     public List<TrafficData> byIdGetVideoPath(TrafficData trafficData){
         return TrafficDataService.byIdGetVideoPath(trafficData);
     }
-
-
-
 }

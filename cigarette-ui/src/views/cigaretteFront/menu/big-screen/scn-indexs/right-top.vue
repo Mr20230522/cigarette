@@ -12,9 +12,9 @@
         <div class="inner_right">
           <div class="dibu"></div>
           <div class="content-wrapper">
-            <div class="image-container" @click.stop="enlargeImage(item.image)">
+            <div class="image-container" @click.stop="enlargeImage(item.picUrl)">
               <img
-                :src="item.image"
+                :src="item.picUrl"
                 @error="handleImgError(item)"
                 alt="车辆图片"
                 loading="lazy"
@@ -24,34 +24,34 @@
               <div class="text-row">
                 <div class="info">
                   <span class="labels">车牌号：</span>
-                  <span class="contents zhuyao">{{ item.licensePlate }}</span>
+                  <span class="contents zhuyao">{{ item.plate }}</span>
                 </div>
                 <div class="info">
                   <span class="labels">车辆类型：</span>
-                  <span class="contents">{{ getVehicleTypeName(item.carTypeId) }}</span>
+                  <span class="contents">{{ item.plateType}}</span>
                 </div>
               </div>
               <div class="text-row">
                 <div class="info">
                   <span class="labels">嫌疑程度：</span>
-                  <span class="contents warning">{{ item.degreeSuspicion | montionFilter }}</span>
+                  <span class="contents warning">{{ item.level | montionFilter }}</span>
                 </div>
                 <div class="info">
                   <span class="labels">时间：</span>
-                  <span class="contents" style="font-size:12px">{{ item.createTime }}</span>
+                  <span class="contents" style="font-size:12px">{{ item.captureTime }}</span>
                 </div>
               </div>
               <div class="text-row address-alert">
                 <div class="info address">
                   <span class="labels">监测点：</span>
-                  <span class="contents ciyao">{{ getDetectionName(item.detectionId) }}</span>
+                  <span class="contents ciyao">{{ item.cameraName }}</span>
                 </div>
-                <div class="info alert">
-                  <span class="labels">备注：</span>
-                  <span class="contents ciyao" :class="{ warning: item.alertdetail }">
-                    {{ item.remark || '无' }}
-                  </span>
-                </div>
+<!--                <div class="info alert">-->
+<!--                  <span class="labels">备注：</span>-->
+<!--                  <span class="contents ciyao" :class="{ warning: item.alertdetail }">-->
+<!--                    {{ item.remark || '无' }}-->
+<!--                  </span>-->
+<!--                </div>-->
               </div>
             </div>
           </div>
@@ -79,7 +79,7 @@ import Reacquire from "@/components/scn-reacquire/reacquire.vue"
 import {ScnEventBus} from "@/utils/scn-event-bus";
 import {getVehicleBehaviorVideo} from "@/api/cigarette/multimediaResource/keyVideo"
 import {listDetection} from "@/api/cigarette/detection/detection";
-import {tenList,overIdList,allList} from "@/api/cigarette/trafficData/trafficData"
+import {tenList, overIdList, allList, byIdGetVideoPath} from "@/api/cigarette/trafficData/trafficData"
 
 
 export default {
@@ -103,8 +103,8 @@ export default {
       displayTimer: null,
       fetchTimer: null,
       queryParams: {
-        degreeSuspicion: 60,
-        behaviorId: null
+        level: null,
+        Id: null
       },
       // 车辆类型映射表
       vehicleTypeMap: {},
@@ -127,7 +127,14 @@ export default {
   methods: {
     async newData(){
       try{
-        
+        const data1=await tenList({level:null})
+        const data2=await overIdList({level:null})
+        const data3=await allList({level:null,Id:null})
+        console.log('!!!data1',data1)
+        console.log('@@@data2',data2)
+        console.log('###data1',data3)
+
+
       }catch{
 
       }
@@ -169,14 +176,12 @@ export default {
 
     handleItemClick(item) {
       ScnEventBus.$emit('force-show-item', {
-        licensePlate: item.licensePlate,
-        carType: this.getVehicleTypeName(item.carTypeId), // 修改为显示名称
-        suspicionLevel: item.degreeSuspicion,
-        color: item.carColor,
-        detectionPoint: item.detectionId,
-        remark: item.remark
+        licensePlate: item.plate,
+        carType: item.cameraName, // 修改为显示名称
+        suspicionLevel: item.level,
+        color: item.vehicleColor,
       });
-      this.showSuspectedVideo(item.behaviorId);
+      this.showSuspectedVideo(item.id);
     },
 
     async initData() {
@@ -188,19 +193,19 @@ export default {
       await this.loadDetectionOptions();
     },
 
-    async showSuspectedVideo(behaviorId) {
+    async showSuspectedVideo(id) {
       try {
-        const videoDataTemp = await this.fetchVideoData(behaviorId)
-        const vehicleDataTemp = await getUpToDataDegreeSuspicion({degreeSuspicion: null, behaviorId: behaviorId})
+        const videoDataTemp = await this.fetchVideoData(id)
+        console.log('!!!videoDataTemp',videoDataTemp)
         if (videoDataTemp) {
           if (videoDataTemp.videoPath) {
             this.videoData.push({
               id: 1,
-              name: videoDataTemp.detectionName,
-              url: 'http://127.0.0.1:8000/' + videoDataTemp.videoPath.replace('/profile/', ''),
+              name: videoDataTemp.cameraName,
+              url: 'http://127.0.0.1:8000/' + videoDataTemp.videoPath,
             })
           } else {
-            this.$message.warning('没有找到该车辆的视频记录');
+            this.$message.warning('没有的视频记录！！！');
           }
           ScnEventBus.$emit('suspected-video', {
             mode: 1,
@@ -216,10 +221,11 @@ export default {
       }
     },
 
-    async fetchVideoData(behaviorId) {
+    async fetchVideoData(id) {
       try {
-        const response = await getVehicleBehaviorVideo(behaviorId);
-        return response.data
+        console.log('!@#id',id)
+        const response = await byIdGetVideoPath({id:id});
+        return response
       } catch (error) {
         console.error('获取视频失败:', error);
         return null
@@ -229,15 +235,15 @@ export default {
     async fetchData() {
       try {
         this.loading = true;
-        const response = await getUpToDataDegreeSuspicion(this.queryParams);
+        const response = await tenList(this.queryParams);
         response.reverse()
 
         if (response && response.length > 0) {
-          this.queryParams.behaviorId = response[response.length - 1].behaviorId;
+          this.queryParams.id = response[response.length - 1].id;
           const newData = response.map(item => ({
             ...item,
             image: item.image
-              ? 'http://127.0.0.1:8000/' + item.image.replace('/profile/', '')
+              ? 'http://127.0.0.1:8000/' + item.image
               : this.getDefaultImage(),
             show: false
           }));

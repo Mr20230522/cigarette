@@ -114,15 +114,16 @@ export default {
       this.lastClickTime = Date.now();
     },
 
-    handleNewVisibleItem(newItem) {
+    handleNewVisibleItem(data) {
       if (Date.now() - this.lastClickTime > 2000) {
         this.updateData({
-          licensePlate: newItem.licensePlate,
-          carType: newItem.carTypeId,
-          suspicionLevel: newItem.degreeSuspicion,
-          color: newItem.carColor,
-          detectionPoint: newItem.detectionId,
-          remark: newItem.remark
+          // 映射发送方的原始键名
+          licensePlate: data.plate || '无车牌',
+          carType: data.cameraName || '未知类型',
+          suspicionLevel: data.level || 0,
+          color: data.vehicleColor || '未知颜色',
+          detectionPoint: data.cameraId || null,
+          remark: data.remark || '无'
         });
       }
     }

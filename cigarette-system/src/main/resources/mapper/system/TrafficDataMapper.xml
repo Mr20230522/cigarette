@@ -43,6 +43,7 @@
         select *from trafficData
         <where>
             <if test="level!=null">and level>#{level}</if>
+            <if test="Id!=null">and Id>#{Id} </if>
         </where>
         ORDER BY CaptureTime DESC
         LIMIT 10
@@ -68,7 +69,7 @@
     <select id="byIdGetVideoPath" parameterType="trafficData" resultMap="TrafficDataResult">
         select *from trafficData
         <where>
-            <if test="Id!=null">and Id=#{Id} </if>
+            <if test="Id!=null">and Id=#{Id,jdbcType=BIGINT} </if>
         </where>
     </select>
 
