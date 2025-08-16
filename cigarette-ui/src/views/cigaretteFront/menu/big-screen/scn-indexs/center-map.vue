@@ -28,9 +28,9 @@
           </div>
 
           <!-- 保持原有的无视频提示 -->
-          <div v-if="displayedCameras.length === 0" class="no-video">
-            请选择摄像头
-          </div>
+<!--          <div v-if="displayedCameras.length === 0" class="no-video">-->
+<!--            请选择摄像头-->
+<!--          </div>-->
         </div>
       </dv-border-box-13>
     </div>

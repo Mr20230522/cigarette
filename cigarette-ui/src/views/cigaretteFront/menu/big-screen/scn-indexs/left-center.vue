@@ -31,15 +31,8 @@
 <script>
 import Reacquire from "@/components/scn-reacquire/reacquire.vue";
 import Echart from "@/components/scn-echart/index.vue";
-import {
-  getUpToDataDegreeSuspicionAll
-} from '@/api/cigarette/vehicle/vehicleBehavior';
-import { listDetection } from '@/api/cigarette/detection/detection';
+import { overIdList } from "@/api/cigarette/trafficData/trafficData"
 
-import {tenList, overIdList, allList, byIdGetVideoPath} from "@/api/cigarette/trafficData/trafficData"
-
-
-// 预定义一组丰富的颜色（共24种）
 const COLOR_PALETTE = [
   '#FF6B6B', '#FFA07A', '#FFD700', '#98FB98', '#87CEFA', '#9370DB',
   '#FF6347', '#40E0D0', '#FF69B4', '#7B68EE', '#00FA9A', '#1E90FF',
@@ -76,19 +69,8 @@ export default {
       pageflag: true,
       timer: null,
       queryParams: {
-        carId: null,
-        carTypeId: null,
-        carColor: null,
-        degreeSuspicion: 60,
-        driverId: null,
-        drivingDirection: null,
-        illegalStatus: null,
-        status: null,
-        accompliceId: null
-      },
-      queryParams2: {
         level: null,
-        Id: null
+        id: null
       }
     };
   },
@@ -99,7 +81,6 @@ export default {
     this.clearRefreshTimer();
   },
   methods: {
-    // 获取颜色 - 根据索引从调色板中循环获取颜色
     getColor(index) {
       return COLOR_PALETTE[index % COLOR_PALETTE.length];
     },
@@ -114,14 +95,12 @@ export default {
     startRefreshTimer() {
       this.clearRefreshTimer();
       this.timer = setInterval(() => {
-        if (this.queryParams2.Id) {
-          overIdList(this.queryParams2).then(response => {
-            console.log('11111response',response)
+        if (this.queryParams.id) {
+          overIdList(this.queryParams).then(response => {
             if (response && response.length) {
-              response.reverse()
-              this.queryParams2.Id = response[response.length - 1].Id;
-              this.rawData = [...this.rawData, ...response];
+              this.queryParams.id = response[response.length - 1].id;
               this.processIncrementalData(response);
+              this.rawData = [...this.rawData, ...response];
               this.initChart();
             }
           });
@@ -131,10 +110,10 @@ export default {
 
     getData() {
       this.pageflag = true;
-      overIdList(this.queryParams2).then(response => {
+      console.log('我被调用了')
+      overIdList(this.queryParams).then(response => {
         if (response && response.length) {
-          response.reverse()
-          this.queryParams2.Id = response[response.length - 1].Id;
+          this.queryParams.id = response[response.length - 1].id;
           this.rawData = response;
           this.processFullData();
           this.initChart();
@@ -150,11 +129,9 @@ export default {
     selectType(type) {
       if (this.activeType === type) return;
 
-      this.clearRefreshTimer();
       this.activeType = type;
       this.processFullData();
       this.initChart();
-      this.startRefreshTimer();
     },
 
     processFullData() {
@@ -175,7 +152,7 @@ export default {
           this.warningData.vehicleColor = this.calculateVehicleColorData(this.rawData);
           break;
         case 'detection':
-          this.calculateDetectionData(this.rawData);
+          this.warningData.detection = this.calculateDetectionData(this.rawData);
           break;
       }
     },
@@ -227,7 +204,7 @@ export default {
       let day = 0, night = 0;
       data.forEach(item => {
         const hour = new Date(item.captureTime).getHours();
-        hour < 18 ? day++ : night++;
+        hour >= 6 && hour < 18 ? day++ : night++;
       });
       return {
         total: day + night,
@@ -250,13 +227,14 @@ export default {
           name: `${hour}:00`,
           value: value,
           color: this.getColor(hour)
-        })).filter(v => v.value > 0)
+        }))
       };
     },
 
     calculateVehicleTypeData(data) {
-      const typeCounts = data.reduce((acc, {vehicleType}) => {
-        acc[vehicleType] = (acc[vehicleType] || 0) + 1;
+      const typeCounts = data.reduce((acc, item) => {
+        const type = item.vehicleType || '未知';
+        acc[type] = (acc[type] || 0) + 1;
         return acc;
       }, {});
       return {
@@ -268,8 +246,9 @@ export default {
     },
 
     calculateVehicleColorData(data) {
-      const colorCounts = data.reduce((acc, {vehicleColor}) => {
-        if (vehicleColor) acc[vehicleColor] = (acc[vehicleColor] || 0) + 1;
+      const colorCounts = data.reduce((acc, item) => {
+        const color = item.vehicleColor || '未知';
+        acc[color] = (acc[color] || 0) + 1;
         return acc;
       }, {});
       return {
@@ -281,35 +260,69 @@ export default {
     },
 
     calculateDetectionData(data) {
-      // 1. 统计每个cameraName出现的次数
-      const detectionStats = {};
-      let total = 0;
+      const detectionStats = data.reduce((acc, item) => {
+        const name = item.cameraName || '未知站点';
+        acc[name] = (acc[name] || 0) + 1;
+        return acc;
+      }, {});
 
-      data.forEach(item => {
-        if (item.cameraName) {
-          detectionStats[item.cameraName] = (detectionStats[item.cameraName] || 0) + 1;
-          total++;
-        }
-      });
-
-      // 2. 转换为图表需要的格式
       const categories = Object.entries(detectionStats)
         .map(([name, count], index) => ({
           name: name,
           value: count,
           color: this.getColor(index)
         }))
-        .sort((a, b) => b.value - a.value); // 按数量降序排序
+        .sort((a, b) => b.value - a.value);
 
-      // 3. 更新数据并渲染图表
-      this.warningData.detection = {
-        total: total,
+      return {
+        total: data.length,
         categories: categories
       };
-
-      this.initChart();
     },
 
+    initChart() {
+      const currentData = this.warningData[this.activeType];
+
+      this.options = {
+        title: {
+          text: ["{value|" + currentData.total + "}", "{name|总数}"].join("\n"),
+          top: "center",
+          left: "center",
+          textStyle: {
+            rich: {
+              value: {color: "#fff", fontSize: 24, fontWeight: "bold", lineHeight: 20},
+              name: {color: "#fff", lineHeight: 20},
+            },
+          },
+        },
+        tooltip: {
+          trigger: "item",
+          formatter: params => {
+            const percent = ((params.value / currentData.total) * 100).toFixed(1);
+            return `${params.name}<br/>数量: ${params.value}<br/>占比: ${percent}%`;
+          }
+        },
+        series: [{
+          type: "pie",
+          radius: ["42%", "65%"],
+          data: currentData.categories.map(item => ({
+            value: item.value,
+            name: item.name,
+            itemStyle: {color: item.color}
+          })),
+          label: {show: false},
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: 'rgba(0, 0, 0, 0.5)'
+            }
+          }
+        }]
+      };
+    },
+
+    // 合并数据的各个方法保持不变
     mergeQuarterData(newData) {
       const newStats = this.calculateQuarterData(newData);
       const current = this.warningData.quarter;
@@ -336,13 +349,8 @@ export default {
       const newStats = this.calculateHoursData(newData);
       const current = this.warningData.hours;
       current.total += newStats.total;
-      newStats.categories.forEach(newItem => {
-        const existing = current.categories.find(item => item.name === newItem.name);
-        if (existing) {
-          existing.value += newItem.value;
-        } else {
-          current.categories.push(newItem);
-        }
+      newStats.categories.forEach((newItem, index) => {
+        current.categories[index].value += newItem.value;
       });
     },
 
@@ -386,55 +394,13 @@ export default {
           current.categories.push(newItem);
         }
       });
-    },
-
-    initChart() {
-      const currentData = this.warningData[this.activeType];
-      const colors = currentData.categories.map(item => item.color);
-
-      this.options = {
-        title: {
-          text: ["{value|" + currentData.total + "}", "{name|总数}"].join("\n"),
-          top: "center",
-          left: "center",
-          textStyle: {
-            rich: {
-              value: {color: "#fff", fontSize: 24, fontWeight: "bold", lineHeight: 20},
-              name: {color: "#fff", lineHeight: 20},
-            },
-          },
-        },
-        tooltip: {
-          trigger: "item",
-          formatter: params => {
-            const percent = ((params.value / currentData.total) * 100).toFixed(1);
-            return `${params.name}<br/>数量: ${params.value}<br/>占比: ${percent}%`;
-          }
-        },
-        series: [{
-          type: "pie",
-          radius: ["42%", "65%"],
-          data: currentData.categories.map(item => ({
-            value: item.value,
-            name: item.name,
-            itemStyle: {color: item.color}
-          })),
-          label: {show: false},
-          emphasis: {
-            itemStyle: {
-              shadowBlur: 10,
-              shadowOffsetX: 0,
-              shadowColor: 'rgba(0, 0, 0, 0.5)'
-            }
-          }
-        }]
-      };
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
+/* 保持原有样式不变 */
 .container {
   display: flex;
   height: 100%;

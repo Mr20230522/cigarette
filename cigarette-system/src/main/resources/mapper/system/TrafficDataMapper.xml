@@ -19,12 +19,12 @@
         <result column="VehicleLogo" property="vehicleLogo" />
         <result column="VehicleLogoAll" property="vehicleLogoAll" />
         <result column="CaptureTime" property="captureTime" />
-        <result column="PicUrl" property="picUrl" />
-        <result column="PlateLicense" property="plateLicense" />
+        <result column="PicUrl" property="picUrl" jdbcType="LONGVARCHAR"/>
+        <result column="PlateLicense" property="plateLicense" jdbcType="LONGVARCHAR"/>
         <result column="FileNo" property="fileNo" />
         <result column="StartOffset" property="startOffset" />
-        <result column="SrcJson" property="srcJson" />
-        <result column="Level" property="level" />
+        <result column="SrcJson" property="srcJson" jdbcType="LONGVARCHAR"/>
+        <result column="level" property="level" />
         <result column="CleanupStatus" property="cleanupStatus" />
         <result column="CleanupTime" property="cleanupTime" />
         <result column="CreatedAt" property="createdAt" />
@@ -39,41 +39,38 @@
         <result column="VideoDownloadTime" property="videoDownloadTime" />
         <result column="VideoFilePath" property="videoFilePath" />
     </resultMap>
+
+    <!-- 修改表名为全小写 -->
     <select id="tenList" parameterType="trafficData" resultMap="TrafficDataResult">
-        select *from trafficData
+        select * from trafficdata
         <where>
             <if test="level!=null">and level>#{level}</if>
-            <if test="Id!=null">and Id>#{Id} </if>
+            <if test="id!=null">and Id>#{id} </if>
         </where>
         ORDER BY CaptureTime DESC
         LIMIT 10
     </select>
 
     <select id="allList" parameterType="trafficData" resultMap="TrafficDataResult">
-        select *from trafficData
+        select * from trafficdata
         <where>
             <if test="level!=null">and level>#{level}</if>
         </where>
     </select>
-
 
     <select id="overIdList" parameterType="trafficData" resultMap="TrafficDataResult">
-        select *from trafficData
+        select * from trafficdata
         <where>
-            <if test="Id!=null">and Id>#{Id} </if>
+            <if test="id!=null">and Id>#{id} </if>
             <if test="level!=null">and level>#{level}</if>
+            <if test="captureTime != null">and CaptureTime >= #{captureTime}</if>
         </where>
     </select>
-
 
     <select id="byIdGetVideoPath" parameterType="trafficData" resultMap="TrafficDataResult">
-        select *from trafficData
+        select * from trafficdata
         <where>
-            <if test="Id!=null">and Id=#{Id,jdbcType=BIGINT} </if>
+            <if test="id!=null">and Id=#{id,jdbcType=BIGINT} </if>
         </where>
     </select>
-
-
-
-
 </mapper>

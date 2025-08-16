@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { listVehicleBehaviorVoAll, getUpToDataDegreeSuspicion } from "@/api/cigarette/vehicle/vehicleBehavior";
+import { overIdList } from "@/api/cigarette/trafficData/trafficData"
 
 export default {
   data() {
@@ -52,53 +52,38 @@ export default {
       selectTimeType: 1, // 默认选择最近一天
       selectedTime: '',
       timeOptions: [
-        { label: '最近一天', value: 1 },
-        { label: '最近一月', value: 2 },
-        { label: '最近一星期', value: 3 }
+        {label: '最近一天', value: 1},
+        {label: '最近一月', value: 2},
+        {label: '最近一星期', value: 3}
       ],
-      allData: [], // 存储所有数据（包括定期获取的新数据）
-      vehicleBehaviorList: [], // 存储计算结果
+      allData: [],
+      vehicleBehaviorList: [],
       queryParams: {
-        pageNum: 1,
-        pageSize: 1000,
-        carId: null,
-        carTypeId: null,
-        carColor: null,
-        degreeSuspicion: null,
-        driverId: null,
-        drivingDirection: null,
-        illegalStatus: null,
-        status: null,
-        accompliceId: null
-      },
-      queryParams2: {
-        pageNum: 1,
-        pageSize: 1000,
-        degreeSuspicion: 0,
-        behaviorId: null // 用于获取比此ID更新的数据
+        id: null,
+        captureTime: null
       },
       config: {
         number: [0],
         content: '{nt}',
-        style: { fontSize: 24, fill: "#00fdfa" }
+        style: {fontSize: 24, fill: "#00fdfa"}
       },
       onlineconfig: {
         number: [0],
         content: '{nt}',
-        style: { fontSize: 24, fill: "#07f7a8" }
+        style: {fontSize: 24, fill: "#07f7a8"}
       },
       offlineconfig: {
         number: [0],
         content: '{nt}%',
-        style: { fontSize: 24, fill: "#e3b337" }
+        style: {fontSize: 24, fill: "#e3b337"}
       },
       laramnumconfig: {
         number: [0],
         content: '{nt}',
-        style: { fontSize: 24, fill: "#f5023d" }
+        style: {fontSize: 24, fill: "#f5023d"}
       },
-      refreshTimer: null, // 定时器
-      refreshInterval: 5000 // 5秒刷新一次
+      refreshTimer: null,
+      refreshInterval: 2000,
     }
   },
   created() {
@@ -108,102 +93,85 @@ export default {
     clearInterval(this.refreshTimer);
   },
   methods: {
-    // 初始化数据
     initData() {
       this.calculateTime(this.selectTimeType);
-      // 先清除现有定时器
       clearInterval(this.refreshTimer);
       this.getInitialData();
-      this.startAutoRefresh();
     },
 
-    // 获取初始数据（完全替换）
     async getInitialData() {
       try {
-        const params = {
-          ...this.queryParams,
-          startTime: this.selectedTime,
-          endTime: this.formatDate(new Date())
-        };
+        this.queryParams.captureTime=this.selectedTime
 
-        const response = await listVehicleBehaviorVoAll(params);
+
+        const response = await overIdList(this.queryParams);
+        console.log('API响应数据:', response);
 
         if (response && response.length > 0) {
-          // 使用Vue.set确保响应式更新
-          this.$set(this, 'allData', response);
-          this.queryParams2.behaviorId = response[response.length - 1].behaviorId;
-
-          // 数据获取完成后再处理并启动定时器
+          this.allData = response;
+          this.queryParams.id = response[response.length - 1].id;
           this.processData();
           this.startAutoRefresh();
         } else {
-          console.error("数据格式异常:", response);
+          console.warn('API返回空数据，启动轮询等待新数据');
           this.setDefaultData();
+          this.startAutoRefresh(); // 即使没有数据也启动轮询
         }
       } catch (error) {
-        console.error("获取初始数据失败:", error);
+        console.error("获取数据失败:", error);
         this.setDefaultData();
       }
     },
 
-    // 开始定时刷新
     startAutoRefresh() {
-      // 先清除现有定时器
       clearInterval(this.refreshTimer);
-
-      // 创建新定时器
-      this.refreshTimer = setInterval(async () => {
-        await this.getNewData();
+      this.refreshTimer = setInterval(() => {
+        console.log('自动刷新数据...');
+        this.getNewData();
       }, this.refreshInterval);
-
     },
 
-    // 获取新增数据（追加）
     async getNewData() {
       try {
-        if (!this.queryParams2.behaviorId) {
+        if (!this.queryParams.id) {
+          console.warn('缺少必要参数，终止轮询');
           return;
         }
-        const response = await getUpToDataDegreeSuspicion(this.queryParams2);
-        if (response && response.length > 0) {
-          // 使用Vue.set确保响应式
-          this.$set(this, 'allData', [...this.allData, ...response]);
-          this.queryParams2.behaviorId = response[response.length - 1].behaviorId;
 
-          // 数据更新完成后再处理
+        this.queryParams.captureTime=this.selectedTime // 必须带上相同时间范围
+
+
+        const response = await overIdList(this.queryParams);
+
+        if (response && response.length > 0) {
+          console.log('!@!@response',response)
+          this.queryParams.id = response[response.length - 1].id;
+          // 确保不超过数据限制
+          this.allData = [...this.allData, ...response];
           this.processData();
+        } else {
+          console.log('没有获取到新数据');
         }
       } catch (error) {
         console.error("获取新增数据失败:", error);
       }
     },
 
-    // 处理数据并计算统计结果
     processData() {
-      const selectedDate = new Date(this.selectedTime).getTime();
       let alarmCount = 0;
       let normalCount = 0;
-      let totalInRange = 0;
 
       this.allData.forEach(item => {
-        if (item && item.createTime) {
-          const itemTime = new Date(item.createTime).getTime();
-
-          if (itemTime >= selectedDate) {
-            totalInRange++;
-
-            const suspicion = Number(item.degreeSuspicion) || 0;
-            if (suspicion > 60) {
-              alarmCount++;
-            } else {
-              normalCount++;
-            }
-          }
+        const suspicion = Number(item.level) || 0;
+        if (suspicion > 60) {
+          alarmCount++;
+        } else {
+          normalCount++;
         }
       });
 
       this.vehicleBehaviorList = [{
-        totalNum: totalInRange,
+        totalNum: this.allData.length,
         onlineNum: normalCount,
         alarmNum: alarmCount
       }];
@@ -211,7 +179,6 @@ export default {
       this.updateCharts();
     },
 
-    // 更新所有图表
     updateCharts() {
       const data = this.vehicleBehaviorList[0] || {
         totalNum: 0,
@@ -219,16 +186,15 @@ export default {
         alarmNum: 0
       };
 
+      // 使用Vue.set或创建新对象确保响应式更新
       this.config = {
         ...this.config,
         number: [data.totalNum]
       };
-
       this.onlineconfig = {
         ...this.onlineconfig,
         number: [data.onlineNum]
       };
-
       this.laramnumconfig = {
         ...this.laramnumconfig,
         number: [data.alarmNum]
@@ -237,14 +203,12 @@ export default {
       const alarmRatio = data.totalNum > 0
         ? Math.round((data.alarmNum / data.totalNum) * 100)
         : 0;
-
       this.offlineconfig = {
         ...this.offlineconfig,
         number: [alarmRatio]
       };
     },
 
-    // 设置默认数据
     setDefaultData() {
       this.allData = [];
       this.vehicleBehaviorList = [{
@@ -255,26 +219,25 @@ export default {
       this.updateCharts();
     },
 
-    // 时间范围切换
     setTimeRange(range) {
+      if (this.selectTimeType === range) return;
+
       this.selectTimeType = range;
-      // 切换时间时重新初始化数据（会自动清除旧定时器）
       this.initData();
     },
 
-    // 计算时间范围
     calculateTime(range) {
       const now = new Date();
       let startTime = new Date();
 
       switch (range) {
-        case 1: // 最近一天
+        case 1:
           startTime.setDate(now.getDate() - 1);
           break;
-        case 2: // 最近一月
+        case 2:
           startTime.setMonth(now.getMonth() - 1);
           break;
-        case 3: // 最近一周
+        case 3:
           startTime.setDate(now.getDate() - 7);
           break;
         default:
@@ -283,23 +246,22 @@ export default {
 
       startTime.setHours(0, 0, 0, 0);
       this.selectedTime = this.formatDate(startTime);
+      this.queryParams.id = null; // 重置ID
+      console.log('计算后的时间范围:', this.selectedTime);
     },
 
-    // 格式化日期
     formatDate(date) {
       if (!(date instanceof Date)) {
         date = new Date(date);
       }
-
       const pad = n => n.toString().padStart(2, '0');
-      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
-    }
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}.00`;
+    },
   }
 };
 </script>
 
 <style lang='scss' scoped>
-/* 保持原有样式不变 */
 .user_Overview {
   li {
     flex: 1;
@@ -335,28 +297,20 @@ export default {
       }
     }
 
-    .allnum {
-      &::before {
-        background-image: url("~@/assets/scn-img/left_top_lan.png");
-      }
+    .allnum::before {
+      background-image: url("~@/assets/scn-img/left_top_lan.png");
     }
 
-    .online {
-      &::before {
-        background-image: url("~@/assets/scn-img/left_top_lv.png");
-      }
+    .online::before {
+      background-image: url("~@/assets/scn-img/left_top_lv.png");
     }
 
-    .offline {
-      &::before {
-        background-image: url("~@/assets/scn-img/left_top_huang.png");
-      }
+    .offline::before {
+      background-image: url("~@/assets/scn-img/left_top_huang.png");
     }
 
-    .laramnum {
-      &::before {
-        background-image: url("~@/assets/scn-img/left_top_hong.png");
-      }
+    .laramnum::before {
+      background-image: url("~@/assets/scn-img/left_top_hong.png");
     }
   }
 }

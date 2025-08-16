@@ -1,12 +1,14 @@
 package com.ruoyi.system.domain;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 public class TrafficData {
 
 
-    private Long Id;
+    private Long id;
 
     private Integer cameraId;
 
@@ -32,7 +34,7 @@ public class TrafficData {
 
     private String vehicleLogoAll;
 
-    private LocalDateTime captureTime;
+    private String captureTime;
 
     private String picUrl;
 
@@ -75,11 +77,11 @@ public class TrafficData {
     // Getters and Setters
 
     public Long getId() {
-        return Id;
+        return id;
     }
 
-    public void setId(Long Id) {
-        this.Id = Id;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Integer getCameraId() {
@@ -178,11 +180,11 @@ public class TrafficData {
         this.vehicleLogoAll = vehicleLogoAll;
     }
 
-    public LocalDateTime getCaptureTime() {
+    public String getCaptureTime() {
         return captureTime;
     }
 
-    public void setCaptureTime(LocalDateTime captureTime) {
+    public void setCaptureTime(String captureTime) {
         this.captureTime = captureTime;
     }
 
@@ -341,7 +343,7 @@ public class TrafficData {
     @Override
     public String toString() {
         return "TrafficData{" +
-                "Id=" + Id +
+                "Id=" + id +
                 ", cameraId=" + cameraId +
                 ", cameraName='" + cameraName + '\'' +
                 ", laneNo=" + laneNo +

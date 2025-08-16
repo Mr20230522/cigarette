@@ -171,7 +171,6 @@ export default {
       }
     },
     handleItemClick(item) {
-      console.log('item',this.formatItemData(item))
       ScnEventBus.$emit('force-show-item', this.formatItemData(item));
       this.showSuspectedVideo(item.id);
     },
@@ -188,7 +187,6 @@ export default {
     async showSuspectedVideo(id) {
       try {
         const videoDataTemp = await this.fetchVideoData(id)
-        console.log('!!!videoDataTemp',videoDataTemp)
         if (videoDataTemp) {
           if (videoDataTemp.videoPath) {
             this.videoData.push({
@@ -215,7 +213,6 @@ export default {
 
     async fetchVideoData(id) {
       try {
-        console.log('!@#id',id)
         const response = await byIdGetVideoPath({id:id});
         return response
       } catch (error) {
@@ -228,7 +225,6 @@ export default {
       try {
         this.loading = true;
         const response = await tenList(this.queryParams);
-        console.log('response',response)
         response.reverse()
 
         if (response && response.length > 0) {

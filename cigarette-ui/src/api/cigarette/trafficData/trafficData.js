@@ -12,8 +12,9 @@ export function tenList(query) {
 
 //比id大的数据获取
 export function overIdList(query) {
+  console.log('!!!query',query)
   return request({
-    url: '/cigarette//trafficData/overIdList',
+    url: '/cigarette/trafficData/overIdList',
     method: 'get',
     params: query
   })
@@ -22,7 +23,7 @@ export function overIdList(query) {
 //获取所有的数据
 export function allList(query) {
   return request({
-    url: '/cigarette//trafficData/allList',
+    url: '/cigarette/trafficData/allList',
     method: 'get',
     params: query
   })
@@ -32,7 +33,7 @@ export function allList(query) {
 //通过id获取视屏地址
 export function byIdGetVideoPath(query) {
   return request({
-    url: '/cigarette//trafficData/byIdGetVideoPath',
+    url: '/cigarette/trafficData/byIdGetVideoPath',
     method: 'get',
     params: query
   })

@@ -7,7 +7,7 @@
 
 <script>
 import * as echarts from 'echarts';
-import { byDateGetSuspicionVehicleBehavior } from '@/api/cigarette/vehicle/vehicleBehavior';
+import { overIdList } from "@/api/cigarette/trafficData/trafficData"
 
 export default {
   data() {
@@ -22,72 +22,79 @@ export default {
     });
   },
   methods: {
+    // 获取前7天的日期（不包括今天），正确处理跨年情况
+    getPreviousSevenDays() {
+      const dates = [];
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      for (let i = 1; i <= 7; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        dates.push(date);
+      }
+
+      // 按日期从早到晚排序（解决跨年问题）
+      dates.sort((a, b) => a - b);
+
+      // 格式化为 YYYY-MM-DD
+      return dates.map(date => date.toISOString().split('T')[0]);
+    },
+
+    // 处理API返回的数据为图表需要的格式
+    processChartData(apiData, dateRange) {
+      // 创建一个按日期索引的对象
+      const dateCountMap = {};
+
+      // 初始化所有日期为0
+      dateRange.forEach(date => {
+        dateCountMap[date] = 0;
+      });
+
+      // 填充实际数据
+      apiData.forEach(item => {
+        if (item.captureTime) {
+          const date = item.captureTime.split(' ')[0]; // 提取日期部分
+          if (dateCountMap.hasOwnProperty(date)) {
+            dateCountMap[date]++;
+          }
+        }
+      });
+
+      // 转换为chartData格式，保持原始日期顺序
+      this.chartData = [
+        dateRange, // 已经排好序的日期数组
+        dateRange.map(date => dateCountMap[date]) // 对应的数量数组
+      ];
+
+      console.log('处理后的图表数据:', this.chartData);
+    },
+
     async fetchData() {
       this.loading = true;
-
       try {
-        // 获取今天的日期
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); // 设置时间为 00:00:00
+        const previousSevenDays = this.getPreviousSevenDays();
 
-        // 生成前七天的日期数据（不包括今天）
-        const getPreviousSevenDays = (today) => {
-          const dates = [];
-          for (let i = 1; i <= 7; i++) {
-            const newDate = new Date(today);
-            newDate.setDate(newDate.getDate() - i);
-            const year = newDate.getFullYear();
-            const month = String(newDate.getMonth() + 1).padStart(2, '0');
-            const day = String(newDate.getDate()).padStart(2, '0');
-            dates.push(`${year}-${month}-${day} 00:00:00`);
-          }
-          return dates;
-        };
-
-        const previousSevenDays = getPreviousSevenDays(today);
-
-        // 调用API方法
-        const response = await byDateGetSuspicionVehicleBehavior({
-          begin: previousSevenDays[6], // 最早的日期（6号 00:00:00）
-          end: previousSevenDays[0].split(' ')[0] + ' 23:59:59', // 最近的日期（12号 23:59:59）
-          degreeSuspicion: 60 // 可根据需要调整嫌疑度阈值
+        // 调用API获取数据
+        const response = await overIdList({
+          startTime: previousSevenDays[0] + ' 00:00:00',
+          endTime: previousSevenDays[6] + ' 23:59:59'
         });
 
-        // 处理返回的数据
-        this.chartData = response;
+        console.log('API响应数据:', response);
+        this.processChartData(response, previousSevenDays);
       } catch (error) {
         console.error('获取数据失败:', error);
-        // 模拟数据作为后备
         this.generateMockData();
       } finally {
         this.loading = false;
       }
     },
 
-    // 后备模拟数据生成
+    // 模拟数据生成（备用）
     generateMockData() {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0); // 设置时间为 00:00:00
-
-      const dates = [];
-      const counts = [];
-
-      for (let i = 1; i <= 7; i++) {
-        const newDate = new Date(today);
-        newDate.setDate(newDate.getDate() - i);
-        const year = newDate.getFullYear();
-        const month = String(newDate.getMonth() + 1).padStart(2, '0');
-        const day = String(newDate.getDate()).padStart(2, '0');
-        dates.push(`${year}-${month}-${day}`);
-
-        const dayOfWeek = newDate.getDay();
-        let baseCount = 10;
-        if (dayOfWeek === 0 || dayOfWeek === 6) {
-          baseCount = 15;
-        }
-        counts.push(Math.round(baseCount + Math.random() * 8));
-      }
-
+      const dates = this.getPreviousSevenDays();
+      const counts = dates.map(() => Math.floor(Math.random() * 20) + 5);
       this.chartData = [dates, counts];
     },
 
@@ -95,13 +102,23 @@ export default {
       const chartDom = this.$refs.chart;
       const myChart = echarts.init(chartDom);
 
+      // 格式化日期显示（月-日）
+      const formatDateLabel = (dateStr) => {
+        const [year, month, day] = dateStr.split('-');
+        return `${month}-${day}`;
+      };
+
       const option = {
         tooltip: {
           trigger: 'axis',
-          formatter: '{b}<br/>嫌疑车辆: {c}辆'
+          formatter: params => {
+            const date = params[0].axisValue;
+            const count = params[0].data;
+            return `${date}<br/>嫌疑车辆: ${count}辆`;
+          }
         },
         grid: {
-          left: '5%',  // 增加左边距，给第一个数据点留出空间
+          left: '5%',
           right: '5%',
           bottom: '10%',
           top: '25%',
@@ -109,8 +126,8 @@ export default {
         },
         xAxis: {
           type: 'category',
-          boundaryGap: true,  // 改为true，使第一个数据点不与y轴重叠
-          data: this.chartData[0], // 日期数组
+          boundaryGap: true,
+          data: this.chartData[0].map(formatDateLabel), // 显示为月-日格式
           axisLine: {
             lineStyle: {
               color: '#999'
@@ -132,7 +149,7 @@ export default {
         series: [{
           name: '嫌疑车辆',
           type: 'line',
-          data: this.chartData[1], // 数量数组
+          data: this.chartData[1],
           symbol: 'circle',
           symbolSize: 8,
           itemStyle: {
@@ -172,6 +189,7 @@ export default {
 </script>
 
 <style scoped>
+/* 样式保持不变 */
 .suspect-chart-container {
   width: 100%;
   height: 280px;

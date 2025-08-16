@@ -30,7 +30,7 @@ public class TrafficDataControl extends BaseController {
      * 查询车辆表前十条
      */
     @GetMapping("/allList")
-    public List<TrafficData> allList(TrafficData trafficData){
+    public List<TrafficData> allList( TrafficData trafficData){
         return TrafficDataService.allList(trafficData);
     }
 
@@ -40,6 +40,7 @@ public class TrafficDataControl extends BaseController {
      */
     @GetMapping("/overIdList")
     public List<TrafficData> overIdList(TrafficData trafficData){
+        System.out.println("control:!!!!!!!!trafficData"+trafficData.getLevel()+trafficData.getCaptureTime());
         return TrafficDataService.overIdList(trafficData);
     }
 
