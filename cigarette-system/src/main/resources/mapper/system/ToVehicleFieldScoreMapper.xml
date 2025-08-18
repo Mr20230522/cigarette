@@ -6,6 +6,7 @@
 
     <resultMap type="ToVehicleFieldScore" id="ToVehicleFieldScoreResult">
         <result property="id" column="id"/>
+        <result property="trafficdataId" column="trafficdata_id"/>
         <result property="plate" column="plate"/>
         <result property="vehicleTypeScore" column="vehicle_type_score"/>
         <result property="brandScore" column="brand_score"/>
@@ -21,9 +22,20 @@
     </resultMap>
 
     <sql id="selectVehicleFieldScoreVo">
-        SELECT id, plate, vehicle_type_score, brand_score, sub_brand_score,
-               plate_risk_score, face_score, time_score, month_score,
-               location_score, total_score, create_time, update_time
+        SELECT id,
+               trafficdata_id,
+               plate,
+               vehicle_type_score,
+               brand_score,
+               sub_brand_score,
+               plate_risk_score,
+               face_score,
+               time_score,
+               month_score,
+               location_score,
+               total_score,
+               create_time,
+               update_time
         FROM to_vehicle_field_score
     </sql>
 
@@ -32,14 +44,16 @@
         WHERE id = #{id}
     </select>
 
-    <select id="selectByPlate" parameterType="string" resultMap="ToVehicleFieldScoreResult">
+    <select id="selectByTrafficdataId" parameterType="Long" resultMap="ToVehicleFieldScoreResult">
         <include refid="selectVehicleFieldScoreVo"/>
-        WHERE plate = #{plate}
+        WHERE trafficdata_id = #{trafficdataId}
     </select>
 
-    <select id="selectToVehicleFieldScoreList" parameterType="ToVehicleFieldScore" resultMap="ToVehicleFieldScoreResult">
+    <select id="selectToVehicleFieldScoreList" parameterType="ToVehicleFieldScore"
+            resultMap="ToVehicleFieldScoreResult">
         <include refid="selectVehicleFieldScoreVo"/>
         <where>
+            <if test="trafficdataId != null">AND trafficdata_id = #{trafficdataId}</if>
             <if test="plate != null and plate != ''">AND plate LIKE CONCAT('%', #{plate}, '%')</if>
             <if test="totalScore != null">AND total_score = #{totalScore}</if>
             <if test="createTime != null">AND DATE(create_time) = DATE(#{createTime})</if>
@@ -47,36 +61,42 @@
     </select>
 
     <insert id="insertToVehicleFieldScore" parameterType="ToVehicleFieldScore" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO to_vehicle_field_score (
-            plate,
-            vehicle_type_score, brand_score, sub_brand_score,
-            plate_risk_score, face_score, time_score, month_score,
-            location_score, total_score, create_time, update_time
-        ) VALUES (
-                     #{plate},
-                     #{vehicleTypeScore}, #{brandScore}, #{subBrandScore},
-                     #{plateRiskScore}, #{faceScore}, #{timeScore}, #{monthScore},
-                     #{locationScore}, #{totalScore}, NOW(), NOW()
-                 )
+        INSERT INTO to_vehicle_field_score (trafficdata_id, plate,
+                                            vehicle_type_score, brand_score, sub_brand_score,
+                                            plate_risk_score, face_score, time_score, month_score,
+                                            location_score, total_score, create_time, update_time)
+        VALUES (#{trafficdataId}, #{plate},
+                #{vehicleTypeScore}, #{brandScore}, #{subBrandScore},
+                #{plateRiskScore}, #{faceScore}, #{timeScore}, #{monthScore},
+                #{locationScore}, #{totalScore}, NOW(), NOW())
     </insert>
 
-    <update id="updateToVehicleFieldScoreByPlate" parameterType="ToVehicleFieldScore">
+    <update id="updateToVehicleFieldScoreByTrafficdataId" parameterType="ToVehicleFieldScore">
         UPDATE to_vehicle_field_score
-        SET
+        SET plate              = #{plate},
             vehicle_type_score = #{vehicleTypeScore},
-            brand_score = #{brandScore},
-            sub_brand_score = #{subBrandScore},
-            plate_risk_score = #{plateRiskScore},
-            face_score = #{faceScore},
-            time_score = #{timeScore},
-            month_score = #{monthScore},
-            location_score = #{locationScore},
-            total_score = #{totalScore},
-            update_time = NOW()
-        WHERE plate = #{plate}
+            brand_score        = #{brandScore},
+            sub_brand_score    = #{subBrandScore},
+            plate_risk_score   = #{plateRiskScore},
+            face_score         = #{faceScore},
+            time_score         = #{timeScore},
+            month_score        = #{monthScore},
+            location_score     = #{locationScore},
+            total_score        = #{totalScore},
+            update_time        = NOW()
+        WHERE trafficdata_id = #{trafficdataId}
     </update>
 
     <delete id="deleteToVehicleFieldScoreById" parameterType="Long">
-        DELETE FROM to_vehicle_field_score WHERE id = #{id}
+        DELETE
+        FROM to_vehicle_field_score
+        WHERE id = #{id}
+    </delete>
+    <delete id="deleteToVehicleFieldScoreByIds" parameterType="String">
+        DELETE FROM to_vehicle_field_score
+        WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
     </delete>
 </mapper>

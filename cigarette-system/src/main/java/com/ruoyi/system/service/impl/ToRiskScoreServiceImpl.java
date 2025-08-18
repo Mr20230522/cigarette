@@ -1072,7 +1072,7 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
             }
 
             // 保存各字段得分
-            saveFieldScores(data.getPlate(), fieldScores, totalScore);
+            saveFieldScores(data, fieldScores, totalScore);
 
             // 更新主表风险等级
             try {
@@ -1091,18 +1091,24 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
     }
 
     /**
-     * 保存或更新车辆各字段得分
+     * 保存或更新车辆各字段得分（基于 trafficdata_id）
      */
-    private void saveFieldScores(String plate, Map<FactorType, Integer> fieldScores, double totalScore) {
-        ToVehicleFieldScore scoreRecord = fieldScoreService.selectByPlate(plate);
+    private void saveFieldScores(ToVehicleRealTimMonitoring data, Map<FactorType, Integer> fieldScores, double totalScore) {
+        if (data.getId() == null || data.getPlate() == null) {
+            System.err.println("数据ID或车牌为空，无法保存得分：" + data);
+            return;
+        }
+
+        ToVehicleFieldScore scoreRecord = fieldScoreService.selectByTrafficdataId(data.getId());
         boolean exists = scoreRecord != null;
 
         if (!exists) {
             scoreRecord = new ToVehicleFieldScore();
-            scoreRecord.setPlate(plate);
+            scoreRecord.setTrafficdataId(data.getId()); // 关键：外键
+            scoreRecord.setPlate(data.getPlate());
         }
 
-        // 初始化为 0
+        // 设置各字段得分
         scoreRecord.setVehicleTypeScore(getScore(fieldScores, FactorType.VEHICLE_TYPE));
         scoreRecord.setBrandScore(getScore(fieldScores, FactorType.BRAND));
         scoreRecord.setSubBrandScore(getScore(fieldScores, FactorType.Sub_BRAND));
@@ -1114,12 +1120,11 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
         scoreRecord.setTotalScore(totalScore);
 
         if (exists) {
-            fieldScoreService.updateToVehicleFieldScoreByPlate(scoreRecord);
+            fieldScoreService.updateToVehicleFieldScoreByTrafficdataId(scoreRecord);
         } else {
             fieldScoreService.insertToVehicleFieldScore(scoreRecord);
         }
     }
-
     private Integer getScore(Map<FactorType, Integer> map, FactorType type) {
         return map.getOrDefault(type, 0);
     }
