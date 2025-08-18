@@ -457,7 +457,8 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
     private static final String POSITION_FILE = "risk_position.txt";
     // 明确默认时区（如需改为服务器默认，可改为 ZoneId.systemDefault()）
     private static final ZoneId DEFAULT_ZONE = ZoneId.systemDefault();
-
+//    private ToCarHistoryMapper ToHistoryVehicle;
+//    List<ToHistoryVehicle> his_car_plate_List =  ToHistoryVehicle.getHisCarPlatetory();
     @Autowired
     private ToVehicleRealTimMonitoringMapper vehicleMapper;
 
@@ -581,12 +582,12 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
             try {
                 vehicleMapper.updateLevel(data.getId(), score);
 //                System.out.println("更新风险分数成功，ID=" + data.getId() + "，score=" + score);
-//                // 输出触发详情（可选）
-//                if (!triggeredFactors.isEmpty()) {
-//                    System.out.println("ID=" + data.getId() + " 触发因子: " + String.join(", ", triggeredFactors) + "，总分=" + score);
-//                } else {
-//                    System.out.println("ID=" + data.getId() + " 未触发任何因子，总分=0");
-//                }
+                // 输出触发详情（可选）
+                if (!triggeredFactors.isEmpty()) {
+                    System.out.println("ID=" + data.getId() + " 触发因子: " + String.join(", ", triggeredFactors) + "，总分=" + score);
+                } else {
+                    System.out.println("ID=" + data.getId() + " 未触发任何因子，总分=0");
+                }
             } catch (Exception ex) {
                 // 更新失败记录并继续：避免更新失败导致整个批次停止
                 System.err.println("更新风险分数失败，ID=" + data.getId() + "，score=" + score + "，异常：" + ex.getMessage());
