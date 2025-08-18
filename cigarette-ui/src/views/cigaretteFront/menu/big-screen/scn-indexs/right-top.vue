@@ -1,5 +1,5 @@
 <template>
-  <div v-if="pageflag" class="right_center_wrap beautify-scroll-def">
+  <div v-if="pageflag" class="right_center_wrap beautify-scroll-def" @wheel="handleWheel">
     <transition-group name="list" tag="ul" class="right_center">
       <li
         class="right_center_item"
@@ -8,7 +8,7 @@
         :class="{ 'show': item.show }"
         @click="handleItemClick(item)"
       >
-        <span class="orderNum">{{ getDisplayIndex(i) }}</span>
+        <span class="orderNum">{{ }}</span>
         <div class="inner_right">
           <div class="dibu"></div>
           <div class="content-wrapper">
@@ -46,12 +46,6 @@
                   <span class="labels">监测点：</span>
                   <span class="contents ciyao">{{ item.cameraName }}</span>
                 </div>
-                <!--                <div class="info alert">-->
-                <!--                  <span class="labels">备注：</span>-->
-                <!--                  <span class="contents ciyao" :class="{ warning: item.alertdetail }">-->
-                <!--                    {{ item.remark || '无' }}-->
-                <!--                  </span>-->
-                <!--                </div>-->
               </div>
             </div>
           </div>
@@ -81,10 +75,8 @@ import {getVehicleBehaviorVideo} from "@/api/cigarette/multimediaResource/keyVid
 import {listDetection} from "@/api/cigarette/detection/detection";
 import {tenList, overIdList, allList, byIdGetVideoPath} from "@/api/cigarette/trafficData/trafficData"
 
-
 export default {
   components: {Reacquire},
-  // 声明依赖的字典（与第一个组件一致）
   dicts: ['tob_vehicle_type'],
   data() {
     return {
@@ -92,24 +84,23 @@ export default {
       videoData: [],
       vehicleData: null,
       pageflag: true,
-      allData: [],
-      visibleList: [],
-      currentIndex: 0,
+      allData: [],          // 所有加载的数据
+      visibleList: [],       // 实际显示的数据
       loading: false,
       enlargedImage: null,
-      batchSize: 5,
-      displayInterval: 2000,
-      fetchInterval: 4000,
+      batchSize: 5,         // 每次加载的数据量
+      displayInterval: 2000, // 每条数据显示间隔
+      fetchInterval: 4000,   // 获取新数据的间隔
       displayTimer: null,
       fetchTimer: null,
       queryParams: {
         level: null,
         Id: null
       },
-      // 车辆类型映射表
       vehicleTypeMap: {},
-      // 字典加载状态
-      dictLoaded: false
+      dictLoaded: false,
+      maxItems: 100,        // 最大显示条数
+      currentDisplayIndex: 0 // 当前显示到的索引
     }
   },
   filters: {
@@ -118,21 +109,16 @@ export default {
     }
   },
   created() {
-    // 初始化字典监听
     this.initDictWatch();
     this.initData()
   },
-
   methods: {
-
     handleImageError(event) {
-      event.target.src = this.getDefaultImage(); // 强制替换为占位图
+      event.target.src = this.getDefaultImage();
     },
     getDefaultImage() {
-      // 灰色背景 + 文字提示（可自定义颜色和文字）
       return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="60"%3E%3Crect fill="%23e0e0e0" width="80" height="60"%3E%3C/rect%3E%3Ctext x="50%" y="50%" font-size="10" text-anchor="middle" dominant-baseline="middle" fill="%23666666"%3E图片加载失败%3C/text%3E%3C/svg%3E';
     },
-    // 初始化字典监听
     initDictWatch() {
       this.$watch(
         () => this.dict.type.tob_vehicle_type,
@@ -145,25 +131,20 @@ export default {
         {immediate: true}
       );
     },
-
-    // 构建车辆类型映射关系
     buildVehicleTypeMap(dictData) {
       this.vehicleTypeMap = dictData.reduce((map, item) => {
         map[item.value] = item.label;
         return map;
       }, {});
     },
-
-    // 安全获取车辆类型名称
     getVehicleTypeName(typeId) {
       if (!typeId) return '未知类型';
       return this.vehicleTypeMap[typeId] || `未知类型(${typeId})`;
     },
-
     formatItemData(item) {
       return {
         licensePlate: item.plate || '无车牌',
-        carType: item.vehicleType || '未知类型',  // 确保使用vehicleType
+        carType: item.vehicleType || '未知类型',
         suspicionLevel: item.level || 0,
         color: item.vehicleColor || '未知颜色',
         detectionPoint: item.cameraName,
@@ -172,60 +153,30 @@ export default {
     },
     handleItemClick(item) {
       ScnEventBus.$emit('force-show-item', this.formatItemData(item));
-      this.showSuspectedVideo(item.id);
     },
-
     async initData() {
-      this.pageflag = true
-      this.allData = []
-      this.visibleList = []
-      this.currentIndex = 0
-      await this.fetchData()
+      this.pageflag = true;
+      this.allData = [];
+      this.visibleList = [];
+      this.currentDisplayIndex = 0;
+      await this.fetchData();
       await this.loadDetectionOptions();
-    },
-
-    async showSuspectedVideo(id) {
-      try {
-        const videoDataTemp = await this.fetchVideoData(id)
-        if (videoDataTemp) {
-          if (videoDataTemp.videoPath) {
-            this.videoData.push({
-              id: 1,
-              name: videoDataTemp.cameraName,
-              url: 'http://127.0.0.1:8000/' + videoDataTemp.videoPath,
-            })
-          } else {
-            this.$message.warning('没有的视频记录！！！');
-          }
-          ScnEventBus.$emit('suspected-video', {
-            mode: 1,
-            cameras: this.videoData
-          })
-          this.videoData = []
-        }else{
-          this.$message.warning('没有找到该车辆的行为记录');
-        }
-
-      } catch (error) {
-        console.error('处理视频数据失败:', error);
-      }
     },
 
     async fetchVideoData(id) {
       try {
         const response = await byIdGetVideoPath({id:id});
-        return response
+        return response;
       } catch (error) {
         console.error('获取视频失败:', error);
-        return null
+        return null;
       }
     },
-
     async fetchData() {
       try {
         this.loading = true;
         const response = await tenList(this.queryParams);
-        response.reverse()
+        response.reverse();
 
         if (response && response.length > 0) {
           this.queryParams.id = response[response.length - 1].id;
@@ -236,8 +187,16 @@ export default {
               : this.getDefaultImage(),
             show: false
           }));
-          console.log('!!!!newData！！！！',newData)
+
+          // 添加到数据池
           this.allData = [...this.allData, ...newData];
+
+          // 限制最大数量
+          if (this.allData.length > this.maxItems) {
+            this.allData = this.allData.slice(-this.maxItems);
+          }
+
+          // 启动逐条显示
           this.startDisplay();
         } else {
           this.prepareNextBatch();
@@ -249,7 +208,98 @@ export default {
         this.loading = false;
       }
     },
+    startDisplay() {
+      clearInterval(this.displayTimer);
 
+      this.displayTimer = setInterval(() => {
+        if (this.currentDisplayIndex < this.allData.length && !this.isUserScrolling) {
+          const newItem = {
+            ...this.allData[this.currentDisplayIndex],
+            show: true
+          };
+
+          // 新数据添加到顶部（从上往下显示）
+          this.visibleList.unshift(newItem);
+
+          // 限制显示数量
+          if (this.visibleList.length > this.maxItems) {
+            this.visibleList = this.visibleList.slice(0, this.maxItems);
+          }
+
+          this.currentDisplayIndex++;
+
+          // 自动滚动到顶部显示新数据
+          if (!this.isUserScrolling) {
+            this.$nextTick(() => {
+              this.$refs.scrollContainer.scrollTop = 0;
+            });
+          }
+        } else if (this.currentDisplayIndex >= this.allData.length) {
+          clearInterval(this.displayTimer);
+          this.prepareNextBatch();
+        }
+      }, this.displayInterval);
+    },
+    showNextItem() {
+      if (this.currentDisplayIndex < this.allData.length) {
+        const newItem = {
+          ...this.allData[this.currentDisplayIndex],
+          show: true
+        };
+
+        // 添加到显示列表顶部（新数据在上方）
+        this.visibleList.unshift(newItem);
+
+        // 限制显示数量
+        if (this.visibleList.length > this.batchSize) {
+          this.visibleList = this.visibleList.slice(0, this.batchSize);
+        }
+
+        this.currentDisplayIndex++;
+      }
+    },
+    prepareNextBatch() {
+      clearTimeout(this.fetchTimer);
+      this.fetchTimer = setTimeout(() => {
+        this.fetchData();
+      }, this.fetchInterval);
+    },
+    getDisplayIndex(i) {
+      return this.allData.length - this.currentDisplayIndex + i + 1;
+    },
+    enlargeImage(url) {
+      this.enlargedImage = url;
+    },
+    handleImgError(item) {
+      item.picUrl = this.getDefaultImage();
+    },
+    handleWheel(event) {
+      const container = this.$refs.scrollContainer;
+
+      // 向下滚动且接近底部时加载更多
+      if (event.deltaY > 0 &&
+        container.scrollTop + container.clientHeight >= container.scrollHeight - 50) {
+        this.loadMoreItems();
+      }
+    },
+    loadMoreItems() {
+      // 如果已经显示全部数据则不加载
+      if (this.visibleList.length >= this.allData.length) return;
+
+      // 每次加载5条
+      const remaining = this.allData.length - this.visibleList.length;
+      const loadCount = Math.min(5, remaining);
+
+      for (let i = 0; i < loadCount; i++) {
+        const index = this.visibleList.length;
+        if (index < this.allData.length) {
+          this.visibleList.push({
+            ...this.allData[index],
+            show: true
+          });
+        }
+      }
+    },
     loadDetectionOptions() {
       listDetection().then(response => {
         this.detectionOptions = response.rows.map(item => ({
@@ -260,61 +310,11 @@ export default {
       }).catch(error => {
         console.error("Failed to load detection options:", error);
       });
-    },
-
-    getDetectionName(detectionId) {
-      const detection = this.detectionOptions.find(item => item.detectionId === detectionId)
-      return detection ? detection.detectionName : '未知监测点';
-    },
-
-    startDisplay() {
-      clearInterval(this.displayTimer)
-
-      this.displayTimer = setInterval(() => {
-        if (this.currentIndex < this.allData.length) {
-          const newItem = {
-            ...this.allData[this.currentIndex],
-            show: true
-          }
-
-          this.visibleList = [...this.visibleList, newItem]
-
-          if (this.visibleList.length > this.batchSize) {
-            this.visibleList = this.visibleList.slice(-this.batchSize)
-          }
-
-          ScnEventBus.$emit('new-visible-item', newItem)
-
-          this.currentIndex++
-        } else {
-          clearInterval(this.displayTimer)
-          this.prepareNextBatch()
-        }
-      }, this.displayInterval)
-    },
-
-    prepareNextBatch() {
-      clearTimeout(this.fetchTimer)
-      this.fetchTimer = setTimeout(() => {
-        this.fetchData()
-      }, this.fetchInterval)
-    },
-
-    getDisplayIndex(i) {
-      return this.currentIndex - this.visibleList.length + i + 1
-    },
-
-    enlargeImage(url) {
-      this.enlargedImage = url
-    },
-
-    handleImgError(item) {
-      item.image = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg   ' width='80' height='40'%3E%3Crect fill='%23f5f5f5' width='80' height='40'/%3E%3Ctext x='40' y='20' font-size='10' text-anchor='middle'%3E无图片%3C/text%3E%3C/svg%3E"
-    },
+    }
   },
   beforeDestroy() {
-    clearInterval(this.displayTimer)
-    clearTimeout(this.fetchTimer)
+    clearInterval(this.displayTimer);
+    clearTimeout(this.fetchTimer);
   }
 }
 </script>
@@ -324,7 +324,13 @@ export default {
   position: relative;
   width: 100%;
   height: 440px;
-  overflow: hidden;
+  overflow-y: auto; /* 允许垂直滚动 */
+  overflow-x: hidden;
+  scrollbar-width: none; /* 隐藏滚动条（Firefox） */
+  -ms-overflow-style: none; /* 隐藏滚动条（IE 10+） */
+  &::-webkit-scrollbar {
+    display: none; /* 隐藏滚动条（Chrome、Safari、Opera） */
+  }
 
   .right_center {
     width: 100%;
@@ -332,6 +338,8 @@ export default {
     padding: 0;
     margin: 0;
     list-style: none;
+    display: block;
+    //flex-direction: column-reverse; /* 新数据从下方插入 */
 
     .right_center_item {
       display: flex;
@@ -508,5 +516,22 @@ export default {
       }
     }
   }
+}
+
+/* 列表动画效果 */
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+.list-enter{
+  opacity: 0;
+  transform: translateY(-30px);
+}
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}
+.list-move {
+  transition: transform 0.5s;
 }
 </style>

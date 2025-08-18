@@ -1,39 +1,63 @@
 <template>
   <div class="center_bottom">
     <div class="control-container">
-      <!-- 分屏模式选择 -->
-      <div class="mode-control">
-        <div
-          v-for="mode in modes"
-          :key="mode.value"
-          class="mode-btn"
-          :class="{ 'active': currentMode === mode.value }"
-          @click="changeMode(mode.value)"
-        >
-          {{ mode.label }}
+      <!-- 搜索框 -->
+      <div class="search-container">
+        <div class="search-field">
+          <label for="search-plate">车牌号：</label>
+          <input type="text" id="search-plate" v-model="searchParams.plate" placeholder="请输入车牌号">
         </div>
-      </div>
-
-      <!-- 摄像头选择 -->
-      <div class="camera-control-wrapper">
-        <div class="camera-control">
-          <div
-            v-for="camera in cameras"
-            :key="camera.id"
-            class="camera-btn"
-            :class="{
-              'active': selectedCameras.includes(camera.id),
-              'disabled': isCameraDisabled(camera.id)
-            }"
-            @click="selectCamera(camera)"
+        <div class="search-field">
+          <label for="search-suspicion-min">嫌疑程度：</label>
+          <input
+            type="number"
+            id="search-suspicion-min"
+            v-model="searchParams.suspicionMin"
+            placeholder="最小值(0-99)"
+            min="0"
+            max="99"
+            @input="validateSuspicionMin"
           >
-            {{ camera.name }}
-          </div>
+          <span class="separator">至</span>
+          <input
+            type="number"
+            id="search-suspicion-max"
+            v-model="searchParams.suspicionMax"
+            placeholder="最大值(1-100)"
+            min="1"
+            max="100"
+            @input="validateSuspicionMax"
+          >
         </div>
-      </div>
-      <div class="camera-control">
-        <div class="camera-btn" @click="confirmSelection">
-          确定
+        <div class="search-field">
+          <label for="search-start-date">起始日期：</label>
+          <el-date-picker
+            v-model="searchParams.startDate"
+            type="datetime"
+            placeholder="选择开始日期"
+            format="yyyy-MM-dd HH:mm"
+            value-format="yyyy-MM-ddTHH:mm:ss"
+            @change="validateDateRange"
+            :picker-options="pickerOptions"
+            popper-class="transparent-datepicker"
+          />
+        </div>
+        <div class="search-field">
+          <label for="search-end-date">结束日期：</label>
+          <el-date-picker
+            v-model="searchParams.endDate"
+            type="datetime"
+            placeholder="选择结束日期"
+            format="yyyy-MM-dd HH:mm"
+            value-format="yyyy-MM-ddTHH:mm:ss"
+            @change="validateDateRange"
+            :picker-options="pickerOptions"
+            popper-class="transparent-datepicker"
+          />
+        </div>
+        <div class="search-actions">
+          <button @click="performSearch">搜索</button>
+          <button @click="resetSearch" class="reset-btn">重置</button>
         </div>
       </div>
     </div>
@@ -51,114 +75,155 @@ export default {
       detectionOptions: [],
       detections: [],
       total: 0,
-      cameraList: [],
-      queryParams: {
-        pageNum: 1,
-        pageSize: 9999,
-        cameraIp: null,
-        cameraModel: null,
-        cameraManufacturer: null,
-        detectionId: null,
-        resolutionRatio: null,
-        frameRate: null,
-        nightVision: null,
-        connectionType: null,
-        installationDate: null,
-        guaranteePeriod: null,
-        longitude: null,
-        latitude: null,
-        cameraType: null,
-        cameraGroupIndication: null,
-        cameraApplicationType: null,
-        status: null,
-        detectionName: null,
-        districtId: null,
+      cameras: [],
+      searchParams: {
+        plate: null,
+        suspicionMin: null,
+        suspicionMax: null,
+        startDate: null,
+        endDate: null
       },
-      isSuspectMode: false,
-      currentMode: 1,
-      selectedCameras: [],
-      modes: [
-        { value: 1, label: '1分屏' },
-        { value: 2, label: '2分屏' },
-        { value: 3, label: '3分屏' },
-        { value: 4, label: '4分屏' }
-      ],
-      cameras: [] // 初始化为空数组，将通过API数据填充
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        }
+      }
     };
   },
   methods: {
-    changeMode(mode) {
-      this.currentMode = mode;
-      this.selectedCameras = [];
-      if (mode === 1 && this.cameras.length > 0) {
-        this.selectedCameras.push(this.cameras[0].id);
-      }
-    },
-    selectCamera(camera) {
-      const index = this.selectedCameras.indexOf(camera.id);
-      if (index === -1) {
-        if (this.selectedCameras.length < this.currentMode) {
-          this.selectedCameras.push(camera.id);
-        }
-      } else {
-        this.selectedCameras.splice(index, 1);
-      }
-    },
-    isCameraDisabled(cameraId) {
-      return !this.selectedCameras.includes(cameraId) &&
-        this.selectedCameras.length >= this.currentMode;
-    },
-    confirmSelection() {
-      if (this.selectedCameras.length !== this.currentMode) {
-        alert(`请选择 ${this.currentMode} 个摄像头`);
-        return;
-      }
-      this.updateDisplay();
-    },
-    updateDisplay() {
-      const selectedCameras = this.selectedCameras.map(id =>
-        this.cameras.find(cam => cam.id === id)
-      ).filter(Boolean);
-
-      ScnEventBus.$emit('video-display-change', {
-        mode: this.currentMode,
-        cameras: selectedCameras
-      });
-    },
     async getList() {
       try {
-        // 1. 获取检测点数据
         const detectionsResponse = await listDetection();
         this.detections = detectionsResponse.rows;
 
-        // 2. 获取摄像头数据
         const cameraResponse = await listCamera(this.queryParams);
         this.cameraList = cameraResponse.rows;
         this.total = cameraResponse.total;
 
-        // 3. 动态生成cameras数组
         this.cameras = this.cameraList.map(camera => {
           const detection = this.detections.find(d => d.detectionId === camera.detectionId);
           return {
             id: camera.cameraId,
             name: `${camera.cameraId}${detection ? '-' + detection.detectionName : ''}`,
-            url: 'http://127.0.0.1:8000/'+camera.cameraUrl.replace('/profile/', '')
+            url: 'http://127.0.0.1:8000/' + camera.cameraUrl.replace('/profile/', ''),
+            suspicionLevel: camera.suspicionLevel,
+            captureTime: camera.captureTime
           };
         });
-
-        // 4. 默认选中第一个摄像头
-        if (this.cameras.length > 0) {
-          this.selectedCameras = [this.cameras[0].id];
-          this.updateDisplay();
-        }
       } catch (error) {
         console.error("数据加载失败:", error);
       }
+    },
+    validateSuspicionMin() {
+      if (this.searchParams.suspicionMin === null || this.searchParams.suspicionMin === '') return;
+
+      let value = parseInt(this.searchParams.suspicionMin);
+
+      if (isNaN(value)) {
+        this.searchParams.suspicionMin = null;
+        return;
+      }
+
+      if (value < 0) value = 0;
+      if (value > 99) value = 99;
+
+      this.searchParams.suspicionMin = value;
+
+      if (this.searchParams.suspicionMax !== null && this.searchParams.suspicionMax < value) {
+        this.searchParams.suspicionMax = Math.min(value + 1, 100);
+      }
+    },
+    validateSuspicionMax() {
+      if (this.searchParams.suspicionMax === null || this.searchParams.suspicionMax === '') return;
+
+      let value = parseInt(this.searchParams.suspicionMax);
+
+      if (isNaN(value)) {
+        this.searchParams.suspicionMax = null;
+        return;
+      }
+
+      if (value < 1) value = 1;
+      if (value > 100) value = 100;
+
+      this.searchParams.suspicionMax = value;
+
+      if (this.searchParams.suspicionMin !== null && this.searchParams.suspicionMin > value) {
+        this.searchParams.suspicionMin = Math.max(value - 1, 0);
+      }
+    },
+    validateDateRange() {
+      // 验证时间范围
+      if (this.searchParams.startDate && this.searchParams.endDate) {
+        const start = new Date(this.searchParams.startDate);
+        const end = new Date(this.searchParams.endDate);
+
+        if (start > end) {
+          this.$message.warning('开始时间不能大于结束时间');
+          this.searchParams.endDate = null;
+        }
+      }
+    },
+    performSearch() {
+      // 深拷贝参数避免响应式问题
+      const params = JSON.parse(JSON.stringify({
+        ...this.searchParams,
+        // 确保时间格式正确
+        startDate: this.searchParams.startDate ? this.searchParams.startDate + ':00' : null,
+        endDate: this.searchParams.endDate ? this.searchParams.endDate + ':00' : null
+      }))
+
+      console.log('正在发送搜索参数:', params) // 调试日志
+
+      // 使用$nextTick确保DOM更新后触发
+      this.$nextTick(() => {
+        ScnEventBus.$emit('vehicle-search', params)
+      })
+
+      // 本地过滤（可选）
+      this.filterCameras()
+    },
+    resetSearch() {
+      this.searchParams = {
+        plate: null,
+        suspicionMin: null,
+        suspicionMax: null,
+        startDate: null,
+        endDate: null
+      };
+      // 发送重置后的空参数进行搜索
+      ScnEventBus.$emit('vehicle-search', {...this.searchParams});
+    },
+    filterCameras() {
+      // 本地过滤逻辑（可选）
+      this.cameras = this.cameraList.filter(camera => {
+        let match = true;
+
+        if (this.searchParams.plate) {
+          match = match && camera.name.includes(this.searchParams.plate);
+        }
+
+        if (this.searchParams.suspicionMin !== null || this.searchParams.suspicionMax !== null) {
+          const suspicion = parseFloat(camera.suspicionLevel);
+          match = match && (!this.searchParams.suspicionMin || suspicion >= this.searchParams.suspicionMin);
+          match = match && (!this.searchParams.suspicionMax || suspicion <= this.searchParams.suspicionMax);
+        }
+
+        if (this.searchParams.startDate || this.searchParams.endDate) {
+          const captureDate = new Date(camera.captureTime);
+          const startDate = this.searchParams.startDate ? new Date(this.searchParams.startDate) : null;
+          const endDate = this.searchParams.endDate ? new Date(this.searchParams.endDate) : null;
+
+          match = match && (!startDate || captureDate >= startDate);
+          match = match && (!endDate || captureDate <= endDate);
+        }
+
+        return match;
+      });
     }
   },
   created() {
     this.getList();
-    this.currentMode = this.modes[0].value;
   }
 };
 </script>
@@ -171,87 +236,129 @@ export default {
   .control-container {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 10px;
+    gap: 12px;
+    padding: 12px;
     max-width: 1200px;
     margin: 0 auto;
 
-    .mode-control {
+    .search-container {
       display: flex;
-      justify-content: center;
-      gap: 10px;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 22px;
 
-      .mode-btn {
-        padding: 8px 15px;
-        background: rgba(100, 100, 100, 0.2);
-        border: 1px solid rgba(100, 100, 100, 0.5);
-        border-radius: 4px;
-        color: #fff;
-        cursor: pointer;
-        transition: all 0.3s;
+      .search-field {
+        display: flex;
+        align-items: center;
+        gap: 12px;
 
-        &:hover {
-          background: rgba(59, 64, 151, 0.4);
+        label {
+          font-size: 15px;
+          color: #fff;
+          width: 125px;
+          text-align: right;
         }
 
-        &.active {
+        input {
+          padding: 9px 14px;
+          border: 1px solid rgba(100, 100, 100, 0.5);
+          border-radius: 5px;
+          background: rgba(0, 0, 0, 0.1);
+          color: #fff;
+          font-size: 15px;
+          width: 160px;
+
+          &[type="number"] {
+            width: 130px;
+          }
+        }
+
+        ::v-deep .el-date-editor {
+          width: 220px;
+
+          .el-input__inner {
+            background: rgba(0, 0, 0, 0.1);
+            border-color: rgba(100, 100, 100, 0.5);
+            color: #fff;
+          }
+
+          .el-input__prefix, .el-input__suffix {
+            color: rgba(255, 255, 255, 0.6);
+          }
+        }
+
+        .separator {
+          color: #fff;
+          padding: 0 6px;
+          font-size: 14px;
+        }
+      }
+
+      .search-actions {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 10px;
+
+        button {
+          padding: 10px 24px;
           background: rgba(0, 24, 62, 0.8);
-          box-shadow: 0 0 5px rgba(0, 67, 143, 0.8);
-        }
-      }
-    }
+          border: none;
+          border-radius: 5px;
+          color: #fff;
+          cursor: pointer;
+          font-size: 15px;
+          transition: background 0.3s;
 
-    /* 新增的摄像头控制容器 */
-    .camera-control-wrapper {
-      max-height: 120px; /* 三行高度（每行约40px） */
-      overflow-y: auto;  /* 垂直滚动 */
-      padding-right: 5px; /* 为滚动条留出空间 */
-
-      /* 自定义滚动条样式 */
-      &::-webkit-scrollbar {
-        width: 6px;
-      }
-      &::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.3);
-        border-radius: 3px;
-      }
-      &::-webkit-scrollbar-track {
-        background: rgba(0, 0, 0, 0.1);
-      }
-    }
-
-    .camera-control {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      min-height: 40px; /* 确保至少一行高度 */
-
-      .camera-btn {
-        padding: 8px 15px;
-        background: rgba(100, 100, 100, 0.2);
-        border: 1px solid rgba(100, 100, 100, 0.5);
-        border-radius: 4px;
-        color: #fff;
-        cursor: pointer;
-        transition: all 0.3s;
-        flex-shrink: 0; /* 防止按钮被压缩 */
-
-        &:hover:not(.disabled) {
-          background: rgba(59, 64, 151, 0.4);
+          &:hover {
+            background: rgba(0, 36, 93, 0.8);
+          }
         }
 
-        &.active {
-          background: rgba(0, 24, 62, 0.8);
-          box-shadow: 0 0 5px rgba(0, 67, 143, 0.8);
-        }
+        .reset-btn {
+          background: rgba(62, 0, 0, 0.8);
 
-        &.disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
+          &:hover {
+            background: rgba(93, 0, 0, 0.8);
+          }
         }
       }
     }
   }
+}
+</style>
+
+<style>
+/* 全局样式，用于时间选择器的透明背景 */
+.transparent-datepicker {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+  border: 1px solid rgba(0, 114, 255, 0.3) !important;
+  color: #fff !important;
+}
+
+.transparent-datepicker .el-picker-panel__body-wrapper,
+.transparent-datepicker .el-picker-panel__body {
+  background-color: transparent !important;
+}
+
+.transparent-datepicker .el-time-panel {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+  border: 1px solid rgba(0, 114, 255, 0.3) !important;
+}
+
+.transparent-datepicker .el-date-table th {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.transparent-datepicker .el-date-table td.current:not(.disabled) span {
+  background-color: rgba(0, 114, 255, 0.5) !important;
+}
+
+.transparent-datepicker .el-date-table td.today span {
+  color: #00eaff !important;
+}
+
+.transparent-datepicker .el-time-spinner__item.active:not(.disabled) {
+  color: #00eaff !important;
 }
 </style>
