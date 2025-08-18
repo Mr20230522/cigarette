@@ -54,6 +54,7 @@ export default {
       dateYear: null,
       dateWeek: null,
       weekday: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
+      isEdge: navigator.userAgent.includes('Edg')
     };
   },
   filters: {
@@ -62,29 +63,64 @@ export default {
     },
   },
   created() {
-    this.autoLogin();
+    this.initAuth();
+    window.addEventListener('unhandledrejection', this.handlePromiseRejection);
   },
   mounted() {
     this.timeFn();
     this.cancelLoading();
-    window.addEventListener('beforeunload', this.handleBeforeUnload);
+    // 仅在非Edge浏览器或开发环境下添加beforeunload监听
+    if (!this.isEdge || process.env.NODE_ENV === 'development') {
+      window.addEventListener('beforeunload', this.handleBeforeUnload);
+    }
   },
   beforeDestroy() {
     clearInterval(this.timing);
+    window.removeEventListener('unhandledrejection', this.handlePromiseRejection);
     window.removeEventListener('beforeunload', this.handleBeforeUnload);
-    this.$store.dispatch('LogOut');
   },
   methods: {
-    async autoLogin() {
-      try {
-        await this.$store.dispatch('Login', {
-          username: 'admin',
-          password: 'admin123'
-        });
-      } catch (error) {
-        this.$message.error('大屏系统自动登录失败，请联系管理员');
+    async initAuth() {
+      // 检查本地是否有token
+      const localToken = localStorage.getItem('token');
+      if (localToken) {
+        this.$store.commit('SET_TOKEN', localToken);
+        try {
+          await this.$store.dispatch('GetInfo');
+        } catch (error) {
+          console.error('自动获取用户信息失败:', error);
+          await this.autoLogin();
+        }
+      } else {
+        await this.autoLogin();
       }
     },
+
+    async autoLogin() {
+      try {
+        if (!this.$store.getters.token) {
+          const response = await this.$store.dispatch('Login', {
+            username: 'admin',
+            password: 'admin123'
+          }, {
+            withCredentials: true
+          });
+
+          // 存储token到本地
+          if (response && response.token) {
+            localStorage.setItem('token', response.token);
+          }
+        }
+      } catch (error) {
+        console.error('自动登录失败:', error);
+        this.$message.error('大屏系统自动登录失败，请联系管理员');
+        // 在Edge浏览器中重试一次
+        if (this.isEdge) {
+          setTimeout(() => this.autoLogin(), 1000);
+        }
+      }
+    },
+
     toggleFullscreen() {
       const element = document.querySelector('.fixed-container');
       if (screenfull.isEnabled) {
@@ -93,6 +129,7 @@ export default {
         this.$message.warning('您的浏览器不支持全屏功能');
       }
     },
+
     timeFn() {
       this.timing = setInterval(() => {
         this.dateDay = formatTime(new Date(), "HH: mm: ss");
@@ -100,16 +137,25 @@ export default {
         this.dateWeek = this.weekday[new Date().getDay()];
       }, 1000);
     },
+
     cancelLoading() {
       setTimeout(() => {
         this.loading = false;
       }, 500);
     },
-    async handleBeforeUnload(event) {
-      try {
-        await this.$store.dispatch('LogOut');
-      } catch (error) {
-        console.error('退出登录失败:', error);
+
+    handleBeforeUnload(event) {
+      // 仅在特定条件下退出登录
+      if (this.$store.state.user.forceLogoutOnExit) {
+        this.$store.dispatch('LogOut');
+      }
+    },
+
+    handlePromiseRejection(event) {
+      console.error('未处理的Promise拒绝:', event.reason);
+      // 如果是认证错误，尝试重新登录
+      if (event.reason && event.reason.response && event.reason.response.status === 401) {
+        this.autoLogin();
       }
     }
   },
@@ -121,15 +167,8 @@ export default {
 
 /* 新增的最外层容器样式 */
 .fixed-container {
-  //position: fixed;
-  //top: 0;
-  //left: 0;
-  //width: 100vw;
   height: 100vh;
   overflow: hidden;
-  //display: flex;
-  //justify-content: center;
-  //align-items: center;
   background-color: #000;
 
   .color {

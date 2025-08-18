@@ -46,12 +46,12 @@
                   <span class="labels">监测点：</span>
                   <span class="contents ciyao">{{ item.cameraName }}</span>
                 </div>
-<!--                <div class="info alert">-->
-<!--                  <span class="labels">备注：</span>-->
-<!--                  <span class="contents ciyao" :class="{ warning: item.alertdetail }">-->
-<!--                    {{ item.remark || '无' }}-->
-<!--                  </span>-->
-<!--                </div>-->
+                <!--                <div class="info alert">-->
+                <!--                  <span class="labels">备注：</span>-->
+                <!--                  <span class="contents ciyao" :class="{ warning: item.alertdetail }">-->
+                <!--                    {{ item.remark || '无' }}-->
+                <!--                  </span>-->
+                <!--                </div>-->
               </div>
             </div>
           </div>
@@ -231,11 +231,12 @@ export default {
           this.queryParams.id = response[response.length - 1].id;
           const newData = response.map(item => ({
             ...item,
-            image: item.image
-              ? 'http://127.0.0.1:8000/' + item.image
+            picUrl: item.picUrl
+              ? 'http://127.0.0.1:8000/Images/' + item.picUrl
               : this.getDefaultImage(),
             show: false
           }));
+          console.log('!!!!newData！！！！',newData)
           this.allData = [...this.allData, ...newData];
           this.startDisplay();
         } else {
