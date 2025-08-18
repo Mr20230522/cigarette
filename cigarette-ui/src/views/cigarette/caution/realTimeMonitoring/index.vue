@@ -12,8 +12,8 @@
       <div class="image-container" style="padding: 0">
 
         <!-- 头像图片 -->
-<!--        <img :src="'/images/'+this.imgd[0].picUrl" style="max-width: 100%;height: 210px">-->
-        <img :src="'http://localhost:9090/images/2025-08-18/110542_663_427_vehicle.jpg'" style="max-width: 100%;height: 210px">
+        <img :src="'/images/'+this.imgd[0].picUrl" style="max-width: 100%;height: 210px">
+<!--        <img :src="'http://localhost:9090/images/2025-08-18/110542_663_427_vehicle.jpg'" style="max-width: 100%;height: 210px">-->
         <!-- 分割线 -->
 
       </div>
