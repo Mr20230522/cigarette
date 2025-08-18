@@ -830,15 +830,13 @@
 //这个版本加入案件车牌匹配
 package com.ruoyi.system.service.impl;
 
-import com.ruoyi.system.domain.ToFactorConfig;
-import com.ruoyi.system.domain.ToFactorTrigger;
-import com.ruoyi.system.domain.ToVehicleRealTimMonitoring;
-import com.ruoyi.system.domain.TobCaseHistory;
+import com.ruoyi.system.domain.*;
 import com.ruoyi.system.mapper.ToFactorConfigMapper;
 import com.ruoyi.system.mapper.ToFactorTriggerMapper;
 import com.ruoyi.system.mapper.ToVehicleRealTimMonitoringMapper;
 
 import com.ruoyi.system.service.IToRiskScoreService;
+import com.ruoyi.system.service.IToVehicleFieldScoreService;
 import com.ruoyi.system.service.ITobCaseHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -874,10 +872,12 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
 
     @Autowired
     private ToFactorTriggerMapper factorTriggerMapper;
-
+    // 新增：历史案件 Mapper
     @Autowired
-    private ITobCaseHistoryService caseHistoryService; // 新增：历史案件 Mapper
-
+    private ITobCaseHistoryService caseHistoryService;
+    //各个字段得分
+    @Autowired
+    private IToVehicleFieldScoreService fieldScoreService;
     // 预加载历史车牌集合（避免重复查询）
     private Set<String> historicalPlates = new HashSet<>();
 
@@ -919,15 +919,99 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
         }
     }
 
+//    @Override
+//    public void processNextBatch() {
+//        long lastId = readLastProcessedId();
+//        List<ToVehicleRealTimMonitoring> dataList = vehicleMapper.selectAfterId(lastId, BATCH_SIZE);
+//        if (dataList == null || dataList.isEmpty()) {
+//            return;
+//        }
+//
+//        // 预加载历史车牌（只在首次或需要时刷新）
+//        loadHistoricalPlates();
+//
+//        List<ToFactorConfig> factors = factorConfigMapper.selectFactorConfigList(null);
+//        List<ToFactorTrigger> triggers = factorTriggerMapper.selectFactorTriggerList(null);
+//
+//        Map<Long, List<String>> factorTriggersMap = triggers.stream()
+//                .filter(Objects::nonNull)
+//                .collect(Collectors.groupingBy(ToFactorTrigger::getFactorId,
+//                        Collectors.mapping(ToFactorTrigger::getTriggerValue, Collectors.toList())));
+//
+//        long maxId = lastId;
+//
+//        // 预解析因子元数据
+//        class FactorMeta {
+//            final ToFactorConfig config;
+//            final FactorType type;
+//            final List<String> triggerValues;
+//
+//            FactorMeta(ToFactorConfig config, FactorType type, List<String> triggerValues) {
+//                this.config = config;
+//                this.type = type;
+//                this.triggerValues = triggerValues;
+//            }
+//        }
+//
+//        List<FactorMeta> factorMetas = new ArrayList<>();
+//        for (ToFactorConfig factor : factors) {
+//            if (factor == null) continue;
+//            FactorType type = FactorType.fromName(factor.getFactorName());
+//            List<String> tv = factorTriggersMap.getOrDefault(factor.getId(), Collections.emptyList());
+//            List<String> cleaned = tv.stream()
+//                    .filter(Objects::nonNull)
+//                    .map(String::trim)
+//                    .filter(s -> !s.isEmpty())
+//                    .collect(Collectors.toList());
+//            factorMetas.add(new FactorMeta(factor, type, cleaned));
+//        }
+//
+//        for (ToVehicleRealTimMonitoring data : dataList) {
+//            if (data == null) continue;
+//            double score = 0.0;
+//            List<String> triggeredFactors = new ArrayList<>();
+//
+//            for (FactorMeta fm : factorMetas) {
+//                try {
+//                    if (isTriggeredSafely(data, fm.type, fm.triggerValues)) {
+//                        Integer v = fm.config.getFactorValue();
+//                        if (v != null) score += v;
+//                        Double addSocre = (double) (v != null ? v : 0);
+//                        triggeredFactors.add(fm.config.getFactorName() + "(+" + addSocre + ")");
+//                    }
+//                } catch (Exception ex) {
+//                    System.err.println("判断因子触发时发生异常，因子ID=" + fm.config.getId() + "，记录ID=" + data.getId() + "，异常：" + ex.getMessage());
+//                }
+//            }
+//
+//            try {
+//                vehicleMapper.updateLevel(data.getId(), score);
+//                if (!triggeredFactors.isEmpty()) {
+//                    System.out.println("ID=" + data.getId() + " 触发因子: " + String.join(", ", triggeredFactors) + "，总分=" + score);
+//                } else {
+//                    System.out.println("ID=" + data.getId() + " 未触发任何因子，总分=0");
+//                }
+//            } catch (Exception ex) {
+//                System.err.println("更新风险分数失败，ID=" + data.getId() + "，score=" + score + "，异常：" + ex.getMessage());
+//            }
+//
+//            if (data.getId() > maxId) {
+//                maxId = data.getId();
+//            }
+//        }
+//
+//        writeLastProcessedId(maxId);
+//    }
+
+
+    //将各个字段的得分保存到数据表
+
     @Override
     public void processNextBatch() {
         long lastId = readLastProcessedId();
         List<ToVehicleRealTimMonitoring> dataList = vehicleMapper.selectAfterId(lastId, BATCH_SIZE);
-        if (dataList == null || dataList.isEmpty()) {
-            return;
-        }
+        if (dataList == null || dataList.isEmpty()) return;
 
-        // 预加载历史车牌（只在首次或需要时刷新）
         loadHistoricalPlates();
 
         List<ToFactorConfig> factors = factorConfigMapper.selectFactorConfigList(null);
@@ -938,18 +1022,17 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
                 .collect(Collectors.groupingBy(ToFactorTrigger::getFactorId,
                         Collectors.mapping(ToFactorTrigger::getTriggerValue, Collectors.toList())));
 
-        long maxId = lastId;
-
-        // 预解析因子元数据
         class FactorMeta {
             final ToFactorConfig config;
             final FactorType type;
             final List<String> triggerValues;
+            final Integer value;
 
             FactorMeta(ToFactorConfig config, FactorType type, List<String> triggerValues) {
                 this.config = config;
                 this.type = type;
                 this.triggerValues = triggerValues;
+                this.value = config.getFactorValue() != null ? config.getFactorValue() : 0;
             }
         }
 
@@ -966,42 +1049,81 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
             factorMetas.add(new FactorMeta(factor, type, cleaned));
         }
 
+        long maxId = lastId;
+
         for (ToVehicleRealTimMonitoring data : dataList) {
-            if (data == null) continue;
-            double score = 0.0;
+            if (data == null || data.getPlate() == null) continue;
+
+            Map<FactorType, Integer> fieldScores = new HashMap<>();
+            double totalScore = 0.0;
             List<String> triggeredFactors = new ArrayList<>();
 
             for (FactorMeta fm : factorMetas) {
                 try {
                     if (isTriggeredSafely(data, fm.type, fm.triggerValues)) {
-                        Integer v = fm.config.getFactorValue();
-                        if (v != null) score += v;
-                        Double addSocre = (double) (v != null ? v : 0);
-                        triggeredFactors.add(fm.config.getFactorName() + "(+" + addSocre + ")");
+                        Integer score = fm.value;
+                        totalScore += score;
+                        fieldScores.merge(fm.type, score, Integer::sum);
+                        triggeredFactors.add(fm.config.getFactorName() + "(+" + score + ")");
                     }
                 } catch (Exception ex) {
-                    System.err.println("判断因子触发时发生异常，因子ID=" + fm.config.getId() + "，记录ID=" + data.getId() + "，异常：" + ex.getMessage());
+                    System.err.println("因子触发异常，因子ID=" + fm.config.getId() + "，记录ID=" + data.getId() + "：" + ex.getMessage());
                 }
             }
 
+            // 保存各字段得分
+            saveFieldScores(data.getPlate(), fieldScores, totalScore);
+
+            // 更新主表风险等级
             try {
-                vehicleMapper.updateLevel(data.getId(), score);
+                vehicleMapper.updateLevel(data.getId(), totalScore);
                 if (!triggeredFactors.isEmpty()) {
-                    System.out.println("ID=" + data.getId() + " 触发因子: " + String.join(", ", triggeredFactors) + "，总分=" + score);
-                } else {
-                    System.out.println("ID=" + data.getId() + " 未触发任何因子，总分=0");
+                    System.out.println("ID=" + data.getId() + " 车牌=" + data.getPlate() + " 触发: " + String.join(", ", triggeredFactors) + "，总分=" + totalScore);
                 }
             } catch (Exception ex) {
-                System.err.println("更新风险分数失败，ID=" + data.getId() + "，score=" + score + "，异常：" + ex.getMessage());
+                System.err.println("更新风险分失败，ID=" + data.getId() + "：" + ex.getMessage());
             }
 
-            if (data.getId() > maxId) {
-                maxId = data.getId();
-            }
+            if (data.getId() > maxId) maxId = data.getId();
         }
 
         writeLastProcessedId(maxId);
     }
+
+    /**
+     * 保存或更新车辆各字段得分
+     */
+    private void saveFieldScores(String plate, Map<FactorType, Integer> fieldScores, double totalScore) {
+        ToVehicleFieldScore scoreRecord = fieldScoreService.selectByPlate(plate);
+        boolean exists = scoreRecord != null;
+
+        if (!exists) {
+            scoreRecord = new ToVehicleFieldScore();
+            scoreRecord.setPlate(plate);
+        }
+
+        // 初始化为 0
+        scoreRecord.setVehicleTypeScore(getScore(fieldScores, FactorType.VEHICLE_TYPE));
+        scoreRecord.setBrandScore(getScore(fieldScores, FactorType.BRAND));
+        scoreRecord.setSubBrandScore(getScore(fieldScores, FactorType.Sub_BRAND));
+        scoreRecord.setPlateRiskScore(getScore(fieldScores, FactorType.PLATE));
+        scoreRecord.setFaceScore(getScore(fieldScores, FactorType.FACE));
+        scoreRecord.setTimeScore(getScore(fieldScores, FactorType.TIME));
+        scoreRecord.setMonthScore(getScore(fieldScores, FactorType.MONTH));
+        scoreRecord.setLocationScore(getScore(fieldScores, FactorType.LOCATION));
+        scoreRecord.setTotalScore(totalScore);
+
+        if (exists) {
+            fieldScoreService.updateToVehicleFieldScoreByPlate(scoreRecord);
+        } else {
+            fieldScoreService.insertToVehicleFieldScore(scoreRecord);
+        }
+    }
+
+    private Integer getScore(Map<FactorType, Integer> map, FactorType type) {
+        return map.getOrDefault(type, 0);
+    }
+
 
     private void loadHistoricalPlates() {
         if (!historicalPlates.isEmpty()) return;
@@ -1015,7 +1137,7 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
                         .map(String::trim)
                         .collect(Collectors.toSet()));
             }
-            System.out.println("✅ 已加载历史案件车牌数: " + historicalPlates.size());
+            System.out.println("已加载历史案件车牌数: " + historicalPlates.size());
         } catch (Exception e) {
             System.err.println("加载历史车牌失败：" + e.getMessage());
         }
