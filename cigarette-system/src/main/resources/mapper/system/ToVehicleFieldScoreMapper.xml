@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.ToVehicleFieldScoreMapper">
+
+    <resultMap type="ToVehicleFieldScore" id="ToVehicleFieldScoreResult">
+        <result property="id" column="id"/>
+        <result property="trafficdataId" column="trafficdata_id"/>
+        <result property="plate" column="plate"/>
+        <result property="vehicleTypeScore" column="vehicle_type_score"/>
+        <result property="brandScore" column="brand_score"/>
+        <result property="subBrandScore" column="sub_brand_score"/>
+        <result property="plateRiskScore" column="plate_risk_score"/>
+        <result property="faceScore" column="face_score"/>
+        <result property="timeScore" column="time_score"/>
+        <result property="monthScore" column="month_score"/>
+        <result property="locationScore" column="location_score"/>
+        <result property="totalScore" column="total_score"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectVehicleFieldScoreVo">
+        SELECT id,
+               trafficdata_id,
+               plate,
+               vehicle_type_score,
+               brand_score,
+               sub_brand_score,
+               plate_risk_score,
+               face_score,
+               time_score,
+               month_score,
+               location_score,
+               total_score,
+               create_time,
+               update_time
+        FROM to_vehicle_field_score
+    </sql>
+
+    <select id="selectToVehicleFieldScoreById" parameterType="Long" resultMap="ToVehicleFieldScoreResult">
+        <include refid="selectVehicleFieldScoreVo"/>
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByTrafficdataId" parameterType="Long" resultMap="ToVehicleFieldScoreResult">
+        <include refid="selectVehicleFieldScoreVo"/>
+        WHERE trafficdata_id = #{trafficdataId}
+    </select>
+
+    <select id="selectToVehicleFieldScoreList" parameterType="ToVehicleFieldScore"
+            resultMap="ToVehicleFieldScoreResult">
+        <include refid="selectVehicleFieldScoreVo"/>
+        <where>
+            <if test="trafficdataId != null">AND trafficdata_id = #{trafficdataId}</if>
+            <if test="plate != null and plate != ''">AND plate LIKE CONCAT('%', #{plate}, '%')</if>
+            <if test="totalScore != null">AND total_score = #{totalScore}</if>
+            <if test="createTime != null">AND DATE(create_time) = DATE(#{createTime})</if>
+        </where>
+    </select>
+
+    <insert id="insertToVehicleFieldScore" parameterType="ToVehicleFieldScore" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO to_vehicle_field_score (trafficdata_id, plate,
+                                            vehicle_type_score, brand_score, sub_brand_score,
+                                            plate_risk_score, face_score, time_score, month_score,
+                                            location_score, total_score, create_time, update_time)
+        VALUES (#{trafficdataId}, #{plate},
+                #{vehicleTypeScore}, #{brandScore}, #{subBrandScore},
+                #{plateRiskScore}, #{faceScore}, #{timeScore}, #{monthScore},
+                #{locationScore}, #{totalScore}, NOW(), NOW())
+    </insert>
+
+    <update id="updateToVehicleFieldScoreByTrafficdataId" parameterType="ToVehicleFieldScore">
+        UPDATE to_vehicle_field_score
+        SET plate              = #{plate},
+            vehicle_type_score = #{vehicleTypeScore},
+            brand_score        = #{brandScore},
+            sub_brand_score    = #{subBrandScore},
+            plate_risk_score   = #{plateRiskScore},
+            face_score         = #{faceScore},
+            time_score         = #{timeScore},
+            month_score        = #{monthScore},
+            location_score     = #{locationScore},
+            total_score        = #{totalScore},
+            update_time        = NOW()
+        WHERE trafficdata_id = #{trafficdataId}
+    </update>
+
+    <delete id="deleteToVehicleFieldScoreById" parameterType="Long">
+        DELETE
+        FROM to_vehicle_field_score
+        WHERE id = #{id}
+    </delete>
+    <delete id="deleteToVehicleFieldScoreByIds" parameterType="String">
+        DELETE FROM to_vehicle_field_score
+        WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
