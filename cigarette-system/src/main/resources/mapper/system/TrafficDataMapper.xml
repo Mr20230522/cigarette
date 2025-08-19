@@ -44,7 +44,7 @@
     <select id="tenList" parameterType="trafficData" resultMap="TrafficDataResult">
         select * from trafficdata
         <where>
-            <if test="level!=null">and level>#{level}</if>
+            <if test="level!=null">and level>=#{level}</if>
             <if test="id!=null">and Id>#{id} </if>
         </where>
         ORDER BY CaptureTime DESC
@@ -54,7 +54,7 @@
     <select id="allList" parameterType="trafficData" resultMap="TrafficDataResult">
         select * from trafficdata
         <where>
-            <if test="level!=null">and level>#{level}</if>
+            <if test="level!=null">and level>=#{level}</if>
         </where>
     </select>
 
