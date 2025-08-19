@@ -8,6 +8,8 @@
 <script>
 import * as echarts from 'echarts';
 import { overIdList } from "@/api/cigarette/trafficData/trafficData"
+import { getSuspicionLevel } from "@/api/cigarette/caution/suspicion";
+
 
 export default {
   data() {
@@ -74,14 +76,16 @@ export default {
       this.loading = true;
       try {
         const previousSevenDays = this.getPreviousSevenDays();
+        const currentLevel = await getSuspicionLevel();
+
 
         // 调用API获取数据
         const response = await overIdList({
-          startTime: previousSevenDays[0] + ' 00:00:00',
-          endTime: previousSevenDays[6] + ' 23:59:59'
+          endTime: previousSevenDays[6] + ' 23:59:59',
+          level:currentLevel.data
         });
 
-        console.log('API响应数据:', response);
+        console.log('API响应数据1111:', response);
         this.processChartData(response, previousSevenDays);
       } catch (error) {
         console.error('获取数据失败:', error);
