@@ -32,6 +32,7 @@
 import Reacquire from "@/components/scn-reacquire/reacquire.vue";
 import Echart from "@/components/scn-echart/index.vue";
 import { overIdList } from "@/api/cigarette/trafficData/trafficData"
+import {getSuspicionLevel} from "@/api/cigarette/caution/suspicion";
 
 const COLOR_PALETTE = [
   '#FF6B6B', '#FFA07A', '#FFD700', '#98FB98', '#87CEFA', '#9370DB',
@@ -108,9 +109,10 @@ export default {
       }, 2000);
     },
 
-    getData() {
+    async getData() {
+      const currentLevel = await getSuspicionLevel();
+      this.queryParams.level = currentLevel.data;
       this.pageflag = true;
-      console.log('我被调用了')
       overIdList(this.queryParams).then(response => {
         if (response && response.length) {
           this.queryParams.id = response[response.length - 1].id;
