@@ -37,29 +37,21 @@
         <table class="vehicle-table">
           <thead>
           <tr>
-            <th>序号</th>
             <th>车牌号</th>
-            <th>嫌疑程度</th>
-            <th>抓拍时间</th>
-            <th>操作</th>
+            <th>照片</th>
+            <th>视频</th>
           </tr>
           </thead>
           <tbody>
-          <tr v-for="(vehicle, index) in filteredVehicles" :key="index">
-            <td>{{ index + 1 }}</td>
+          <tr v-for="vehicle in filteredVehicles" :key="vehicle.licensePlate">
             <td>
               <span class="license-plate">{{ vehicle.licensePlate }}</span>
             </td>
             <td>
-                <span class="suspicion-level" :class="getSuspicionClass(vehicle.suspicionLevel)">
-                  {{ vehicle.suspicionLevel }}%
-                </span>
+              <button @click="showImage(vehicle)" class="btn-image">查看照片</button>
             </td>
-            <td>{{ formatTime(vehicle.captureTime) }}</td>
-            <td class="action-buttons">
-              <button @click="showImage(vehicle)" class="btn-image">图片</button>
-              <button @click="showVideo(vehicle)" class="btn-video">视频</button>
-              <button @click="showDetails(vehicle)" class="btn-details">详情</button>
+            <td>
+              <button @click="showVideo(vehicle)" class="btn-video">播放视频</button>
             </td>
           </tr>
           </tbody>
@@ -122,6 +114,7 @@ export default {
   methods: {
     // 切换视图模式
     handleSwitchViewMode(mode) {
+      console.log('切换视图模式:', mode);
       this.viewMode = mode;
     },
 
@@ -133,6 +126,8 @@ export default {
       return this.vehicleData[field] || '暂无数据';
     },
     handleForceShowItem(data) {
+      console.log('接收到强制显示数据:', data);
+      this.viewMode = 'card'; // 确保切换到卡片视图
       this.updateData(data);
       this.lastClickTime = Date.now();
     },
@@ -151,8 +146,19 @@ export default {
 
     // 表格视图方法
     handleSearch(params) {
+      // 1. 强制切换到表格视图
+      this.viewMode = 'table';
+
+      // 2. 更新搜索参数
       this.searchParams = params;
+
+      // 3. 执行过滤
       this.filterVehicles();
+
+      // 4. 调试输出（可选）
+      console.log("当前视图模式:", this.viewMode);
+      console.log("搜索参数:", this.searchParams);
+      console.log("过滤后数据:", this.filteredVehicles);
     },
     handleNewData(newData) {
       const vehicle = {
@@ -434,5 +440,12 @@ export default {
 .action-buttons button:hover {
   opacity: 0.8;
   transform: translateY(-1px);
+}
+
+.vehicle-table td {
+  text-align: center; /* 内容居中 */
+}
+.btn-image, .btn-video {
+  min-width: 100px; /* 按钮最小宽度 */
 }
 </style>

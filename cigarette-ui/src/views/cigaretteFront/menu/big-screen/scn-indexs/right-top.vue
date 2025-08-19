@@ -152,7 +152,22 @@ export default {
       }
     },
     handleItemClick(item) {
-      ScnEventBus.$emit('force-show-item', this.formatItemData(item));
+      // 先强制通知切换到卡片视图
+      ScnEventBus.$emit('switch-view-mode', 'card');
+
+      // 再发送数据
+      const formattedData = {
+        licensePlate: item.plate || '无车牌',
+        carType: this.getVehicleTypeName(item.vehicleType), // 使用字典转换
+        suspicionLevel: item.level || 0,
+        color: item.vehicleColor || '未知颜色',
+        detectionPoint: item.cameraName || '未知监测点',
+        remark: item.remark || '无'
+      };
+
+      // 添加调试日志
+      console.log('发送车辆数据:', formattedData);
+      ScnEventBus.$emit('force-show-item', formattedData);
     },
     async initData() {
       this.pageflag = true;
