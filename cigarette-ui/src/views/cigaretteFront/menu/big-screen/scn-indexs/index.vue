@@ -49,7 +49,7 @@
 <!--      </ItemWrap>-->
       <ItemWrap
         class="contetn_left-bottom contetn_lr-item_right"
-        title="预警视屏 "
+        title="预警分析 "
       >
         <RightBottom />
       </ItemWrap>

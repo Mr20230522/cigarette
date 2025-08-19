@@ -7,30 +7,25 @@
     </div>
     <div class="mapwrap">
       <dv-border-box-13>
-        <!-- 保持原有容器结构 -->
         <div class="video-main-container">
-          <!-- 动态分屏显示 -->
-          <div class="video-grid" :class="`grid-${displayMode}`">
-            <div
-                v-for="(camera, index) in displayedCameras"
-                :key="index"
-                class="grid-item"
-            >
-              <video
-                  :ref="`videoPlayer${index}`"
-                  :src="camera.url"
-                  autoplay
-                  muted
-                  controls
-              ></video>
-              <div class="camera-label">{{ camera.name }}</div>
+          <!-- 显示接收到的图片和嫌疑程度 -->
+          <div class="display-container" v-if="receivedData.picUrl">
+            <div class="image-wrapper">
+              <img
+                :src="receivedData.picUrl"
+                alt="车辆图片"
+                class="display-image"
+                @error="handleImageError"
+              />
+              <div class="level-display">{{ receivedData.level }}</div>
             </div>
           </div>
 
-          <!-- 保持原有的无视频提示 -->
-<!--          <div v-if="displayedCameras.length === 0" class="no-video">-->
-<!--            请选择摄像头-->
-<!--          </div>-->
+          <!-- 无数据时的提示 -->
+          <div v-else class="no-data-prompt">
+            <i class="el-icon-picture-outline"></i>
+            <p>等待接收车辆数据...</p>
+          </div>
         </div>
       </dv-border-box-13>
     </div>
@@ -43,40 +38,40 @@ import { ScnEventBus } from '@/utils/scn-event-bus';
 export default {
   data() {
     return {
-      maptitle: "",
-      displayMode: 1,
-      displayedCameras: []
+      maptitle: "车辆监控显示",
+      receivedData: {
+        picUrl: null,
+        level: null
+      }
     };
   },
   mounted() {
-    ScnEventBus.$on('video-display-change', this.updateDisplay);
-    ScnEventBus.$on('suspected-video', this.updateDisplay);
+    // 监听A组件发送的数据
+    ScnEventBus.$on('vehicle-data-received', this.handleVehicleData);
   },
   beforeDestroy() {
-    ScnEventBus.$off('video-display-change', this.updateDisplay);
-    ScnEventBus.$off('suspected-video', this.updateDisplay);
+    ScnEventBus.$off('vehicle-data-received', this.handleVehicleData);
   },
   methods: {
-    updateDisplay({ mode, cameras }) {
-      this.displayMode = mode;
-      this.displayedCameras = cameras;
-
-      this.$nextTick(() => {
-        this.displayedCameras.forEach((_, index) => {
-          const player = (this.$refs[`videoPlayer${index}`] && this.$refs[`videoPlayer${index}`][0]) || null;
-          if (player) {
-            player.load();
-            player.play().catch(e => console.error('播放失败:', e));
-          }
-        });
-      });
+    handleVehicleData(data) {
+      // 接收A组件发送的数据
+      this.receivedData = {
+        picUrl: data.picUrl,
+        level: data.level
+      };
+    },
+    handleImageError(event) {
+      // 图片加载失败时的处理
+      event.target.src = this.getDefaultImage();
+    },
+    getDefaultImage() {
+      return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg " width="400" height="300"%3E%3Crect fill="%23343f4f" width="400" height="300"%3E%3C/rect%3E%3Ctext x="50%" y="50%" font-size="16" text-anchor="middle" dominant-baseline="middle" fill="%23666"%3E图片加载失败%3C/text%3E%3C/svg%3E';
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-/* 保持原有所有样式不变 */
 .centermap {
   margin-bottom: 30px;
 
@@ -92,10 +87,10 @@ export default {
       font-weight: 900;
       letter-spacing: 6px;
       background: linear-gradient(
-              92deg,
-              #0072ff 0%,
-              #00eaff 48.8525390625%,
-              #01aaff 100%
+          92deg,
+          #0072ff 0%,
+          #00eaff 48.8525390625%,
+          #01aaff 100%
       );
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -128,71 +123,65 @@ export default {
       width: 100%;
       height: 100%;
       position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-      .video-grid {
+      .display-container {
         width: 100%;
         height: 100%;
-        display: grid;
-        gap: 5px;
-        padding: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-        &.grid-1 {
-          grid-template-columns: 1fr;
-          grid-template-rows: 1fr;
-        }
-
-        &.grid-2 {
-          grid-template-columns: 1fr 1fr;
-          grid-template-rows: 1fr;
-        }
-
-        &.grid-3 {
-          grid-template-columns: 1fr 1fr;
-          grid-template-rows: 1fr 1fr;
-          .grid-item:nth-child(3) {
-            grid-column: span 2;
-          }
-        }
-
-        &.grid-4 {
-          grid-template-columns: 1fr 1fr;
-          grid-template-rows: 1fr 1fr;
-        }
-
-        .grid-item {
+        .image-wrapper {
           position: relative;
-          overflow: hidden;
-          border: 1px solid rgba(0, 114, 255, 0.3);
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
 
-          video {
+          .display-image {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: cover; /* 强制全屏显示 */
+            border: 2px solid rgba(0, 114, 255, 0.5);
+            border-radius: 6px;
+            box-shadow: 0 0 20px rgba(0, 114, 255, 0.3);
           }
 
-          .camera-label {
+          .level-display {
             position: absolute;
-            bottom: 5px;
-            left: 5px;
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-            padding: 2px 5px;
-            border-radius: 3px;
-            font-size: 12px;
+            top: 20px;
+            right: 20px;
+            font-size: 42px;
+            font-weight: bold;
+            color: #E6A23C;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.9);
+            padding: 12px 24px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            border: 2px solid rgba(230, 162, 60, 0.7);
+            z-index: 10;
           }
         }
       }
 
-      .no-video {
+      .no-data-prompt {
         display: flex;
-        justify-content: center;
+        flex-direction: column;
         align-items: center;
-        height: 100%;
-        color: #fff;
-        font-size: 20px;
+        justify-content: center;
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 18px;
+
+        i {
+          font-size: 48px;
+          margin-bottom: 15px;
+        }
       }
     }
   }
 }
 </style>
-

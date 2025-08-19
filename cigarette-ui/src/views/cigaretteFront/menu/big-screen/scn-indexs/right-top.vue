@@ -27,7 +27,7 @@
                   <span class="contents zhuyao">{{ item.plate }}</span>
                 </div>
                 <div class="info">
-                  <span class="labels">车辆类型：</span>
+                  <span class="labels">车牌类型：</span>
                   <span class="contents">{{ item.plateType }}</span>
                 </div>
               </div>
@@ -152,16 +152,16 @@ export default {
       // 再发送数据
       const formattedData = {
         plate: response.data.plate || '无车牌',
-        vehicle_type_score: response.data.vehicleTypeScore || '暂无数据',// 使用字典转换
-        brand_score: response.data.brandScore || '暂无数据',
-        sub_brand_score: response.data.subBrandScore || '暂无数据',
-        plate_risk_score: response.data.plateRiskScore || '暂无数据',
-        face_score: response.data.faceScore || '暂无数据',
-        time_score: response.data.timeScore || '暂无数据',
-        month_score: response.data.monthScore || '暂无数据',
-        location_score: response.data.locationScore || '暂无数据',
-        total_score: response.data.totalScore || '暂无数据',
-        create_time: response.data.createTime || '暂无数据',
+        vehicle_type_score: response.data.vehicleTypeScore || '0',// 使用字典转换
+        brand_score: response.data.brandScore || '0',
+        sub_brand_score: response.data.subBrandScore || '0',
+        plate_risk_score: response.data.plateRiskScore || '0',
+        face_score: response.data.faceScore || '0',
+        time_score: response.data.timeScore || '0',
+        month_score: response.data.monthScore || '0',
+        location_score: response.data.locationScore || '0',
+        total_score: response.data.totalScore || '0',
+        create_time: response.data.createTime || '0',
       };
 
       // 添加调试日志
@@ -198,7 +198,8 @@ export default {
           const newData = response.map(item => ({
             ...item,
             picUrl: item.picUrl
-              ? 'http://127.0.0.1:8000/Images/' + item.picUrl
+              //！！！！！'http://127.0.0.1:8000/Images' + item.picUrl
+              ? 'http://127.0.0.1:8000/' + item.picUrl
               : this.getDefaultImage(),
             show: false
           }));
@@ -236,6 +237,17 @@ export default {
           // 新数据添加到顶部（从上往下显示）
           this.visibleList.unshift(newItem);
 
+          // 发送数据给B组件 - 确保这是正确的代码位置
+          try {
+            ScnEventBus.$emit('vehicle-data-received', {
+              picUrl: newItem.picUrl,
+              level: newItem.level
+            });
+            console.log('数据已发送到B组件:', { picUrl: newItem.picUrl, level: newItem.level });
+          } catch (error) {
+            console.error('发送数据到B组件失败:', error);
+          }
+
           // 限制显示数量
           if (this.visibleList.length > this.maxItems) {
             this.visibleList = this.visibleList.slice(0, this.maxItems);
@@ -244,7 +256,7 @@ export default {
           this.currentDisplayIndex++;
 
           // 自动滚动到顶部显示新数据
-          if (!this.isUserScrolling) {
+          if (!this.isUserScrolling && this.$refs.scrollContainer) {
             this.$nextTick(() => {
               this.$refs.scrollContainer.scrollTop = 0;
             });
