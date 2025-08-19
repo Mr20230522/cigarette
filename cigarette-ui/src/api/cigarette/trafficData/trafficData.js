@@ -12,7 +12,6 @@ export function tenList(query) {
 
 //比id大的数据获取
 export function overIdList(query) {
-  console.log('!!!query',query)
   return request({
     url: '/cigarette/trafficData/overIdList',
     method: 'get',

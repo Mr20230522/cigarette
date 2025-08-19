@@ -68,12 +68,11 @@
 </template>
 
 <script>
-import {getUpToDataDegreeSuspicion} from '@/api/cigarette/vehicle/vehicleBehavior'
 import Reacquire from "@/components/scn-reacquire/reacquire.vue"
 import {ScnEventBus} from "@/utils/scn-event-bus";
-import {getVehicleBehaviorVideo} from "@/api/cigarette/multimediaResource/keyVideo"
 import {listDetection} from "@/api/cigarette/detection/detection";
-import {tenList, overIdList, allList, byIdGetVideoPath} from "@/api/cigarette/trafficData/trafficData"
+import {tenList, byIdGetVideoPath} from "@/api/cigarette/trafficData/trafficData"
+import {getByTrafficDataId} from "@/api/cigarette/caution/vehicleFieldScore"
 
 export default {
   components: {Reacquire},
@@ -111,6 +110,7 @@ export default {
   created() {
     this.initDictWatch();
     this.initData()
+
   },
   methods: {
     handleImageError(event) {
@@ -141,35 +141,33 @@ export default {
       if (!typeId) return '未知类型';
       return this.vehicleTypeMap[typeId] || `未知类型(${typeId})`;
     },
-    formatItemData(item) {
-      return {
-        licensePlate: item.plate || '无车牌',
-        carType: item.vehicleType || '未知类型',
-        suspicionLevel: item.level || 0,
-        color: item.vehicleColor || '未知颜色',
-        detectionPoint: item.cameraName,
-        remark: item.remark || '无'
-      }
-    },
-    handleItemClick(item) {
+    async handleItemClick(item) {
+      const response=await getByTrafficDataId(item.id)
+
       // 先强制通知切换到卡片视图
       ScnEventBus.$emit('switch-view-mode', 'card');
 
+
       // 再发送数据
       const formattedData = {
-        licensePlate: item.plate || '无车牌',
-        carType: this.getVehicleTypeName(item.vehicleType), // 使用字典转换
-        suspicionLevel: item.level || 0,
-        color: item.vehicleColor || '未知颜色',
-        detectionPoint: item.cameraName || '未知监测点',
-        remark: item.remark || '无'
+        plate: response.data.plate || '无车牌',
+        vehicle_type_score: response.data.vehicleTypeScore|| '暂无数据',// 使用字典转换
+        brand_score: response.data.brandScore || '暂无数据',
+        sub_brand_score: response.data.subBrandScore || '暂无数据',
+        plate_risk_score: response.data.plateRiskScore || '暂无数据',
+        face_score: response.data.faceScore || '暂无数据',
+        time_score:response.data.timeScore|| '暂无数据',
+        month_score:response.data.monthScore || '暂无数据',
+        location_score:response.data.locationScore || '暂无数据',
+        total_score:response.data.totalScore || '暂无数据',
+        create_time:response.data.createTime || '暂无数据',
       };
 
       // 添加调试日志
-      console.log('发送车辆数据:', formattedData);
       ScnEventBus.$emit('force-show-item', formattedData);
     },
     async initData() {
+      const response=await getByTrafficDataId(1789)
       this.pageflag = true;
       this.allData = [];
       this.visibleList = [];
