@@ -45,10 +45,12 @@
 
 <script>
 import { overIdList } from "@/api/cigarette/trafficData/trafficData"
+import { getSuspicionLevel } from "@/api/cigarette/caution/suspicion";
 
 export default {
   data() {
     return {
+      level:null,
       selectTimeType: 1, // 默认选择最近一天
       selectedTime: '',
       timeOptions: [
@@ -101,11 +103,12 @@ export default {
 
     async getInitialData() {
       try {
-        this.queryParams.captureTime=this.selectedTime
-
+        // 首先获取嫌疑程度标准线
+        const currentLevel = await getSuspicionLevel();
+        this.level = currentLevel.data;
+        this.queryParams.captureTime = this.selectedTime;
 
         const response = await overIdList(this.queryParams);
-        console.log('API响应数据:', response);
 
         if (response && response.length > 0) {
           this.allData = response;
@@ -113,15 +116,15 @@ export default {
           this.processData();
           this.startAutoRefresh();
         } else {
-          console.warn('API返回空数据，启动轮询等待新数据');
           this.setDefaultData();
-          this.startAutoRefresh(); // 即使没有数据也启动轮询
+          this.startAutoRefresh();
         }
       } catch (error) {
         console.error("获取数据失败:", error);
         this.setDefaultData();
       }
     },
+
 
     startAutoRefresh() {
       clearInterval(this.refreshTimer);
@@ -163,7 +166,8 @@ export default {
 
       this.allData.forEach(item => {
         const suspicion = Number(item.level) || 0;
-        if (suspicion > 60) {
+        // 使用从后端获取的level作为判断标准
+        if (suspicion >= this.level) {  // 修改为大于等于阈值
           alarmCount++;
         } else {
           normalCount++;
