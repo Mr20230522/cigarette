@@ -173,6 +173,12 @@ export default {
       return this.tableData.slice(-this.maxDataCount); // 只显示最后 maxDataCount 条
     }
   },
+  created() {
+    // 页面加载时生成唯一 pageToken
+    //这是第一版本的生成 UUID 方法
+    // this.pageToken = this.generateUUID();
+    this.pageToken = this.pageToken = Math.random().toString(36).substr(2) + Date.now();
+  },
   methods: {
     fetchData() {
       request({
@@ -187,26 +193,65 @@ export default {
         this.generateImgData();
       });
     },
+    // fetchNewData() {
+    //   if (this.isFetching) return;
+    //   this.isFetching = true;
+    //   request({
+    //     url: `/toVehicleMonitoring/list?lastId=${j++}`,
+    //     method: 'get',
+    //     timeout: 30000
+    //   }).then(res => {
+    //     const newData = Array.isArray(res.data) ? res.data : [res.data];
+    //     if (newData.length > 0) {
+    //       this.tableData.push(newData[0]);
+    //       // if (this.tableData.length > this.maxDataCount) {
+    //       //   this.tableData.shift();
+    //       // }
+    //       this.imgd = newData;
+    //       this.imgd2 = newData[0];
+    //       // console.log("数据")
+    //       // console.log(this.imgd[0])
+    //       // console.log("变量")
+    //       // console.log(this.imgd[0].picUrl)
+    //       //alert(this.imgd[0].picUrl)
+    //       //console.log(this.imgd)
+    //       this.generateImgData();
+    //     }
+    //   }).catch(err => {
+    //     console.error('请求失败:', err);
+    //   }).finally(() => {
+    //     this.isFetching = false;
+    //   });
+    // },
     fetchNewData() {
       if (this.isFetching) return;
       this.isFetching = true;
       request({
-        url: `/toVehicleMonitoring/list?lastId=${j++}`,
+        // url: `/toVehicleMonitoring/list?lastId=${i++}`,
+        url: `/toVehicleMonitoring/list`,
         method: 'get',
+        params: {
+          pageToken: this.pageToken,
+          // lastId: i++ // 如果需要传递 lastId，可以取消注释
+        },
         timeout: 30000
       }).then(res => {
         const newData = Array.isArray(res.data) ? res.data : [res.data];
         if (newData.length > 0) {
-          this.tableData.push(newData[0]);
+          // this.tableData.push(newData[0]);
           // if (this.tableData.length > this.maxDataCount) {
           //   this.tableData.shift();
           // }
+          this.tableData.unshift(newData[0]);
+          if (this.tableData.length > this.maxDataCount) {
+            this.tableData.pop();
+          }
           this.imgd = newData;
           this.imgd2 = newData[0];
           // console.log("数据")
           // console.log(this.imgd[0])
           // console.log("变量")
-          // console.log(this.imgd[0].picUrl)
+          console.log("/Images/"+this.imgd[0].picUrl)
           //alert(this.imgd[0].picUrl)
           //console.log(this.imgd)
           this.generateImgData();
@@ -319,7 +364,8 @@ export default {
       this.$nextTick(() => {
         const tableBody = this.$refs.dataTable.$el.querySelector('.el-table__body-wrapper');
         if (tableBody) {
-          tableBody.scrollTop = tableBody.scrollHeight;
+          // tableBody.scrollTop = tableBody.scrollHeight;
+          tableBody.scrollTop = 0;
         }
       });
     }
