@@ -286,30 +286,35 @@ export default {
 /* 公共基础样式 */
 .vehicle-container {
   width: 100%;
-  height: 100%;
+  height: auto;
+  max-height: 380px;
   font-family: inherit;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-/* 卡片视图样式 - 放大版 */
+/* 卡片视图样式 */
 .vehicle-info-container {
   width: 100%;
-  height: 100%;
-  padding: 14px;  /* 增大内边距 */
+  height: auto;
+  padding: 8px;
   box-sizing: border-box;
   overflow-y: auto;
+  flex: 1;
 }
 
 .info-header {
   text-align: center;
-  margin-bottom: 14px;  /* 增大间距 */
-  padding-bottom: 10px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
   border-bottom: 1px solid rgba(0, 114, 255, 0.3);
 }
 
 .info-header h3 {
   color: #00eaff;
   margin: 0;
-  font-size: 17px;  /* 增大标题字号 */
+  font-size: 15px;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -318,38 +323,38 @@ export default {
 .info-grid {
   display: flex;
   flex-direction: column;
-  gap: 12px;  /* 增大行间距 */
+  gap: 6px;
 }
 
 .info-row {
   display: flex;
-  gap: 12px;  /* 增大列间距 */
+  gap: 6px;
 }
 
 .info-item {
   flex: 1;
-  min-height: 40px;  /* 增大最小高度 */
-  padding: 10px 14px;  /* 增大内边距 */
+  min-height: 30px;
+  padding: 6px 8px;
   background: rgba(16, 42, 67, 0.7);
-  border-radius: 4px;
+  border-radius: 3px;
   display: flex;
   align-items: center;
 }
 
 .info-item.full-row {
-  flex: 0 0 calc(100% - 30px);
+  flex: 0 0 calc(100% - 20px);
 }
 
 .info-label {
   color: rgba(255, 255, 255, 0.6);
-  min-width: 90px;  /* 增大标签宽度 */
-  font-size: 14px;  /* 增大字号 */
+  min-width: 75px;
+  font-size: 12px;
   flex-shrink: 0;
 }
 
 .info-value {
   color: #fff;
-  font-size: 14px;  /* 增大字号 */
+  font-size: 12px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -359,45 +364,48 @@ export default {
 /* 特殊颜色样式 */
 .zhuyao {
   color: #00eaff !important;
-  font-size: 15px !important;  /* 重点字段更大 */
+  font-size: 13px !important;
 }
 
 .warning {
   color: #E6A23C !important;
-  font-size: 15px !important;  /* 警告字段更大 */
+  font-size: 13px !important;
 }
 
-/* 表格视图样式 - 同步放大 */
+/* 表格视图样式 */
 .vehicle-table-container {
   width: 100%;
-  height: 100%;
-  padding: 16px;
+  height: auto;
+  padding: 10px;
   box-sizing: border-box;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .table-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
   border-bottom: 1px solid rgba(0, 114, 255, 0.3);
 }
 
 .table-header h3 {
   color: #00eaff;
   margin: 0;
-  font-size: 17px;
+  font-size: 15px;
 }
 
 .table-summary {
   color: rgba(255, 255, 255, 0.6);
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .vehicle-table-wrapper {
   width: 100%;
-  height: calc(100% - 50px);
+  flex: 1;
   overflow-y: auto;
 }
 
@@ -405,12 +413,12 @@ export default {
   width: 100%;
   border-collapse: collapse;
   color: #fff;
-  font-size: 14px;  /* 表格字体放大 */
+  font-size: 12px;
 }
 
 .vehicle-table th,
 .vehicle-table td {
-  padding: 12px 15px;  /* 增大单元格内边距 */
+  padding: 8px 10px;
   text-align: left;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -430,17 +438,17 @@ export default {
 .license-plate {
   color: #00eaff;
   font-weight: bold;
-  font-size: 15px;  /* 车牌号更大 */
+  font-size: 13px;
 }
 
 .btn-image, .btn-video {
-  padding: 6px 12px;  /* 按钮增大 */
+  padding: 4px 8px;
   border: none;
-  border-radius: 3px;
+  border-radius: 2px;
   cursor: pointer;
-  font-size: 14px;  /* 按钮文字放大 */
+  font-size: 12px;
   transition: all 0.3s;
-  min-width: 100px;  /* 按钮最小宽度增大 */
+  min-width: 80px;
 }
 
 .btn-image {
