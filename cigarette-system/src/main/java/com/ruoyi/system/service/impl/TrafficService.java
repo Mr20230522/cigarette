@@ -29,7 +29,6 @@ public class TrafficService implements ITrafficDataService {
     //获取比id大的数据
     @Override
     public List<TrafficData> overIdList(TrafficData trafficData){
-        System.out.println("trafficDatatrafficDatatrafficDatatrafficDatatrafficDatatrafficData!!!"+trafficData);
         return trafficDataMapper.overIdList(trafficData);
     }
 
