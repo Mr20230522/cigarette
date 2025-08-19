@@ -3,7 +3,7 @@
     <!-- 卡片视图 -->
     <div v-if="viewMode === 'card'" class="vehicle-info-container">
       <div class="info-header">
-        <h3>嫌疑车辆详细信息</h3>
+        <h3>嫌疑车辆嫌疑度因子分析信息</h3>
       </div>
       <div class="info-grid">
         <!-- 第一行：车牌号和创建时间 -->
