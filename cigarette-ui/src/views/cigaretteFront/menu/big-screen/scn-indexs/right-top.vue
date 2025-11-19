@@ -198,11 +198,12 @@ export default {
           const newData = response.map(item => ({
             ...item,
             picUrl: item.picUrl
-              //！！！！！'http://127.0.0.1:8000/Images' + item.picUrl
+              // ? 'http://10.145.16.196:8000/' + item.picUrl
               ? 'http://127.0.0.1:8000/' + item.picUrl
               : this.getDefaultImage(),
             show: false
           }));
+          console.log('!!newData.picUrl',newData.picUrl)
 
           // 添加到数据池
           this.allData = [...this.allData, ...newData];

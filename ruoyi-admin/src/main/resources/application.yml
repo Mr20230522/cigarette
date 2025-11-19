@@ -6,7 +6,7 @@ ruoyi:
   version: 3.8.7
   # 版权年份
   copyrightYear: 2024
-  # 文件路径 示例（ Windows配置c:/ruoyi/uploadPath，Linux配置 /home/ruoyi/uploadPath mac配置 /Users/deng/Desktop/asset/）
+  # 文件路径 示例（ Windows配置C:/ruoyi/uploadPath，Linux配置 /home/ruoyi/uploadPath mac配置 /Users/deng/Desktop/asset/）
   profile: /Users/deng/Desktop/asset/
   # 获取ip地址开关
   addressEnabled: false
@@ -132,6 +132,24 @@ xss:
   excludes: /system/notice
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
+
+
+backup:
+  # 备份文件存储路径
+  dir: /Users/deng/Desktop/mysql_backups
+#  dir: C:/mysql_backups
+  # 要备份的表名
+  table: trafficdata
+  # 数据库名
+  database: cigarette
+  # 数据库地址
+  host: localhost
+  # 端口
+  port: 3306
+  # 专用备份用户（权限最小化）
+  username: backup_user
+  #不填！使用 mysql_config_editor 加密
+  password: StrongPas123!
 
 
 

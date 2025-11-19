@@ -10,7 +10,6 @@ import * as echarts from 'echarts';
 import { overIdList } from "@/api/cigarette/trafficData/trafficData"
 import { getSuspicionLevel } from "@/api/cigarette/caution/suspicion";
 
-
 export default {
   data() {
     return {
@@ -24,23 +23,26 @@ export default {
     });
   },
   methods: {
-    // 获取前7天的日期（不包括今天），正确处理跨年情况
+    // 获取不包括今天的过去7天（27,26,25,24,23,22,21）
     getPreviousSevenDays() {
       const dates = [];
       const today = new Date();
-      today.setHours(0, 0, 0, 0);
 
-      for (let i = 1; i <= 7; i++) {
-        const date = new Date(today);
+      // 获取昨天的日期
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      // 从昨天开始往前推6天，总共7天
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date(yesterday);
         date.setDate(date.getDate() - i);
-        dates.push(date);
+        const dateStr = date.toISOString().split('T')[0];
+        dates.push(dateStr);
       }
 
-      // 按日期从早到晚排序（解决跨年问题）
-      dates.sort((a, b) => a - b);
-
-      // 格式化为 YYYY-MM-DD
-      return dates.map(date => date.toISOString().split('T')[0]);
+      console.log('今天日期:', today.toISOString().split('T')[0]);
+      console.log('生成的日期范围:', dates);
+      return dates;
     },
 
     // 处理API返回的数据为图表需要的格式
@@ -78,14 +80,14 @@ export default {
         const previousSevenDays = this.getPreviousSevenDays();
         const currentLevel = await getSuspicionLevel();
 
-
         // 调用API获取数据
         const response = await overIdList({
-          endTime: previousSevenDays[6] + ' 23:59:59',
-          level:currentLevel.data
+          startTime: previousSevenDays[0] + ' 00:00:00',
+          endTime: previousSevenDays[previousSevenDays.length - 1] + ' 23:59:59',
+          level: currentLevel.data
         });
 
-        console.log('API响应数据1111:', response);
+        console.log('API响应数据:', response);
         this.processChartData(response, previousSevenDays);
       } catch (error) {
         console.error('获取数据失败:', error);
@@ -193,7 +195,6 @@ export default {
 </script>
 
 <style scoped>
-/* 样式保持不变 */
 .suspect-chart-container {
   width: 100%;
   height: 280px;

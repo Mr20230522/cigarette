@@ -192,6 +192,8 @@ export default {
 
     // 表格视图方法
     handleSearch(params) {
+      //看一下传过来的参数长啥样
+      console.log('【right-bottom】收到搜索条件 >>>',params.plate, JSON.stringify(params, null, 2))
       // 1. 强制切换到表格视图
       this.viewMode = 'table';
 

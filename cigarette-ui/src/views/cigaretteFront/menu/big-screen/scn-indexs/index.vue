@@ -29,7 +29,7 @@
     </div>
     <div class="contetn_center">
       <CenterMap class="contetn_center_top" />
-      <ItemWrap class="contetn_center-bottom" title="选择摄像头">
+      <ItemWrap class="contetn_center-bottom" title="嫌疑车辆搜索">
         <CenterBottom />
       </ItemWrap>
     </div>

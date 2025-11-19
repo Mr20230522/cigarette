@@ -33,7 +33,7 @@ rebel.xml
 nbproject/private/
 build/*
 nbbuild/
-dist/
+dist1/
 nbdist/
 .nb-gradle/
 
