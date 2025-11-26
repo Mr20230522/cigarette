@@ -195,30 +195,36 @@ export default {
       ScnEventBus.$emit('vehicle-search', {...this.searchParams});
     },
     filterCameras() {
-      // 本地过滤逻辑（可选）
+      // 数组本身保护
+      if (!this.cameraList || !this.cameraList.length) {
+        this.cameras = [];
+        return;
+      }
+
       this.cameras = this.cameraList.filter(camera => {
         let match = true;
 
-        if (this.searchParams.plate) {
-          match = match && camera.name.includes(this.searchParams.plate);
-        }
+        /* 1. 车牌号模糊 */
+        const name = (camera.name || '').toLowerCase();
+        const plate = (this.searchParams.plate || '').toLowerCase();
+        if (plate && !name.includes(plate)) return false;
 
-        if (this.searchParams.suspicionMin !== null || this.searchParams.suspicionMax !== null) {
-          const suspicion = parseFloat(camera.suspicionLevel);
-          match = match && (!this.searchParams.suspicionMin || suspicion >= this.searchParams.suspicionMin);
-          match = match && (!this.searchParams.suspicionMax || suspicion <= this.searchParams.suspicionMax);
-        }
+        /* 2. 嫌疑程度区间 */
+        const suspicion = parseFloat(camera.suspicionLevel) || 0;
+        const min = this.searchParams.suspicionMin ?? 0;
+        const max = this.searchParams.suspicionMax ?? 100;
+        if (suspicion < min || suspicion > max) return false;
 
+        /* 3. 时间区间 */
         if (this.searchParams.startDate || this.searchParams.endDate) {
-          const captureDate = new Date(camera.captureTime);
-          const startDate = this.searchParams.startDate ? new Date(this.searchParams.startDate) : null;
-          const endDate = this.searchParams.endDate ? new Date(this.searchParams.endDate) : null;
-
-          match = match && (!startDate || captureDate >= startDate);
-          match = match && (!endDate || captureDate <= endDate);
+          const capture = new Date(camera.captureTime || 0);
+          const start = this.searchParams.startDate ? new Date(this.searchParams.startDate) : null;
+          const end = this.searchParams.endDate ? new Date(this.searchParams.endDate) : null;
+          if (start && capture < start) return false;
+          if (end && capture > end) return false;
         }
 
-        return match;
+        return true;
       });
     }
   },

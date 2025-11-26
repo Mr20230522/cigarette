@@ -2,6 +2,7 @@ package com.ruoyi.web.controller.cigarette.trafficData;
 
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.system.domain.TrafficData;
+import com.ruoyi.system.domain.undefine.SearchOfTheSuspectedVehicle;
 import com.ruoyi.system.service.ITrafficDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,5 +51,14 @@ public class TrafficDataControl extends BaseController {
     @GetMapping("/byIdGetVideoPath")
     public List<TrafficData> byIdGetVideoPath(TrafficData trafficData){
         return TrafficDataService.byIdGetVideoPath(trafficData);
+    }
+
+    /**
+     * 通过嫌疑查询条件获取视屏地址
+     */
+    @GetMapping("/searchVehicle")
+    public List<TrafficData> searchVehicle(SearchOfTheSuspectedVehicle search){
+        System.out.println("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ"+search);
+        return TrafficDataService.searchVehicle(search);
     }
 }

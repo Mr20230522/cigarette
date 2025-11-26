@@ -73,4 +73,37 @@
             <if test="id!=null">and Id=#{id,jdbcType=BIGINT} </if>
         </where>
     </select>
+
+
+    <select id="searchVehicle"
+            parameterType="com.ruoyi.system.domain.undefine.SearchOfTheSuspectedVehicle"
+            resultMap="TrafficDataResult">
+        SELECT *
+        FROM trafficdata
+        <where>
+            <!-- 车牌号模糊 -->
+            <if test="plate != null and plate != ''">
+                AND Plate LIKE CONCAT('%', #{plate}, '%')
+            </if>
+
+            <!-- 嫌疑程度区间 -->
+            <if test="suspicionMin != 0">
+                AND `level` >= #{suspicionMin}
+            </if>
+            <if test="suspicionMax != 0">
+                AND `level` &lt;= #{suspicionMax}
+            </if>
+
+            <!-- 时间区间 -->
+            <if test="startDate != null and startDate != ''">
+                AND CaptureTime &gt;= STR_TO_DATE(#{startDate}, '%Y-%m-%dT%H:%i:%s')
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND CaptureTime &lt;= STR_TO_DATE(#{endDate}, '%Y-%m-%dT%H:%i:%s')
+            </if>
+        </where>          <!-- ←←← 这里原来是 </order> 导致报错 -->
+        ORDER BY CaptureTime DESC
+    </select>
+
+
 </mapper>

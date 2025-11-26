@@ -109,10 +109,18 @@
 
 <script>
 import { ScnEventBus } from "@/utils/scn-event-bus";
+import {byIdGetVideoPath, searchVehicle} from '@/api/cigarette/trafficData/trafficData';
 
 export default {
   data() {
     return {
+      searchQuery: {
+        plate: '',
+        suspicionMin: 0,
+        suspicionMax: 0,
+        startDate: '',
+        endDate: ''
+      },
       // 视图模式：'card'或'table'
       viewMode: 'card',
 
@@ -155,6 +163,16 @@ export default {
     ScnEventBus.$off('switch-view-mode', this.handleSwitchViewMode);
   },
   methods: {
+    async fetchData() {
+      try {
+        const response = await searchVehicle(this.searchQuery);
+        console.log("!!!!!!",response)
+        return response;
+      } catch (error) {
+        console.error('获取视频失败:', error);
+        return null;
+      }
+    },
     // 切换视图模式
     handleSwitchViewMode(mode) {
       console.log('切换视图模式:', mode);
@@ -191,23 +209,70 @@ export default {
     },
 
     // 表格视图方法
-    handleSearch(params) {
-      //看一下传过来的参数长啥样
-      console.log('【right-bottom】收到搜索条件 >>>',params.plate, JSON.stringify(params, null, 2))
-      // 1. 强制切换到表格视图
+    // handleSearch(params) {
+    //
+    //   //看一下传过来的参数长啥样
+    //   console.log('【right-bottom】收到搜索条件 >>>',params.plate, JSON.stringify(params, null, 2))
+    //   // 1. 强制切换到表格视图
+    //   this.viewMode = 'table';
+    //
+    //   // 2. 更新搜索参数
+    //   this.searchParams = params;
+    //
+    //   // 3. 执行过滤
+    //   this.filterVehicles();
+    //
+    //   // 4. 调试输出（可选）
+    //   console.log("当前视图模式:", this.viewMode);
+    //   console.log("搜索参数:", this.searchParams);
+    //   console.log("过滤后数据:", this.filteredVehicles);
+    // },
+
+    async handleSearch(params) {
+      console.log('【right-bottom】收到搜索条件 >>>', params);
+
+      /* 1. 清空旧条件 */
+      this.searchQuery = {
+        plate: '',
+        suspicionMin: 0,
+        suspicionMax: 0,
+        startDate: '',
+        endDate: ''
+      };
+
+      /* 2. 写入新参数 */
+      Object.assign(this.searchQuery, params);
+
+      /* 3. 切视图 */
       this.viewMode = 'table';
 
-      // 2. 更新搜索参数
-      this.searchParams = params;
+      /* 4. 调后端 */
+      const res = await this.fetchData();
+      if (!res || !res.rows) {
+        this.allVehicles = [];
+        this.filteredVehicles = [];
+        return;
+      }
 
-      // 3. 执行过滤
+      /* 5. 渲染表格 */
+      this.allVehicles = res.rows.map(item => ({
+        licensePlate: item.plate || '无车牌',
+        suspicionLevel: item.level ?? 0,   // 如果后端叫 totalScore 就改成 item.totalScore
+        captureTime: item.captureTime || new Date().toISOString(),
+        imageUrl: item.picUrl ? JSON.parse(item.picUrl)[0] : '',
+        videoUrl: item.videoFilePath || '',
+        details: {
+          carType: item.vehicleType || '未知类型',
+          color: item.vehicleColor || '未知颜色',
+          detectionPoint: item.cameraName || '未知点位'
+        }
+      }));
+
+      /* 6. 本地再过滤一次（保险） */
       this.filterVehicles();
-
-      // 4. 调试输出（可选）
-      console.log("当前视图模式:", this.viewMode);
-      console.log("搜索参数:", this.searchParams);
-      console.log("过滤后数据:", this.filteredVehicles);
     },
+
+
     handleNewData(newData) {
       console.log('!!@@@newData',newData)
       const vehicle = {
@@ -304,7 +369,7 @@ export default {
   box-sizing: border-box;
   overflow-y: auto;
   flex: 1;
-}
+}filterCameras
 
 .info-header {
   text-align: center;

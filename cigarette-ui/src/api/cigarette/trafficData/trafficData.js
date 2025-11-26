@@ -38,4 +38,13 @@ export function byIdGetVideoPath(query) {
   })
 }
 
+//获取复合条件的数据
+export function searchVehicle(query) {
+  return request({
+    url: '/cigarette/trafficData/searchVehicle',
+    method: 'get',
+    params: query
+  })
+}
+
 

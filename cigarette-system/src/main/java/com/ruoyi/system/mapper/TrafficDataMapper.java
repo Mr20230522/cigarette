@@ -1,6 +1,7 @@
 package com.ruoyi.system.mapper;
 
 import com.ruoyi.system.domain.TrafficData;
+import com.ruoyi.system.domain.undefine.SearchOfTheSuspectedVehicle;
 
 import java.util.List;
 
@@ -20,7 +21,10 @@ public interface TrafficDataMapper {
      */
     public List<TrafficData> byIdGetVideoPath(TrafficData trafficData);
 
-
+    /**
+     * 通过嫌疑查询条件获取视屏地址
+     */
+    public List<TrafficData> searchVehicle(SearchOfTheSuspectedVehicle search);
 
 
 }

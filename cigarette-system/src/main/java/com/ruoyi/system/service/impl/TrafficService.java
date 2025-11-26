@@ -1,6 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import com.ruoyi.system.domain.TrafficData;
+import com.ruoyi.system.domain.undefine.SearchOfTheSuspectedVehicle;
 import com.ruoyi.system.mapper.ToVehicleRealTimMonitoringMapper;
 import com.ruoyi.system.mapper.TrafficDataMapper;
 import com.ruoyi.system.service.ITrafficDataService;
@@ -37,10 +38,14 @@ public class TrafficService implements ITrafficDataService {
      */
     @Override
     public List<TrafficData> byIdGetVideoPath(TrafficData trafficData){
-        System.out.println("!@!@!@!@!@!@!@!@trafficData"+trafficData);
         List<TrafficData> tra=trafficDataMapper.byIdGetVideoPath(trafficData);
-        System.out.println("tra))))))))))))))))))"+tra);
         return tra;
     }
 
+    /**
+     * 通过嫌疑查询条件获取视屏地址
+     */
+    public List<TrafficData> searchVehicle(SearchOfTheSuspectedVehicle search){
+        return trafficDataMapper.searchVehicle(search);
+    }
 }

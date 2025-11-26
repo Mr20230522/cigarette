@@ -1,6 +1,7 @@
 package com.ruoyi.system.service;
 
 import com.ruoyi.system.domain.TrafficData;
+import com.ruoyi.system.domain.undefine.SearchOfTheSuspectedVehicle;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
@@ -21,4 +22,9 @@ public interface ITrafficDataService {
      * 通过id获取视屏地址
      */
     public List<TrafficData> byIdGetVideoPath(TrafficData trafficData);
+
+    /**
+     * 通过嫌疑查询条件获取视屏地址
+     */
+    public List<TrafficData> searchVehicle(SearchOfTheSuspectedVehicle search);
 }
