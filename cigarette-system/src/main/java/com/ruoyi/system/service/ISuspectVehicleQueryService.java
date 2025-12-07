@@ -1,4 +1,10 @@
 package com.ruoyi.system.service;
 
-public class ISuspectVehicleQueryService {
+import com.ruoyi.system.domain.ToVehicleRealTimMonitoring;
+import com.ruoyi.system.domain.vo.SuspectVehicleQueryVO;
+
+import java.util.List;
+
+public interface ISuspectVehicleQueryService {
+    List<ToVehicleRealTimMonitoring> selectSuspectVehicleList(SuspectVehicleQueryVO query);
 }
