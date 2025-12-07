@@ -16,4 +16,5 @@ public class SuspectVehicleQueryVO {
     private String vehicleColor;    // 车身颜色
     private Date startTime;         // 捕获开始时间
     private Date endTime;           // 捕获结束时间
+    private Integer level;          // 嫌疑程度
 }

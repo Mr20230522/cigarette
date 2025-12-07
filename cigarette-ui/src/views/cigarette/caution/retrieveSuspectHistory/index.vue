@@ -417,7 +417,14 @@
           style="width: 360px"
         />
       </el-form-item>
-
+      <el-form-item label="嫌疑度" prop="plate">
+        <el-input
+          v-model="queryParams.level"
+          placeholder="请输入最小嫌疑度"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">查询</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
@@ -433,18 +440,19 @@
 
     <!-- 数据表格 -->
     <el-table v-loading="loading" :data="list" border stripe>
-      <el-table-column prop="cameraName" label="相机名称" width="120" align="center"/>
+<!--      <el-table-column prop="cameraName" label="相机名称" width="120" align="center"/>-->
       <el-table-column prop="laneNo" label="车道号" width="80" align="center"/>
       <el-table-column prop="direction" label="方向" width="80" align="center"/>
       <el-table-column prop="speed" label="车速(km/h)" width="90" align="center"/>
       <el-table-column prop="plate" label="车牌" width="120" align="center"/>
       <el-table-column prop="plateType" label="车牌类型" width="100" align="center"/>
       <el-table-column prop="plateColor" label="车牌颜色" width="100" align="center"/>
-      <el-table-column prop="vehicleColor" label="车身颜色" width="100" align="center"/>
-      <el-table-column prop="vehicleType" label="车辆类型" width="100" align="center"/>
+<!--      <el-table-column prop="vehicleColor" label="车身颜色" width="100" align="center"/>-->
+<!--      <el-table-column prop="vehicleType" label="车辆类型" width="100" align="center"/>-->
+      <el-table-column prop="level" label="嫌疑度" width="100" align="center"/>
       <el-table-column prop="captureTime" label="捕获时间" width="160" align="center">
         <template slot-scope="scope">
-          {{ parseTime(scope.row.captureTime) }}
+          {{ scope.row.captureTime }} <!-- 直接显示原始值 -->
         </template>
       </el-table-column>
       <el-table-column label="操作" width="100" align="center" fixed="right">
@@ -468,6 +476,7 @@
 <script>
 // 引入 Ruoyi 时间工具（Vue 2 兼容）
 import {parseTime} from "@/utils/ruoyi";
+import request from "@/utils/request";
 
 export default {
   data() {
@@ -488,7 +497,8 @@ export default {
         vehicleType: undefined,
         vehicleColor: undefined,
         startTime: undefined,
-        endTime: undefined
+        endTime: undefined,
+        level: undefined
       },
       // 时间范围
       dateRange: [],
@@ -527,6 +537,7 @@ export default {
 
     // 查询列表
     getList() {
+      // alert("测试代码已启用getList方法");
       this.loading = true;
 
       // 处理时间范围
@@ -539,15 +550,16 @@ export default {
       }
 
       // 使用 this.$http 发起请求（Ruoyi-Vue 2 内置）
-      this.$http({
-        url: "/system/suspectVehicle/list",
+      request({
+        url: "/suspectVehicle/list",
         method: "get",
         params: this.queryParams
       }).then(response => {
         this.list = response.rows || [];
         this.total = response.total || 0;
         this.loading = false;
-      }).catch(() => {
+      }).catch(error => {
+        console.error("请求异常", error);
         this.loading = false;
       });
     },
