@@ -514,11 +514,15 @@ export default {
         {value: "03", label: "货车"}
       ],
       vehicleColorOptions: [
-        {value: "white", label: "白色"},
-        {value: "black", label: "黑色"},
-        {value: "red", label: "红色"},
-        {value: "blue", label: "蓝色"},
-        {value: "grey", label: "灰色"}
+        {value: "白色", label: "白色"},
+        {value: "灰色", label: "灰色"},
+        {value: "黑色", label: "黑色"},
+        {value: "红色", label: "红色"},
+        {value: "棕色", label: "棕色"},
+        {value: "未知", label: "未知"},
+        {value: "黄色", label: "黄色"},
+        {value: "深蓝色", label: "深蓝色"},
+        {value: "紫色", label: "紫色"}
       ],
       plateColorOptions: [
         {value: "blue", label: "蓝色"},
