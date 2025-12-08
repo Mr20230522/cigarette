@@ -509,9 +509,17 @@ export default {
         {value: "03", label: "新能源汽车"}
       ],
       vehicleTypeOptions: [
-        {value: "01", label: "轿车"},
-        {value: "02", label: "SUV"},
-        {value: "03", label: "货车"}
+        {value: "货车", label: "货车"},
+        {value: "轿车", label: "轿车"},
+        {value: "小货车", label: "小货车"},
+        {value: "SUV/MPV", label: "SUV/MPV"},
+        {value: "二轮车", label: "二轮车"},
+        {value: "面包车", label: "面包车"},
+        {value: "皮卡车", label: "皮卡车"},
+        {value: "三轮车", label: "三轮车"},
+        {value: "行人", label: "行人"},
+        {value: "大型客车", label: "大型客车"},
+        {value: "非机动车", label: "非机动车"}
       ],
       vehicleColorOptions: [
         {value: "白色", label: "白色"},
