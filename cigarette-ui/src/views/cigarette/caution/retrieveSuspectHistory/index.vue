@@ -504,9 +504,13 @@ export default {
       dateRange: [],
       // 字典数据（硬编码，实际建议从字典接口加载）
       plateTypeOptions: [
-        {value: "01", label: "小型汽车"},
-        {value: "02", label: "大型汽车"},
-        {value: "03", label: "新能源汽车"}
+        {value: "黄色双行车尾牌", label: "黄色双行车尾牌"},
+        {value: "92式民用车", label: "92式民用车"},
+        {value: "未知", label: "未知"},
+        {value: "新能源车牌", label: "新能源车牌"},
+        {value: "摩托车", label: "摩托车"},
+        {value: "教练车", label: "教练车"},
+        {value: "黄色1225农用车", label: "黄色1225农用车"}
       ],
       vehicleTypeOptions: [
         {value: "货车", label: "货车"},
