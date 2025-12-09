@@ -85,41 +85,62 @@
           <tr>
             <th>车牌号</th>
             <th>照片</th>
-            <th>视频</th>
+            <th>嫌疑值</th>
           </tr>
           </thead>
           <tbody>
-          <tr v-for="vehicle in filteredVehicles" :key="vehicle.licensePlate">
+          <tr v-for="vehicle in filteredVehicles" :key="vehicle.id">
             <td>
               <span class="license-plate">{{ vehicle.licensePlate }}</span>
             </td>
             <td>
-              <button @click="showImage(vehicle)" class="btn-image">查看照片</button>
+              <button @click="enlargeImage(vehicle.imageUrl)" class="btn-image">查看照片</button>
             </td>
             <td>
-              <button @click="showVideo(vehicle)" class="btn-video">播放视频</button>
+              <span class="suspicion-text">{{ vehicle.suspicionLevel }}</span>
             </td>
           </tr>
           </tbody>
         </table>
       </div>
+      <!-- 分页条（Ruo 封装版，带“前往”输入框） -->
+      <div class="pagination-wrapper">
+        <pagination
+          v-show="total>0"
+          :total="total"
+          :page.sync="searchQuery.pageNum"
+          :limit.sync="searchQuery.pageSize"
+          layout="prev, pager, next, jumper"
+          @pagination="handlePagination"
+        />
+      </div>
+    </div>
+    <div v-if="enlargedImage" class="image-preview-overlay" @click.self="closeEnlarge">
+      <div class="image-preview-container">
+        <img :src="enlargedImage" class="enlarged-image" @error="enlargedImage = getDefaultImage()">
+      </div>
     </div>
   </div>
 </template>
-
 <script>
-import { ScnEventBus } from "@/utils/scn-event-bus";
+import {ScnEventBus} from "@/utils/scn-event-bus";
 import {byIdGetVideoPath, searchVehicle} from '@/api/cigarette/trafficData/trafficData';
+import Pagination from '@/components/Pagination'
 
 export default {
+  components: {Pagination},   // 关键
   data() {
     return {
+      enlargedImage: null,
+      total: 0,        // 总条数
       searchQuery: {
         plate: '',
         suspicionMin: 0,
         suspicionMax: 0,
         startDate: '',
-        endDate: ''
+        endDate: '',
+        pageNum: 1,    // 当前页
+        pageSize: 7   // 每页条数（与截图一致）
       },
       // 视图模式：'card'或'table'
       viewMode: 'card',
@@ -163,10 +184,46 @@ export default {
     ScnEventBus.$off('switch-view-mode', this.handleSwitchViewMode);
   },
   methods: {
+    handlePagination(pagination) {
+      console.log('【分页】事件触发', pagination)
+      this.searchQuery.pageNum = pagination.page
+      this.searchQuery.pageSize = pagination.limit
+      this.fetchTableData()
+    },
+    async fetchTableData() {
+      console.log('【fetchTableData】发起请求，参数：', this.searchQuery)
+      const res = await searchVehicle(this.searchQuery)   // 直接用当前分页参数
+      console.log('【fetchTableData】后端返回：', res)
+
+      if (res?.rows) {
+        this.total = res.total
+        // 后端已分页，直接拿来显示
+        this.filteredVehicles = res.rows.map(it => ({
+          licensePlate: it.plate || '无车牌',
+          suspicionLevel: it.level ?? 0,
+          imageUrl: it.picUrl
+            ? 'http://127.0.0.1:8000/' + it.picUrl.replace(/^\/+/, '')
+            : this.getDefaultImage()
+        }))
+        console.log('【fetchTableData】表格数据已更新，条数：', this.filteredVehicles.length)
+      } else {
+        this.filteredVehicles = []
+        this.total = 0
+        console.warn('【fetchTableData】无数据返回')
+      }
+    },
+    enlargeImage(url) {
+      // 没图或地址异常就用默认图
+      this.enlargedImage = url || this.getDefaultImage()
+    },
+    closeEnlarge() {
+      this.enlargedImage = null
+    },
+
     async fetchData() {
       try {
         const response = await searchVehicle(this.searchQuery);
-        console.log("!!!!!!",response)
+        console.log("!!!!!!", response)
         return response;
       } catch (error) {
         console.error('获取视频失败:', error);
@@ -208,73 +265,19 @@ export default {
       }
     },
 
-    // 表格视图方法
-    // handleSearch(params) {
-    //
-    //   //看一下传过来的参数长啥样
-    //   console.log('【right-bottom】收到搜索条件 >>>',params.plate, JSON.stringify(params, null, 2))
-    //   // 1. 强制切换到表格视图
-    //   this.viewMode = 'table';
-    //
-    //   // 2. 更新搜索参数
-    //   this.searchParams = params;
-    //
-    //   // 3. 执行过滤
-    //   this.filterVehicles();
-    //
-    //   // 4. 调试输出（可选）
-    //   console.log("当前视图模式:", this.viewMode);
-    //   console.log("搜索参数:", this.searchParams);
-    //   console.log("过滤后数据:", this.filteredVehicles);
-    // },
-
     async handleSearch(params) {
-      console.log('【right-bottom】收到搜索条件 >>>', params);
-
-      /* 1. 清空旧条件 */
-      this.searchQuery = {
-        plate: '',
-        suspicionMin: 0,
-        suspicionMax: 0,
-        startDate: '',
-        endDate: ''
-      };
-
-      /* 2. 写入新参数 */
-      Object.assign(this.searchQuery, params);
-
-      /* 3. 切视图 */
-      this.viewMode = 'table';
-
-      /* 4. 调后端 */
-      const res = await this.fetchData();
-      if (!res || !res.rows) {
-        this.allVehicles = [];
-        this.filteredVehicles = [];
-        return;
-      }
-
-      /* 5. 渲染表格 */
-      this.allVehicles = res.rows.map(item => ({
-        licensePlate: item.plate || '无车牌',
-        suspicionLevel: item.level ?? 0,   // 如果后端叫 totalScore 就改成 item.totalScore
-        captureTime: item.captureTime || new Date().toISOString(),
-        imageUrl: item.picUrl ? JSON.parse(item.picUrl)[0] : '',
-        videoUrl: item.videoFilePath || '',
-        details: {
-          carType: item.vehicleType || '未知类型',
-          color: item.vehicleColor || '未知颜色',
-          detectionPoint: item.cameraName || '未知点位'
-        }
-      }));
-
-      /* 6. 本地再过滤一次（保险） */
-      this.filterVehicles();
+      console.log('【right-bottom】收到搜索条件 >>>', params)
+      /* 1. 合并条件并回到第1页 */
+      Object.assign(this.searchQuery, params, {pageNum: 1})
+      /* 2. 切视图 */
+      this.viewMode = 'table'
+      /* 3. 拉数据 */
+      await this.fetchTableData()
     },
 
 
     handleNewData(newData) {
-      console.log('!!@@@newData',newData)
+      console.log('!!@@@newData', newData)
       const vehicle = {
         licensePlate: newData.plate || '无车牌',
         suspicionLevel: newData.level || 0,
@@ -344,6 +347,9 @@ export default {
         plate_risk_score: vehicle.details.detectionPoint,
         total_score: '来自表格数据'
       });
+    },
+    getDefaultImage() {
+      return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="60"%3E%3Crect fill="%23e0e0e0" width="80" height="60"/%3E%3Ctext x="50%" y="50%" font-size="10" text-anchor="middle" dominant-baseline="middle" fill="%23666"%3E图片加载失败%3C/text%3E%3C/svg%3E';
     }
   }
 };
@@ -354,7 +360,7 @@ export default {
 .vehicle-container {
   width: 100%;
   height: auto;
-  max-height: 380px;
+  max-height: 430px;
   font-family: inherit;
   overflow: hidden;
   display: flex;
@@ -369,8 +375,9 @@ export default {
   box-sizing: border-box;
   overflow-y: auto;
   flex: 1;
-}filterCameras
+}
 
+filterCameras
 .info-header {
   text-align: center;
   margin-bottom: 8px;
@@ -535,5 +542,68 @@ export default {
 
 .vehicle-table td {
   text-align: center;
+}
+
+/* ===== 大屏预览 ===== */
+.image-preview-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, .8);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: zoom-out;
+}
+
+.image-preview-container {
+  width: 80%;
+  max-width: 800px;
+  max-height: 80vh;
+}
+
+.enlarged-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border: 2px solid #0072ff;
+  box-shadow: 0 0 20px rgba(0, 114, 255, .5);
+}
+
+.vehicle-table-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* 撑满外部高度 */
+}
+
+.vehicle-table-wrapper {
+  flex: 1; /* 表格占剩余空间 */
+  overflow-y: auto;
+}
+
+.pagination-container { /* 分页始终贴底 */
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+
+
+/* ========== 外层容器：比父容器窄 + 居中 + 己土米黄 ========== */
+.pagination-wrapper {
+  width: 85%; /* 缩窄 20 % */
+
+  margin: 15px 10px; /* 水平居中 */
+  background: black; /* 己土米黄 */
+  //padding: 8px 0; /* 上下留点呼吸感 */
+  border-radius: 4px; /* 圆角 */
+}
+
+.pagination-container {
+  background: black;
+  padding: 8px;
+  border-radius: 4px;
 }
 </style>

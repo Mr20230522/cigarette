@@ -10,11 +10,13 @@ public class SearchOfTheSuspectedVehicle {
     private int suspicionMax;
     private String startDate;
     private String endDate;
+    private Integer pageNum;
+    private Integer pageSize;
 
     public SearchOfTheSuspectedVehicle() {
     }
 
-    public SearchOfTheSuspectedVehicle(String plate, int suspicionMin, int suspicionMax, String startDate, String endDate) {
+    public SearchOfTheSuspectedVehicle(String plate, int suspicionMin, int suspicionMax, String startDate, String endDate, Integer pageNum, Integer pageSize) {
         this.plate = plate;
         this.suspicionMin = suspicionMin;
         this.suspicionMax = suspicionMax;
@@ -62,6 +64,22 @@ public class SearchOfTheSuspectedVehicle {
         this.endDate = endDate;
     }
 
+    public Integer getPageNum() {
+        return pageNum;
+    }
+
+    public void setPageNum(Integer pageNum) {
+        this.pageNum = pageNum;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
+
     @Override
     public String toString() {
         return "SearchOfTheSuspectedVehicle{" +
@@ -70,6 +88,8 @@ public class SearchOfTheSuspectedVehicle {
                 ", suspicionMax=" + suspicionMax +
                 ", startDate='" + startDate + '\'' +
                 ", endDate='" + endDate + '\'' +
+                ", pageNum=" + pageNum +
+                ", pageSize=" + pageSize +
                 '}';
     }
 }

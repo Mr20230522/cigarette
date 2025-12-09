@@ -1,6 +1,8 @@
 package com.ruoyi.web.controller.cigarette.trafficData;
 
+import com.github.pagehelper.PageHelper;
 import com.ruoyi.common.core.controller.BaseController;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.domain.TrafficData;
 import com.ruoyi.system.domain.undefine.SearchOfTheSuspectedVehicle;
 import com.ruoyi.system.service.ITrafficDataService;
@@ -54,11 +56,17 @@ public class TrafficDataControl extends BaseController {
     }
 
     /**
-     * 通过嫌疑查询条件获取视屏地址
+     * 通过嫌疑查询条件获取视频地址（自带分页）
+     * 前端仍用 GET /cigarette/trafficData/searchVehicle
      */
     @GetMapping("/searchVehicle")
-    public List<TrafficData> searchVehicle(SearchOfTheSuspectedVehicle search){
-        System.out.println("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ"+search);
-        return TrafficDataService.searchVehicle(search);
+    public TableDataInfo searchVehicle(SearchOfTheSuspectedVehicle search){
+        // 如果前端没传分页参数，默认第1页，每页4条
+        int pageNum  = search.getPageNum()  == null ? 1 : search.getPageNum();
+        int pageSize = search.getPageSize() == null ? 7 : search.getPageSize();
+        PageHelper.startPage(pageNum, pageSize);
+
+        List<TrafficData> list = TrafficDataService.searchVehicle(search);
+        return getDataTable(list);   // RuoYi 自带，返回 {total, rows}
     }
 }
