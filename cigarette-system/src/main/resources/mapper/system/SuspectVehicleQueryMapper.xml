@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SuspectVehicleQueryMapper">
+    <resultMap id="ToVehicleResult" type="com.ruoyi.system.domain.ToVehicleRealTimMonitoring">
+        <id property="id" column="Id"/>
+        <result property="cameraId" column="CameraId"/>
+        <result property="cameraName" column="CameraName"/>
+        <result property="laneNo" column="LaneNo"/>
+        <result property="direction" column="Direction"/>
+        <result property="speed" column="Speed"/>
+        <result property="plate" column="Plate"/>
+        <result property="plateType" column="PlateType"/>
+        <result property="plateColor" column="PlateColor"/>
+        <result property="vehicleColor" column="VehicleColor"/>
+        <result property="vehicleType" column="VehicleType"/>
+        <result property="vehicleLogo" column="VehicleLogo"/>
+        <result property="vehicleLogoAll" column="VehicleLogoAll"/>
+        <result property="captureTime" column="CaptureTime"/>
+        <result property="picUrl" column="PicUrl"/>
+        <result property="plateLicense" column="PlateLicense"/>
+        <result property="fileNo" column="FileNo"/>
+        <result property="startOffset" column="StartOffset"/>
+        <result property="srcJson" column="SrcJson"/>
+        <result property="level" column="Level"/>
+    </resultMap>
+    <select id="selectSuspectVehicleList"
+            resultType="com.ruoyi.system.domain.ToVehicleRealTimMonitoring">
+        SELECT *
+        FROM trafficdata
+        <where>
+            <if test="query.plate != null and query.plate != ''">
+                AND plate LIKE CONCAT('%', #{query.plate}, '%')
+            </if>
+            <if test="query.plateType != null and query.plateType != ''">
+                AND plateType = #{query.plateType}
+            </if>
+            <if test="query.plateColor != null and query.plateColor != ''">
+                AND plateColor = #{query.plateColor}
+            </if>
+            <if test="query.vehicleType != null and query.vehicleType != ''">
+                AND vehicleType = #{query.vehicleType}
+            </if>
+            <if test="query.vehicleColor != null and query.vehicleColor != ''">
+                AND vehicleColor = #{query.vehicleColor}
+            </if>
+            <if test="query.startTime != null">
+                AND captureTime >= #{query.startTime}
+            </if>
+            <if test="query.endTime != null">
+                AND captureTime &lt;= #{query.endTime}
+            </if>
+            <if test="query.level != null">
+                AND level >= #{query.level}
+            </if>
+        </where>
+        ORDER BY captureTime DESC
+    </select>
+
+</mapper>
