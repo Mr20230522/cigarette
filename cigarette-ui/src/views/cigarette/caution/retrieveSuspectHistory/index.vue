@@ -252,7 +252,7 @@ export default {
         type: "warning"
       }).then(() => {
         request({
-          url: "/system/suspectVehicle/export",
+          url: "/suspectVehicle/export",
           method: "get",
           params: this.queryParams,
           responseType: "blob"
