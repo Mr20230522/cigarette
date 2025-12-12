@@ -131,6 +131,7 @@ import request from "@/utils/request";
 export default {
   data() {
     return {
+      base : 'http://10.145.16.196:8000/Images/',
       // 加载状态
       loading: true,
       // 总条数
@@ -271,12 +272,13 @@ export default {
 
     // 查看图片
     viewImage(row) {
+      row = this.list;
       if (!row.picUrl) {
         this.$message.warning("无抓拍图片");
         return;
       }
       this.$alert(
-        `<img src="'http://10.145.16.196:8000/Images/'+${row.picUrl}?t=${Date.now()}" style="max-width:100%; max-height:500px;">`,
+        `<img src="${base}${row.picUrl}?t=${Date.now()}" style="max-width:100%; max-height:500px;">`,
         "车辆抓拍图",
         {
           dangerouslyUseHTMLString: true,
