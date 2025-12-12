@@ -215,7 +215,7 @@ export default {
         this.queryParams.endTime = undefined;
       }
 
-      // 使用 this.$http 发起请求（Ruoyi-Vue 2 内置）
+      //发起请求
       request({
         url: "/suspectVehicle/list",
         method: "get",
@@ -250,7 +250,7 @@ export default {
         cancelButtonText: "取消",
         type: "warning"
       }).then(() => {
-        this.$http({
+        request({
           url: "/system/suspectVehicle/export",
           method: "get",
           params: this.queryParams,
@@ -276,7 +276,7 @@ export default {
         return;
       }
       this.$alert(
-        `<img src="${row.picUrl}?t=${Date.now()}" style="max-width:100%; max-height:500px;">`,
+        `<img src="'http://10.145.16.196:8000/Images/'+${row.picUrl}?t=${Date.now()}" style="max-width:100%; max-height:500px;">`,
         "车辆抓拍图",
         {
           dangerouslyUseHTMLString: true,
