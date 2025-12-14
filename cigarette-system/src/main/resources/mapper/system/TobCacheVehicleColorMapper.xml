@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobCacheMapper">
+
+    <select id="selectVehicleColorOne" resultType="com.ruoyi.system.domain.cache.TobCacheVehicleColor">
+        SELECT * FROM tob_cache_vehicle_color WHERE id = 1
+    </select>
+
+    <update id="incVehicleColor" parameterType="com.ruoyi.system.domain.cache.TobCacheVehicleColor">
+        UPDATE tob_cache_vehicle_color
+        <set>
+            <if test="white != null">white = white + 1,</if>
+            <if test="black != null">black = black + 1,</if>
+            <if test="gray != null">gray = gray + 1,</if>
+            <if test="red != null">red = red + 1,</if>
+            <if test="blue != null">blue = blue + 1,</if>
+            <if test="brown != null">brown = brown + 1,</if>
+            <if test="silver != null">silver = silver + 1,</if>
+            <if test="yellow != null">yellow = yellow + 1,</if>
+            <if test="green != null">green = green + 1,</if>
+            <if test="otherC != null">other_c = other_c + 1,</if>
+            <if test="deepBlue != null">deep_blue = deep_blue + 1,</if>
+            update_time = NOW()
+        </set>
+        WHERE id = 1
+    </update>
+
+</mapper>

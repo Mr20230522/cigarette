@@ -16,5 +16,6 @@ public class TobCacheDaySlice {
     private Long d6;
     private Long d7;
     private Long monthCurr;
+    private Long maxTrafficId;
     private Date updateTime;
 }

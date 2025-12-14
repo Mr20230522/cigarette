@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobCacheMapper">
+
+    <select id="selectHourOne" resultType="com.ruoyi.system.domain.cache.TobCacheHour">
+        SELECT * FROM tob_cache_hour WHERE id = 1
+    </select>
+
+    <update id="incHour" parameterType="com.ruoyi.system.domain.cache.TobCacheHour">
+        UPDATE tob_cache_hour
+        <set>
+            <if test="h00 != null">h00 = h00 + 1,</if>
+            <if test="h01 != null">h01 = h01 + 1,</if>
+            <if test="h02 != null">h02 = h02 + 1,</if>
+            <if test="h03 != null">h03 = h03 + 1,</if>
+            <if test="h04 != null">h04 = h04 + 1,</if>
+            <if test="h05 != null">h05 = h05 + 1,</if>
+            <if test="h06 != null">h06 = h06 + 1,</if>
+            <if test="h07 != null">h07 = h07 + 1,</if>
+            <if test="h08 != null">h08 = h08 + 1,</if>
+            <if test="h09 != null">h09 = h09 + 1,</if>
+            <if test="h10 != null">h10 = h10 + 1,</if>
+            <if test="h11 != null">h11 = h11 + 1,</if>
+            <if test="h12 != null">h12 = h12 + 1,</if>
+            <if test="h13 != null">h13 = h13 + 1,</if>
+            <if test="h14 != null">h14 = h14 + 1,</if>
+            <if test="h15 != null">h15 = h15 + 1,</if>
+            <if test="h16 != null">h16 = h16 + 1,</if>
+            <if test="h17 != null">h17 = h17 + 1,</if>
+            <if test="h18 != null">h18 = h18 + 1,</if>
+            <if test="h19 != null">h19 = h19 + 1,</if>
+            <if test="h20 != null">h20 = h20 + 1,</if>
+            <if test="h21 != null">h21 = h21 + 1,</if>
+            <if test="h22 != null">h22 = h22 + 1,</if>
+            <if test="h23 != null">h23 = h23 + 1,</if>
+            update_time = NOW()
+        </set>
+        WHERE id = 1
+    </update>
+
+</mapper>

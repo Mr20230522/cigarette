@@ -105,5 +105,12 @@
         ORDER BY CaptureTime DESC
     </select>
 
+    <!-- 增量同步专用：双参数 -->
+    <select id="fetchNewById" resultMap="TrafficDataResult">
+        SELECT * FROM trafficdata
+        WHERE id > #{lastId}
+        ORDER BY id ASC
+            LIMIT #{limit}
+    </select>
 
 </mapper>

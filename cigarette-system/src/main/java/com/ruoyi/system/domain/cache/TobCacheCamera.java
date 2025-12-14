@@ -7,15 +7,13 @@ import java.util.Date;
 public class TobCacheCamera {
     private Long id;
     private Integer timeType;
-    private Long stationA;
-    private Long stationB;
-    private Long stationC;
-    private Long stationD;
-    private Long stationE;
-    private Long stationF;
-    private Long stationG;
-    private Long stationH;
-    private Long stationI;
-    private Long stationJ;
+    /* 对应中文 CameraName 的计数列（驼峰） */
+    private Long banqiao326Gas;
+    private Long laoDifang;
+    private Long g248Xixiang;
+    private Long banqiaoExit;
+    private Long luliangKaikou;
+    private Long luopingAgang;
+    private Long other;
     private Date updateTime;
 }

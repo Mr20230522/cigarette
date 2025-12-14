@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobCacheMapper">
+
+    <select id="selectCameraOne" resultType="com.ruoyi.system.domain.cache.TobCacheCamera">
+        SELECT * FROM tob_cache_camera WHERE id = 1
+    </select>
+
+    <!-- 增量更新：哪个属性不为 null 就给哪个 +1 -->
+    <update id="incCamera" parameterType="com.ruoyi.system.domain.cache.TobCacheCamera">
+        UPDATE tob_cache_camera
+        <set>
+            <if test="banqiao326Gas != null">banqiao_326_gas = banqiao_326_gas + 1,</if>
+            <if test="laoDifang != null">lao_difang = lao_difang + 1,</if>
+            <if test="g248Xixiang != null">g248_xixiang = g248_xixiang + 1,</if>
+            <if test="banqiaoExit != null">banqiao_exit = banqiao_exit + 1,</if>
+            <if test="luliangKaikou != null">luliang_kaikou = luliang_kaikou + 1,</if>
+            <if test="luopingAgang != null">luoping_agang = luoping_agang + 1,</if>
+            <if test="other != null">other = other + 1,</if>
+            update_time = NOW()
+        </set>
+        WHERE id = 1
+    </update>
+
+</mapper>

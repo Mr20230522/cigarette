@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobCacheMapper">
+
+    <select id="selectVehicleTypeOne" resultType="com.ruoyi.system.domain.cache.TobCacheVehicleType">
+        SELECT * FROM tob_cache_vehicle_type WHERE id = 1
+    </select>
+
+    <update id="incVehicleType" parameterType="com.ruoyi.system.domain.cache.TobCacheVehicleType">
+        UPDATE tob_cache_vehicle_type
+        <set>
+            <if test="sedan != null">sedan = sedan + 1,</if>
+            <if test="suvMpv != null">suv_mpv = suv_mpv + 1,</if>
+            <if test="truck != null">truck = truck + 1,</if>
+            <if test="twoWheeler != null">two_wheeler = two_wheeler + 1,</if>
+            <if test="van != null">van = van + 1,</if>
+            <if test="lightTruck != null">light_truck = light_truck + 1,</if>
+            <if test="threeWheeler != null">three_wheeler = three_wheeler + 1,</if>
+            <if test="smallCar != null">small_car = small_car + 1,</if>
+            <if test="pedestrian != null">pedestrian = pedestrian + 1,</if>
+            <if test="largeVehicle != null">large_vehicle = large_vehicle + 1,</if>
+            <if test="pickup != null">pickup = pickup + 1,</if>
+            <if test="largeBus != null">large_bus = large_bus + 1,</if>
+            <if test="unknown != null">unknown = unknown + 1,</if>
+            <if test="nonMotor != null">non_motor = non_motor + 1,</if>
+            <if test="mediumBus != null">medium_bus = medium_bus + 1,</if>
+            <if test="other != null">other = other + 1,</if>
+            <if test="suvOnly != null">suv_only = suv_only + 1,</if>
+            update_time = NOW()
+        </set>
+        WHERE id = 1
+    </update>
+
+</mapper>

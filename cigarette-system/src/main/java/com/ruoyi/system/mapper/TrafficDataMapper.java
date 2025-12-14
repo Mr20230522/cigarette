@@ -2,7 +2,7 @@ package com.ruoyi.system.mapper;
 
 import com.ruoyi.system.domain.TrafficData;
 import com.ruoyi.system.domain.undefine.SearchOfTheSuspectedVehicle;
-
+import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface TrafficDataMapper {
@@ -26,5 +26,6 @@ public interface TrafficDataMapper {
      */
     public List<TrafficData> searchVehicle(SearchOfTheSuspectedVehicle search);
 
-
+    /* 新增：增量同步专用 */
+    List<TrafficData> fetchNewById(@Param("lastId") Long lastId, @Param("limit") int limit);
 }

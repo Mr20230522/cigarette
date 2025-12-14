@@ -18,4 +18,5 @@ public class TobCacheVehicleColor {
     private Long green;
     private Long otherC;
     private Date updateTime;
+    private Long deepBlue;
 }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobCacheMapper">
+
+    <select id="selectSeasonOne" resultType="com.ruoyi.system.domain.cache.TobCacheSeason">
+        SELECT * FROM tob_cache_season WHERE id = 1
+    </select>
+
+    <update id="incSeason" parameterType="com.ruoyi.system.domain.cache.TobCacheSeason">
+        UPDATE tob_cache_season
+        <set>
+            <if test="spring != null">spring = spring + 1,</if>
+            <if test="summer != null">summer = summer + 1,</if>
+            <if test="autumn != null">autumn = autumn + 1,</if>
+            <if test="winter != null">winter = winter + 1,</if>
+            update_time = NOW()
+        </set>
+        WHERE id = 1
+    </update>
+
+</mapper>

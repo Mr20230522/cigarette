@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobCacheMapper">
+
+    <select id="selectDaynightOne" resultType="com.ruoyi.system.domain.cache.TobCacheDaynight">
+        SELECT * FROM tob_cache_daynight WHERE id = 1
+    </select>
+
+    <update id="incDaynight" parameterType="com.ruoyi.system.domain.cache.TobCacheDaynight">
+        UPDATE tob_cache_daynight
+        <set>
+            <if test="dayNum != null">day_num = day_num + 1,</if>
+            <if test="nightNum != null">night_num = night_num + 1,</if>
+            update_time = NOW()
+        </set>
+        WHERE id = 1
+    </update>
+
+</mapper>

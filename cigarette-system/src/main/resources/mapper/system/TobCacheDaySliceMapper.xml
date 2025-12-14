@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobCacheMapper">
+
+    <select id="selectDaySliceOne" resultType="com.ruoyi.system.domain.cache.TobCacheDaySlice">
+        SELECT * FROM tob_cache_day_slice WHERE id = 1
+    </select>
+
+    <update id="incDaySlice" parameterType="com.ruoyi.system.domain.cache.TobCacheDaySlice">
+        UPDATE tob_cache_day_slice
+        <set>
+            <if test="d0 != null">d0 = d0 + 1,</if>
+            <if test="d1 != null">d1 = d1 + 1,</if>
+            <if test="d2 != null">d2 = d2 + 1,</if>
+            <if test="d3 != null">d3 = d3 + 1,</if>
+            <if test="d4 != null">d4 = d4 + 1,</if>
+            <if test="d5 != null">d5 = d5 + 1,</if>
+            <if test="d6 != null">d6 = d6 + 1,</if>
+            <if test="d7 != null">d7 = d7 + 1,</if>
+            <if test="monthCurr != null">month_curr = month_curr + 1,</if>
+            <if test="maxTrafficId != null">max_traffic_id = #{maxTrafficId},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = 1
+    </update>
+    <!-- 每天 00:00:00 执行：整体右移 1 天 -->
+    <update id="dayShift">
+        UPDATE tob_cache_day_slice
+        SET d7 = d6,
+            d6 = d5,
+            d5 = d4,
+            d4 = d3,
+            d3 = d2,
+            d2 = d1,
+            d1 = d0,
+            d0 = 0
+        WHERE id = 1
+    </update>
+
+    <!-- 每月 1 号 00:00:00 执行：只清月累加器 -->
+    <update id="monthReset">
+        UPDATE tob_cache_day_slice
+        SET month_curr = 0
+        WHERE id = 1
+    </update>
+
+</mapper>
