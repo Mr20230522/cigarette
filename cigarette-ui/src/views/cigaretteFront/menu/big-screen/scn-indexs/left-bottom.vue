@@ -7,150 +7,112 @@
 
 <script>
 import * as echarts from 'echarts';
-import { overIdList } from "@/api/cigarette/trafficData/trafficData"
-import { getSuspicionLevel } from "@/api/cigarette/caution/suspicion";
+import { getDaySliceCache } from '@/api/cigarette/cache/bigScreenCache';
 
 export default {
   data() {
     return {
       loading: false,
-      chartData: [[], []], // [dates, counts]
+      chartData: [[], []], // [dates, suspectCounts]
     };
   },
+  created() {
+    this.fetchData();
+  },
   mounted() {
-    this.fetchData().then(() => {
-      this.initChart();
-    });
+    this.$nextTick(() => this.initChart());
   },
   methods: {
-    // 获取不包括今天的过去7天（27,26,25,24,23,22,21）
-    getPreviousSevenDays() {
-      const dates = [];
-      const today = new Date();
-
-      // 获取昨天的日期
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-
-      // 从昨天开始往前推6天，总共7天
-      for (let i = 6; i >= 0; i--) {
-        const date = new Date(yesterday);
-        date.setDate(date.getDate() - i);
-        const dateStr = date.toISOString().split('T')[0];
-        dates.push(dateStr);
+    /* 生成最近 → 最远 7 个自然日的日期字符串 */
+    getSevenDays() {
+      const arr = [];
+      for (let i = 1; i <= 7; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        arr.push(d.toISOString().split('T')[0]);
       }
-
-      console.log('今天日期:', today.toISOString().split('T')[0]);
-      console.log('生成的日期范围:', dates);
-      return dates;
+      return arr; // [昨天, 前天, ... 7 天前]
     },
 
-    // 处理API返回的数据为图表需要的格式
-    processChartData(apiData, dateRange) {
-      // 创建一个按日期索引的对象
-      const dateCountMap = {};
-
-      // 初始化所有日期为0
-      dateRange.forEach(date => {
-        dateCountMap[date] = 0;
-      });
-
-      // 填充实际数据
-      apiData.forEach(item => {
-        if (item.captureTime) {
-          const date = item.captureTime.split(' ')[0]; // 提取日期部分
-          if (dateCountMap.hasOwnProperty(date)) {
-            dateCountMap[date]++;
-          }
-        }
-      });
-
-      // 转换为chartData格式，保持原始日期顺序
-      this.chartData = [
-        dateRange, // 已经排好序的日期数组
-        dateRange.map(date => dateCountMap[date]) // 对应的数量数组
-      ];
-
-      console.log('处理后的图表数据:', this.chartData);
-    },
-
+    /* 拉缓存 → 拼装数据 → 画图表 */
     async fetchData() {
       this.loading = true;
       try {
-        const previousSevenDays = this.getPreviousSevenDays();
-        const currentLevel = await getSuspicionLevel();
-
-        // 调用API获取数据
-        const response = await overIdList({
-          startTime: previousSevenDays[0] + ' 00:00:00',
-          endTime: previousSevenDays[previousSevenDays.length - 1] + ' 23:59:59',
-          level: currentLevel.data
-        });
-
-        console.log('API响应数据:', response);
-        this.processChartData(response, previousSevenDays);
-      } catch (error) {
-        console.error('获取数据失败:', error);
-        this.generateMockData();
+        const obj = await getDaySliceCache();
+        const dates = this.getSevenDays();
+        const counts = [
+          obj.suspectD1, obj.suspectD2, obj.suspectD3, obj.suspectD4,
+          obj.suspectD5, obj.suspectD6, obj.suspectD7
+        ].map(v => Number(v) || 0);
+        this.chartData = [dates, counts];
+        this.refreshChart();
+      } catch (e) {
+        console.error(e);
+        this.mockData();
       } finally {
         this.loading = false;
       }
     },
 
-    // 模拟数据生成（备用）
-    generateMockData() {
-      const dates = this.getPreviousSevenDays();
+    /* 兜底假数据 */
+    mockData() {
+      const dates = this.getSevenDays();
       const counts = dates.map(() => Math.floor(Math.random() * 20) + 5);
       this.chartData = [dates, counts];
+      this.refreshChart();
     },
 
+    /* 首次建图 */
     initChart() {
       const chartDom = this.$refs.chart;
-      const myChart = echarts.init(chartDom);
+      this.myChart = echarts.init(chartDom);
+      this.buildOption();
+      this.myChart.setOption(this.option);
 
-      // 格式化日期显示（月-日）
-      const formatDateLabel = (dateStr) => {
-        const [year, month, day] = dateStr.split('-');
-        return `${month}-${day}`;
+      const resizeHandler = () => this.myChart.resize();
+      window.addEventListener('resize', resizeHandler);
+      this.$once('hook:beforeDestroy', () => {
+        window.removeEventListener('resize', resizeHandler);
+        this.myChart.dispose();
+      });
+    },
+
+    /* 只更新数据 */
+    refreshChart() {
+      if (!this.myChart) return;
+      this.buildOption();
+      this.myChart.setOption(this.option, { notMerge: false });
+    },
+
+    /* 拼装 option */
+    buildOption() {
+      const formatDateLabel = str => {
+        const [_, m, d] = str.split('-');
+        return `${m}-${d}`;
       };
-
-      const option = {
+      this.option = {
         tooltip: {
           trigger: 'axis',
-          formatter: params => {
-            const date = params[0].axisValue;
-            const count = params[0].data;
+          formatter: p => {
+            const date = p[0].axisValue;
+            const count = p[0].data;
             return `${date}<br/>嫌疑车辆: ${count}辆`;
           }
         },
         grid: {
-          left: '5%',
-          right: '5%',
-          bottom: '10%',
-          top: '25%',
-          containLabel: true
+          left: '5%', right: '5%', bottom: '10%', top: '25%', containLabel: true
         },
         xAxis: {
           type: 'category',
           boundaryGap: true,
-          data: this.chartData[0].map(formatDateLabel), // 显示为月-日格式
-          axisLine: {
-            lineStyle: {
-              color: '#999'
-            }
-          }
+          data: this.chartData[0].map(formatDateLabel),
+          axisLine: { lineStyle: { color: '#999' } }
         },
         yAxis: {
           type: 'value',
           name: '车辆数量',
-          axisLine: {
-            show: true
-          },
-          splitLine: {
-            lineStyle: {
-              type: 'dashed'
-            }
-          }
+          axisLine: { show: true },
+          splitLine: { lineStyle: { type: 'dashed' } }
         },
         series: [{
           name: '嫌疑车辆',
@@ -158,37 +120,19 @@ export default {
           data: this.chartData[1],
           symbol: 'circle',
           symbolSize: 8,
-          itemStyle: {
-            color: '#ff4d4f'
-          },
-          lineStyle: {
-            width: 3,
-            color: '#ff4d4f'
-          },
+          itemStyle: { color: '#ff4d4f' },
+          lineStyle: { width: 3, color: '#ff4d4f' },
           areaStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              {offset: 0, color: 'rgba(255, 77, 79, 0.5)'},
-              {offset: 1, color: 'rgba(255, 77, 79, 0.1)'}
+              { offset: 0, color: 'rgba(255, 77, 79, 0.5)' },
+              { offset: 1, color: 'rgba(255, 77, 79, 0.1)' }
             ])
           },
           markPoint: {
-            data: [
-              {type: 'max', name: '最大值'},
-              {type: 'min', name: '最小值'}
-            ]
+            data: [{ type: 'max', name: '最大值' }, { type: 'min', name: '最小值' }]
           }
         }]
       };
-
-      myChart.setOption(option);
-
-      // 响应式调整
-      const resizeHandler = () => myChart.resize();
-      window.addEventListener('resize', resizeHandler);
-      this.$once('hook:beforeDestroy', () => {
-        window.removeEventListener('resize', resizeHandler);
-        myChart.dispose();
-      });
     }
   }
 };
@@ -200,12 +144,10 @@ export default {
   height: 280px;
   position: relative;
 }
-
 .suspect-chart {
   width: 100%;
   height: 100%;
 }
-
 .loading-mask {
   position: absolute;
   top: 0;

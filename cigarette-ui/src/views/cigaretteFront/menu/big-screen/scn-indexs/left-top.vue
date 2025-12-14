@@ -1,268 +1,118 @@
 <template>
-  <div>
+  <div class="left-top-wrapper">   <!-- 唯一根节点 -->
     <!-- 时间范围选择按钮 -->
     <div class="channel-selector">
       <div
-        v-for="label in timeOptions"
-        :key="label.value"
+        v-for="item in timeOptions"
+        :key="item.value"
         class="channel-item"
-        :class="{ active: selectTimeType === label.value }"
-        @click="setTimeRange(label.value)"
+        :class="{ active: selectTimeType === item.value }"
+        @click="changeRange(item.value)"
       >
-        {{ label.label }}
+        {{ item.label }}
       </div>
     </div>
 
     <!-- 统计值列表 -->
     <ul class="user_Overview flex">
-      <li class="user_Overview-item" style="color: #00fdfa">
+      <li style="color:#00fdfa">
         <div class="user_Overview_nums allnum">
-          <dv-digital-flop :config="config" style="width:100%;height:100%;" />
+          <dv-digital-flop :config="configTotal" style="width:100%;height:100%"/>
         </div>
         <p>车辆总数</p>
       </li>
-      <li class="user_Overview-item" style="color: #07f7a8">
+      <li style="color:#07f7a8">
         <div class="user_Overview_nums online">
-          <dv-digital-flop :config="onlineconfig" style="width:100%;height:100%;" />
+          <dv-digital-flop :config="configNormal" style="width:100%;height:100%"/>
         </div>
         <p>正常车辆</p>
       </li>
-      <li class="user_Overview-item" style="color: #f5023d">
+      <li style="color:#f5023d">
         <div class="user_Overview_nums laramnum">
-          <dv-digital-flop :config="laramnumconfig" style="width:100%;height:100%;" />
+          <dv-digital-flop :config="configAlarm" style="width:100%;height:100%"/>
         </div>
         <p>嫌疑车辆</p>
       </li>
-      <li class="user_Overview-item" style="color: #e3b337">
+      <li style="color:#e3b337">
         <div class="user_Overview_nums offline">
-          <dv-digital-flop :config="offlineconfig" style="width:100%;height:100%;" />
+          <dv-digital-flop :config="configRatio" style="width:100%;height:100%"/>
         </div>
-        <p>嫌疑车辆占比</p>
+        <p>嫌疑占比</p>
       </li>
     </ul>
   </div>
 </template>
 
 <script>
-import { overIdList } from "@/api/cigarette/trafficData/trafficData"
-import { getSuspicionLevel } from "@/api/cigarette/caution/suspicion";
+import { getDaySliceCache } from '@/api/cigarette/cache/bigScreenCache'
 
 export default {
   data() {
     return {
-      level:null,
-      selectTimeType: 1, // 默认选择最近一天
-      selectedTime: '',
+      selectTimeType: 1,          // 1 本日  2 本周  3 本月
       timeOptions: [
-        {label: '最近一天', value: 1},
-        {label: '最近一月', value: 2},
-        {label: '最近一星期', value: 3}
+        { label: '本日', value: 1 },
+        { label: '本周', value: 2 },
+        { label: '本月', value: 3 }
       ],
-      allData: [],
-      vehicleBehaviorList: [],
-      queryParams: {
-        id: null,
-        captureTime: null
-      },
-      config: {
-        number: [0],
-        content: '{nt}',
-        style: {fontSize: 24, fill: "#00fdfa"}
-      },
-      onlineconfig: {
-        number: [0],
-        content: '{nt}',
-        style: {fontSize: 24, fill: "#07f7a8"}
-      },
-      offlineconfig: {
-        number: [0],
-        content: '{nt}%',
-        style: {fontSize: 24, fill: "#e3b337"}
-      },
-      laramnumconfig: {
-        number: [0],
-        content: '{nt}',
-        style: {fontSize: 24, fill: "#f5023d"}
-      },
-      refreshTimer: null,
-      refreshInterval: 2000,
+      raw: {},                    // 接口返回的原始对象
+      timer: null,                // 5秒定时器
+      // 四个翻牌器配置
+      configTotal:  { number:[0], content:'{nt}', style:{fontSize:24,fill:'#00fdfa'}},
+      configNormal: { number:[0], content:'{nt}', style:{fontSize:24,fill:'#07f7a8'}},
+      configAlarm:  { number:[0], content:'{nt}', style:{fontSize:24,fill:'#f5023d'}},
+      configRatio:  { number:[0], content:'{nt}%',style:{fontSize:24,fill:'#e3b337'}}
     }
   },
   created() {
-    this.initData();
+    this.load()          // 首次
+    this.timer = setInterval(this.load, 5_000)
   },
   beforeDestroy() {
-    clearInterval(this.refreshTimer);
+    clearInterval(this.timer)
   },
   methods: {
-    initData() {
-      this.calculateTime(this.selectTimeType);
-      clearInterval(this.refreshTimer);
-      this.getInitialData();
+    async load() {
+      this.raw = await getDaySliceCache()
+      if (this.raw) this.calc()
     },
+    calc() {
+      const r = this.raw
+      let total = 0, alarm = 0
 
-    async getInitialData() {
-      try {
-        // 首先获取嫌疑程度标准线
-        const currentLevel = await getSuspicionLevel();
-        this.level = currentLevel.data;
-        this.queryParams.captureTime = this.selectedTime;
-
-        const response = await overIdList(this.queryParams);
-
-        if (response && response.length > 0) {
-          this.allData = response;
-          this.queryParams.id = response[response.length - 1].id;
-          this.processData();
-          this.startAutoRefresh();
-        } else {
-          this.setDefaultData();
-          this.startAutoRefresh();
-        }
-      } catch (error) {
-        console.error("获取数据失败:", error);
-        this.setDefaultData();
-      }
-    },
-
-
-    startAutoRefresh() {
-      clearInterval(this.refreshTimer);
-      this.refreshTimer = setInterval(() => {
-        console.log('自动刷新数据...');
-        this.getNewData();
-      }, this.refreshInterval);
-    },
-
-    async getNewData() {
-      try {
-        if (!this.queryParams.id) {
-          console.warn('缺少必要参数，终止轮询');
-          return;
-        }
-
-        this.queryParams.captureTime=this.selectedTime // 必须带上相同时间范围
-
-
-        const response = await overIdList(this.queryParams);
-
-        if (response && response.length > 0) {
-          console.log('!@!@response',response)
-          this.queryParams.id = response[response.length - 1].id;
-          // 确保不超过数据限制
-          this.allData = [...this.allData, ...response];
-          this.processData();
-        } else {
-          console.log('没有获取到新数据');
-        }
-      } catch (error) {
-        console.error("获取新增数据失败:", error);
-      }
-    },
-
-    processData() {
-      let alarmCount = 0;
-      let normalCount = 0;
-
-      this.allData.forEach(item => {
-        const suspicion = Number(item.level) || 0;
-        // 使用从后端获取的level作为判断标准
-        if (suspicion >= this.level) {  // 修改为大于等于阈值
-          alarmCount++;
-        } else {
-          normalCount++;
-        }
-      });
-
-      this.vehicleBehaviorList = [{
-        totalNum: this.allData.length,
-        onlineNum: normalCount,
-        alarmNum: alarmCount
-      }];
-
-      this.updateCharts();
-    },
-
-    updateCharts() {
-      const data = this.vehicleBehaviorList[0] || {
-        totalNum: 0,
-        onlineNum: 0,
-        alarmNum: 0
-      };
-
-      // 使用Vue.set或创建新对象确保响应式更新
-      this.config = {
-        ...this.config,
-        number: [data.totalNum]
-      };
-      this.onlineconfig = {
-        ...this.onlineconfig,
-        number: [data.onlineNum]
-      };
-      this.laramnumconfig = {
-        ...this.laramnumconfig,
-        number: [data.alarmNum]
-      };
-
-      const alarmRatio = data.totalNum > 0
-        ? Math.round((data.alarmNum / data.totalNum) * 100)
-        : 0;
-      this.offlineconfig = {
-        ...this.offlineconfig,
-        number: [alarmRatio]
-      };
-    },
-
-    setDefaultData() {
-      this.allData = [];
-      this.vehicleBehaviorList = [{
-        totalNum: 0,
-        onlineNum: 0,
-        alarmNum: 0
-      }];
-      this.updateCharts();
-    },
-
-    setTimeRange(range) {
-      if (this.selectTimeType === range) return;
-
-      this.selectTimeType = range;
-      this.initData();
-    },
-
-    calculateTime(range) {
-      const now = new Date();
-      let startTime = new Date();
-
-      switch (range) {
-        case 1:
-          startTime.setDate(now.getDate() - 1);
-          break;
-        case 2:
-          startTime.setMonth(now.getMonth() - 1);
-          break;
-        case 3:
-          startTime.setDate(now.getDate() - 7);
-          break;
-        default:
-          startTime.setDate(now.getDate() - 1);
+      switch (this.selectTimeType) {
+        case 1:               // 本日
+          total = r.d0
+          alarm = r.suspectD0
+          break
+        case 2:               // 本周  d0~d6
+          total = r.d0 + r.d1 + r.d2 + r.d3 + r.d4 + r.d5 + r.d6
+          alarm = r.suspectD0 + r.suspectD1 + r.suspectD2 + r.suspectD3 +
+            r.suspectD4 + r.suspectD5 + r.suspectD6
+          break
+        case 3:               // 本月
+          total = r.monthCurr
+          alarm = r.suspectMonthCurr
+          break
       }
 
-      startTime.setHours(0, 0, 0, 0);
-      this.selectedTime = this.formatDate(startTime);
-      this.queryParams.id = null; // 重置ID
-      console.log('计算后的时间范围:', this.selectedTime);
-    },
+      const normal = total - alarm
+      const ratio  = total ? Math.round((alarm / total) * 100) : 0
 
-    formatDate(date) {
-      if (!(date instanceof Date)) {
-        date = new Date(date);
-      }
-      const pad = n => n.toString().padStart(2, '0');
-      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}.00`;
+      // 触发翻牌器响应式更新
+      this.configTotal  = { ...this.configTotal,  number: [total] }
+      this.configNormal = { ...this.configNormal, number: [normal] }
+      this.configAlarm  = { ...this.configAlarm,  number: [alarm] }
+      this.configRatio  = { ...this.configRatio,  number: [ratio] }
     },
+    changeRange(val) {
+      this.selectTimeType = val   // 切换模式
+      if (this.raw && this.raw.d0 !== undefined) {
+        this.calc()              // 立刻用当前缓存重算
+      }
+    }
   }
-};
+}
 </script>
 
 <style lang='scss' scoped>
