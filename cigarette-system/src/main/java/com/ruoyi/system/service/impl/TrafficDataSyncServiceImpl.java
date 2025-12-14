@@ -1,8 +1,10 @@
 package com.ruoyi.system.service.impl;
 
+import com.ruoyi.system.domain.TobSuspicionLevel;
 import com.ruoyi.system.domain.TrafficData;
 import com.ruoyi.system.domain.cache.*;
 import com.ruoyi.system.mapper.TobCacheMapper;
+import com.ruoyi.system.mapper.TobSuspicionLevelMapper;
 import com.ruoyi.system.mapper.TrafficDataMapper;
 import com.ruoyi.system.service.TrafficDataSyncService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,9 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
     private TrafficDataMapper trafficDataMapper;
     @Autowired
     private TobCacheMapper cacheMapper;
+    @Autowired
+    private TobSuspicionLevelMapper tobSuspicionLevelMapper;
+
 
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -37,6 +42,9 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
                 (slice == null ? "null" : slice.getMaxTrafficId()));
         waterMark = slice == null || slice.getMaxTrafficId() == null
                 ? 0L : slice.getMaxTrafficId();
+        if (tobSuspicionLevelMapper.selectSuspicionLevel() == null) {
+            tobSuspicionLevelMapper.insertSuspicionLevel(0.0); // 默认 0 全放行，也可写 0.7
+        }
     }
 
     @Override
@@ -47,16 +55,24 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
 
         long batchMaxId = waterMark;
         String nowYM = sdf.format(new Date()).substring(0, 7); // 循环外只算一次
+//        Double curLevel = tobSuspicionLevelMapper.selectSuspicionLevel().getLevel();
+        // 原来直接 .getLevel()
+        double curLevel = 0.0;
+        TobSuspicionLevel po = tobSuspicionLevelMapper.selectSuspicionLevel();
+        if (po != null && po.getLevel() != null) {
+            curLevel = po.getLevel();
+        }
+        System.out.println("【当前嫌疑阈值】" + curLevel);
         for (TrafficData t : news) {
             batchMaxId = Math.max(batchMaxId, t.getId());
 
-            TobCacheCamera camera = buildCamera(t);
-            TobCacheDaynight dayN = buildDaynight(t);
-            TobCacheDaySlice slice = buildDaySlice(t, batchMaxId, nowYM);
-            TobCacheHour hour = buildHour(t);
-            TobCacheSeason season = buildSeason(t);
-            TobCacheVehicleColor color = buildColor(t);
-            TobCacheVehicleType type = buildType(t);
+            TobCacheCamera camera = buildCamera(t, curLevel);
+            TobCacheDaynight dayN = buildDaynight(t, curLevel);
+            TobCacheDaySlice slice = buildDaySlice(t, batchMaxId, nowYM, curLevel);
+            TobCacheHour hour = buildHour(t, curLevel);
+            TobCacheSeason season = buildSeason(t, curLevel);
+            TobCacheVehicleColor color = buildColor(t, curLevel);
+            TobCacheVehicleType type = buildType(t, curLevel);
 
             cacheMapper.incCamera(camera);
             cacheMapper.incDaynight(dayN);
@@ -71,16 +87,19 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
 
     /* ------------------- 构建：每条数据 new 一个新对象 ------------------- */
 
-    private TobCacheCamera buildCamera(TrafficData t) {
+    private TobCacheCamera buildCamera(TrafficData t, double level) {
         TobCacheCamera c = new TobCacheCamera();
+        /* 不达标直接返回 */
+        if (t.getLevel() == null || t.getLevel() < level) {
+            return c;          // 全是 null，不加任何计数
+        }
+
         String name = t.getCameraName();
-        if (name == null) {          // 库 NULL
+        if (name == null) {
             c.setOther(1L);
             return c;
         }
-        name = name.trim();          // 去空格
-
-        // 完全相等匹配（大小写随意）
+        name = name.trim();
         switch (name) {
             case "板桥镇326国道中国石化加油站旁卡口":
                 c.setBanqiao326Gas(1L);
@@ -101,20 +120,24 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
                 c.setLuopingAgang(1L);
                 break;
             default:
-                c.setOther(1L);   // 任何未列出卡口
+                c.setOther(1L);
                 break;
         }
         return c;
     }
 
-    private TobCacheDaynight buildDaynight(TrafficData t) {
+    private TobCacheDaynight buildDaynight(TrafficData t, double level) {
         TobCacheDaynight n = new TobCacheDaynight();
+        if (t.getLevel() == null || t.getLevel() < level) {
+            return n;          // 全是 null，不加任何计数
+        }
         int h = hourOf(t.getCaptureTime());
         if (h >= 6 && h < 18) n.setDayNum(1L);
         else n.setNightNum(1L);
         return n;
     }
-//
+
+    //
 //        private TobCacheDaySlice buildDaySlice(TrafficData t, long currId) {
 //        TobCacheDaySlice s = new TobCacheDaySlice();
 //        // 无论数据是哪天的，业务只负责「今天」这一笔
@@ -123,53 +146,88 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
 //        s.setMaxTrafficId(currId);
 //        return s;
 //    }
-    private TobCacheDaySlice buildDaySlice(TrafficData t, long currId,String nowYM) {
+    private TobCacheDaySlice buildDaySlice(TrafficData t, long currId, String nowYM, double level) {
         TobCacheDaySlice s = new TobCacheDaySlice();
         int days = daysBeforeToday(t.getCaptureTime());
-        //超过七天的就扔了
-        if (days < 0) {
-            if (t.getCaptureTime().substring(0, 7).equals(nowYM)) {
-                s.setMonthCurr(1L);
+
+        /* ① 先写普通计数（不论嫌疑） */
+        if (days >= 0 && days <= 7) {
+            switch (days) {
+                case 0:
+                    s.setD0(1L);
+                    break;
+                case 1:
+                    s.setD1(1L);
+                    break;
+                case 2:
+                    s.setD2(1L);
+                    break;
+                case 3:
+                    s.setD3(1L);
+                    break;
+                case 4:
+                    s.setD4(1L);
+                    break;
+                case 5:
+                    s.setD5(1L);
+                    break;
+                case 6:
+                    s.setD6(1L);
+                    break;
+                case 7:
+                    s.setD7(1L);
+                    break;
             }
-            s.setMaxTrafficId(currId);
-            return s;                      // 不写任何 dₙ
-        }
-        // 写对应列
-        switch (days) {
-            case 0:
-                s.setD0(1L);
-                break;
-            case 1:
-                s.setD1(1L);
-                break;
-            case 2:
-                s.setD2(1L);
-                break;
-            case 3:
-                s.setD3(1L);
-                break;
-            case 4:
-                s.setD4(1L);
-                break;
-            case 5:
-                s.setD5(1L);
-                break;
-            case 6:
-                s.setD6(1L);
-                break;
-            case 7:
-                s.setD7(1L);
-                break;
         }
         if (t.getCaptureTime().substring(0, 7).equals(nowYM)) {
             s.setMonthCurr(1L);
         }
+
+        /* ② 再补嫌疑计数（仅当达标） */
+        boolean sus = t.getLevel() != null && t.getLevel() >= level;
+        if (sus) {
+            if (days >= 0 && days <= 7) {
+                switch (days) {
+                    case 0:
+                        s.setSuspectD0(1L);
+                        break;
+                    case 1:
+                        s.setSuspectD1(1L);
+                        break;
+                    case 2:
+                        s.setSuspectD2(1L);
+                        break;
+                    case 3:
+                        s.setSuspectD3(1L);
+                        break;
+                    case 4:
+                        s.setSuspectD4(1L);
+                        break;
+                    case 5:
+                        s.setSuspectD5(1L);
+                        break;
+                    case 6:
+                        s.setSuspectD6(1L);
+                        break;
+                    case 7:
+                        s.setSuspectD7(1L);
+                        break;
+                }
+            }
+            if (t.getCaptureTime().substring(0, 7).equals(nowYM)) {
+                s.setSuspectMonthCurr(1L);
+            }
+        }
+
         s.setMaxTrafficId(currId);
         return s;
     }
 
-    private TobCacheHour buildHour(TrafficData t) {
+    private TobCacheHour buildHour(TrafficData t, double level) {
         TobCacheHour h = new TobCacheHour();
+        if (t.getLevel() == null || t.getLevel() < level) {
+            return h;          // 全是 null，不加任何计数
+        }
         int hour = hourOf(t.getCaptureTime());
         switch (hour) {
             case 0:
@@ -250,8 +308,11 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
         return h;
     }
 
-    private TobCacheSeason buildSeason(TrafficData t) {
+    private TobCacheSeason buildSeason(TrafficData t, double level) {
         TobCacheSeason s = new TobCacheSeason();
+        if (t.getLevel() == null || t.getLevel() < level) {
+            return s;          // 全是 null，不加任何计数
+        }
         int m = monthOf(t.getCaptureTime());
         if (m >= 3 && m <= 5) {
             s.setSpring(1L);
@@ -265,8 +326,11 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
         return s;
     }
 
-    private TobCacheVehicleColor buildColor(TrafficData t) {
+    private TobCacheVehicleColor buildColor(TrafficData t, double level) {
         TobCacheVehicleColor c = new TobCacheVehicleColor();
+        if (t.getLevel() == null || t.getLevel() < level) {
+            return c;          // 全是 null，不加任何计数
+        }
         String v = t.getVehicleColor();
         if (v == null) {
             c.setOtherC(1L);
@@ -299,8 +363,11 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
         return c;
     }
 
-    private TobCacheVehicleType buildType(TrafficData t) {
+    private TobCacheVehicleType buildType(TrafficData t, double level) {
         TobCacheVehicleType v = new TobCacheVehicleType();
+        if (t.getLevel() == null || t.getLevel() < level) {
+            return v;          // 全是 null，不加任何计数
+        }
         String type = t.getVehicleType();
         if (type == null) {
             v.setOther(1L);

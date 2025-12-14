@@ -20,6 +20,15 @@
             <if test="d6 != null">d6 = d6 + 1,</if>
             <if test="d7 != null">d7 = d7 + 1,</if>
             <if test="monthCurr != null">month_curr = month_curr + 1,</if>
+            <if test="suspectD0 != null">suspect_d0 = suspect_d0 + 1,</if>
+            <if test="suspectD1 != null">suspect_d1 = suspect_d1 + 1,</if>
+            <if test="suspectD2 != null">suspect_d2 = suspect_d2 + 1,</if>
+            <if test="suspectD3 != null">suspect_d3 = suspect_d3 + 1,</if>
+            <if test="suspectD4 != null">suspect_d4 = suspect_d4 + 1,</if>
+            <if test="suspectD5 != null">suspect_d5 = suspect_d5 + 1,</if>
+            <if test="suspectD6 != null">suspect_d6 = suspect_d6 + 1,</if>
+            <if test="suspectD7 != null">suspect_d7 = suspect_d7 + 1,</if>
+            <if test="suspectMonthCurr != null">suspect_month_curr = suspect_month_curr + 1,</if>
             <if test="maxTrafficId != null">max_traffic_id = #{maxTrafficId},</if>
             update_time = NOW()
         </set>
@@ -35,14 +44,23 @@
             d3 = d2,
             d2 = d1,
             d1 = d0,
-            d0 = 0
+            d0 = 0,
+            suspect_d7 = suspect_d6,
+            suspect_d6 = suspect_d5,
+            suspect_d5 = suspect_d4,
+            suspect_d4 = suspect_d3,
+            suspect_d3 = suspect_d2,
+            suspect_d2 = suspect_d1,
+            suspect_d1 = suspect_d0,
+            suspect_d0 = 0
         WHERE id = 1
     </update>
 
     <!-- 每月 1 号 00:00:00 执行：只清月累加器 -->
     <update id="monthReset">
         UPDATE tob_cache_day_slice
-        SET month_curr = 0
+        SET month_curr = 0,
+            suspect_month_curr=0
         WHERE id = 1
     </update>
 

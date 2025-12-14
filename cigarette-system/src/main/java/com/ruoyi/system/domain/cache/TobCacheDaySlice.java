@@ -16,6 +16,16 @@ public class TobCacheDaySlice {
     private Long d6;
     private Long d7;
     private Long monthCurr;
+    private Long suspectD0;
+    private Long suspectD1;
+    private Long suspectD2;
+    private Long suspectD3;
+    private Long suspectD4;
+    private Long suspectD5;
+    private Long suspectD6;
+    private Long suspectD7;
+    private Long suspectMonthCurr;
     private Long maxTrafficId;
     private Date updateTime;
+
 }
