@@ -7,6 +7,6 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-public interface SuspectVehicleQueryMapper {
+public interface TobSuspectVehicleQueryMapper {
     List<ToVehicleRealTimMonitoring> selectSuspectVehicleList(@Param("query") TobSuspectVehicleQueryVO query);
 }
