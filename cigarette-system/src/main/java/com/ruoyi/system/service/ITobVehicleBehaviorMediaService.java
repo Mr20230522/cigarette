@@ -3,7 +3,7 @@ package com.ruoyi.system.service;
 import com.ruoyi.system.domain.vo.ToVehicleBehaviorMediaVo;
 
 
-public interface IToVehicleBehaviorMediaService {
+public interface ITobVehicleBehaviorMediaService {
 
         /**
          * 获取车辆行为关联的媒体文件信息

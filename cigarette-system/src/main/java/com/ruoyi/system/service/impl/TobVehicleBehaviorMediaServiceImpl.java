@@ -2,12 +2,12 @@ package com.ruoyi.system.service.impl;
 
 import com.ruoyi.system.domain.vo.ToVehicleBehaviorMediaVo;
 import com.ruoyi.system.mapper.ToVehicleBehaviorMediaMapper;
-import com.ruoyi.system.service.IToVehicleBehaviorMediaService;
+import com.ruoyi.system.service.ITobVehicleBehaviorMediaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ToVehicleBehaviorMediaServiceImpl implements IToVehicleBehaviorMediaService {
+public class TobVehicleBehaviorMediaServiceImpl implements ITobVehicleBehaviorMediaService {
     @Autowired
     private ToVehicleBehaviorMediaMapper VehicleBehaviorMediaMapper;
     @Override

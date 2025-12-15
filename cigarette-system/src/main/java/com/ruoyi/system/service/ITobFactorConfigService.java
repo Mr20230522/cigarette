@@ -4,7 +4,7 @@ package com.ruoyi.system.service;
 import com.ruoyi.system.domain.ToFactorConfig;
 import java.util.List;
 
-public interface IToFactorConfigService {
+public interface ITobFactorConfigService {
     List<ToFactorConfig> selectFactorConfigList(ToFactorConfig filter);
     ToFactorConfig selectFactorConfigById(Long id);
     int insertFactorConfig(ToFactorConfig factorConfig);

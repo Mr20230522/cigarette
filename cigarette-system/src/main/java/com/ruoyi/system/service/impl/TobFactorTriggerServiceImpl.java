@@ -3,14 +3,14 @@ package com.ruoyi.system.service.impl;
 
 import com.ruoyi.system.domain.ToFactorTrigger;
 import com.ruoyi.system.mapper.ToFactorTriggerMapper;
-import com.ruoyi.system.service.IToFactorTriggerService;
+import com.ruoyi.system.service.ITobFactorTriggerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class ToFactorTriggerServiceImpl implements IToFactorTriggerService {
+public class TobFactorTriggerServiceImpl implements ITobFactorTriggerService {
 
     @Autowired
     private ToFactorTriggerMapper factorTriggerMapper;
