@@ -135,28 +135,31 @@ export default {
     },
 
     /* 生成 ECharts 配置 */
+    /* 生成 ECharts 配置（总数字号随位数线性缩小） */
     buildOption() {
-      const obj = this.rawObj
-      const map = DISPLAY_NAME[this.activeType] || {}
-      let list = []
+      const obj  = this.rawObj
+      const map  = DISPLAY_NAME[this.activeType] || {}
+      let list   = []
 
       if (this.activeType === 'hours') {
         // 小时：h00~h23
         for (let i = 0; i < 24; i++) {
           const key = 'h' + String(i).padStart(2, '0')
-          list.push({name: `${i}:00`, value: obj[key] || 0})
+          list.push({ name: `${i}:00`, value: obj[key] || 0 })
         }
       } else {
         // 其余维度
         list = Object.entries(obj)
           .filter(([k]) => !['id', 'timeType', 'updateTime'].includes(k))
           .map(([k, v]) => ({
-            name: map[k] || k,   // 命中中文用中文
+            name: map[k] || k,   // 中文映射
             value: v || 0
           }))
       }
 
-      const total = list.reduce((s, o) => s + o.value, 0)
+      const total  = list.reduce((s, o) => s + o.value, 0)
+      const digit  = String(total).length
+      const titleFs = Math.max(12, 32 - digit * 2) // 每多1位减2px，最小12px
 
       this.options = {
         title: {
@@ -165,8 +168,13 @@ export default {
           left: 'center',
           textStyle: {
             rich: {
-              value: {color: '#fff', fontSize: 24, fontWeight: 'bold', lineHeight: 20},
-              name: {color: '#fff', lineHeight: 20}
+              value: {
+                color: '#fff',
+                fontSize: titleFs, // ← 动态字号
+                fontWeight: 'bold',
+                lineHeight: 20
+              },
+              name: { color: '#fff', lineHeight: 20 }
             }
           }
         },
@@ -183,11 +191,11 @@ export default {
           data: list.map((o, i) => ({
             name: o.name,
             value: o.value,
-            itemStyle: {color: COLOR_PALETTE[i % COLOR_PALETTE.length]}
+            itemStyle: { color: COLOR_PALETTE[i % COLOR_PALETTE.length] }
           })),
-          label: {show: false},
+          label: { show: false },
           emphasis: {
-            itemStyle: {shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0,0,0,.5)'}
+            itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0,0,0,.5)' }
           }
         }]
       }

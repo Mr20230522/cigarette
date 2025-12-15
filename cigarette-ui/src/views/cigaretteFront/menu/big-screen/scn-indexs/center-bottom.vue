@@ -335,11 +335,11 @@ export default {
 </style>
 
 <style>
-/* 全局样式，用于时间选择器的透明背景 */
+/* 修改日期选择器弹窗的样式 */
 .transparent-datepicker {
-  background-color: rgba(0, 0, 0, 0.7) !important;
-  border: 1px solid rgba(0, 114, 255, 0.3) !important;
-  color: #fff !important;
+  background-color: rgba(0, 20, 40, 0.98) !important;
+  border: 1px solid rgba(0, 150, 255, 0.6) !important;
+  color: #e0f7ff !important;
 }
 
 .transparent-datepicker .el-picker-panel__body-wrapper,
@@ -347,24 +347,140 @@ export default {
   background-color: transparent !important;
 }
 
+/* 时间选择面板 */
 .transparent-datepicker .el-time-panel {
-  background-color: rgba(0, 0, 0, 0.7) !important;
-  border: 1px solid rgba(0, 114, 255, 0.3) !important;
+  background-color: rgba(0, 20, 40, 0.98) !important;
+  border: 1px solid rgba(0, 150, 255, 0.6) !important;
 }
 
+/* 表头文本颜色 */
 .transparent-datepicker .el-date-table th {
-  color: rgba(255, 255, 255, 0.6) !important;
+  color: #a0d2ff !important;
 }
 
-.transparent-datepicker .el-date-table td.current:not(.disabled) span {
-  background-color: rgba(0, 114, 255, 0.5) !important;
+/* 不能选择的日期（禁用状态） */
+.transparent-datepicker .el-date-table td.disabled div,
+.transparent-datepicker .el-date-table td.disabled span {
+  color: rgba(255, 255, 255, 0.3) !important;
+  background-color: transparent !important;
+  cursor: not-allowed !important;
 }
 
+/* 不能选择的日期背景 */
+.transparent-datepicker .el-date-table td.disabled {
+  background-color: rgba(100, 100, 100, 0.1) !important;
+}
+
+/* 当前日期（今天） */
 .transparent-datepicker .el-date-table td.today span {
   color: #00eaff !important;
+  font-weight: bold;
 }
 
+/* 当前选中日期 */
+.transparent-datepicker .el-date-table td.current:not(.disabled) span {
+  background-color: rgba(0, 150, 255, 0.7) !important;
+  color: #fff !important;
+}
+
+/* 在范围内的日期 */
+.transparent-datepicker .el-date-table td.in-range div,
+.transparent-datepicker .el-date-table td.in-range div:hover,
+.transparent-datepicker .el-date-table.is-week-mode .el-date-table__row.current div {
+  background-color: rgba(0, 100, 200, 0.3) !important;
+}
+
+/* 开始和结束日期 */
+.transparent-datepicker .el-date-table td.end-date span,
+.transparent-datepicker .el-date-table td.start-date span {
+  background-color: rgba(0, 150, 255, 0.8) !important;
+  color: #fff !important;
+}
+
+/* 可用的日期悬停效果 */
+.transparent-datepicker .el-date-table td.available:hover {
+  background-color: rgba(0, 150, 255, 0.2) !important;
+}
+
+/* 时间选择器的项目 */
 .transparent-datepicker .el-time-spinner__item.active:not(.disabled) {
   color: #00eaff !important;
+}
+
+/* 时间选择器项目悬停 */
+.transparent-datepicker .el-time-spinner__item:hover:not(.disabled):not(.active) {
+  background: rgba(0, 150, 255, 0.2) !important;
+  color: #a0d2ff !important;
+}
+
+/* 按钮统一颜色 */
+.transparent-datepicker .el-button,
+.transparent-datepicker .el-picker-panel__icon-btn,
+.transparent-datepicker .el-date-picker__header-label,
+.transparent-datepicker .el-time-panel__header,
+.transparent-datepicker .el-time-panel__content::before {
+  color: #a0d2ff !important;
+}
+
+/* 按钮悬停 */
+.transparent-datepicker .el-button:hover,
+.transparent-datepicker .el-picker-panel__icon-btn:hover {
+  color: #00eaff !important;
+}
+
+/* 确定按钮和此刻按钮 */
+.transparent-datepicker .el-picker-panel__footer .el-button--text,
+.transparent-datepicker .el-picker-panel__footer .el-button--default {
+  color: #a0d2ff !important;
+  background-color: transparent !important;
+  border-color: rgba(0, 150, 255, 0.5) !important;
+}
+
+/* 确定/此刻按钮悬停 */
+.transparent-datepicker .el-picker-panel__footer .el-button--text:hover,
+.transparent-datepicker .el-picker-panel__footer .el-button--default:hover {
+  color: #00eaff !important;
+  background-color: rgba(0, 150, 255, 0.1) !important;
+  border-color: rgba(0, 150, 255, 0.8) !important;
+}
+
+/* 日期选择器底部边框 */
+.transparent-datepicker .el-picker-panel__footer {
+  border-top: 1px solid rgba(0, 150, 255, 0.3) !important;
+  background-color: rgba(0, 10, 25, 0.8) !important;
+}
+
+/* 月份/年份选择器 */
+.transparent-datepicker .el-year-table td .cell,
+.transparent-datepicker .el-month-table td .cell {
+  color: #e0f7ff !important;
+}
+
+.transparent-datepicker .el-year-table td.current:not(.disabled) .cell,
+.transparent-datepicker .el-month-table td.current:not(.disabled) .cell {
+  color: #00eaff !important;
+  background-color: rgba(0, 150, 255, 0.2) !important;
+}
+
+/* 禁用状态的年份/月份 */
+.transparent-datepicker .el-year-table td.disabled .cell,
+.transparent-datepicker .el-month-table td.disabled .cell {
+  color: rgba(255, 255, 255, 0.3) !important;
+  background-color: transparent !important;
+}
+
+/* 下拉箭头图标 */
+.transparent-datepicker .el-icon-arrow-left:before,
+.transparent-datepicker .el-icon-arrow-right:before,
+.transparent-datepicker .el-icon-d-arrow-left:before,
+.transparent-datepicker .el-icon-d-arrow-right:before {
+  color: #a0d2ff !important;
+}
+
+/* 日期范围分隔线 */
+.transparent-datepicker .el-date-range-picker__time-header,
+.transparent-datepicker .el-date-range-picker__time-header .el-icon-arrow-right {
+  color: #a0d2ff !important;
+  border-color: rgba(0, 150, 255, 0.3) !important;
 }
 </style>

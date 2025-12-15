@@ -4,7 +4,7 @@
       <li
         class="right_center_item"
         v-for="(item, i) in visibleList"
-        :key="item.id || i"
+        :key="i"
         :class="{ 'show': item.show }"
         @click="handleItemClick(item)"
       >
@@ -303,7 +303,7 @@ export default {
     },
     handleWheel(event) {
       const container = this.$refs.scrollContainer;
-
+      if (!container) return;
       // 向下滚动且接近底部时加载更多
       if (event.deltaY > 0 &&
         container.scrollTop + container.clientHeight >= container.scrollHeight - 50) {

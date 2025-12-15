@@ -99,17 +99,22 @@ export default {
       const normal = total - alarm
       const ratio  = total ? Math.round((alarm / total) * 100) : 0
 
-      // 触发翻牌器响应式更新
-      this.configTotal  = { ...this.configTotal,  number: [total] }
-      this.configNormal = { ...this.configNormal, number: [normal] }
-      this.configAlarm  = { ...this.configAlarm,  number: [alarm] }
-      this.configRatio  = { ...this.configRatio,  number: [ratio] }
+      /* ===== 自适应字号：位数越多字越小 ===== */
+      const digit  = String(total).length          // 总位数
+      const fontSz = Math.max(8, 24 - digit * 2)  // 每多1位减2px，最小8px（原来是10px）
+
+      console.log(`位数: ${digit}, 字体: ${fontSz}px, 总数: ${total}`)
+
+      /* 翻牌器配置（带动态字号） */
+      this.configTotal  = { ...this.configTotal,  number: [total], style: { fontSize: fontSz, fill: '#00fdfa' } }
+      this.configNormal = { ...this.configNormal, number: [normal], style: { fontSize: fontSz, fill: '#07f7a8' } }
+      this.configAlarm  = { ...this.configAlarm,  number: [alarm],  style: { fontSize: fontSz, fill: '#f5023d' } }
+      this.configRatio  = { ...this.configRatio,  number: [ratio],  style: { fontSize: fontSz, fill: '#e3b337' } }
     },
+
     changeRange(val) {
-      this.selectTimeType = val   // 切换模式
-      if (this.raw && this.raw.d0 !== undefined) {
-        this.calc()              // 立刻用当前缓存重算
-      }
+      this.selectTimeType = val
+      if (this.raw && this.raw.d0 !== undefined) this.calc()
     }
   }
 }
