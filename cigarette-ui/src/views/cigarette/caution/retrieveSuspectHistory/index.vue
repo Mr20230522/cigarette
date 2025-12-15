@@ -272,7 +272,7 @@ export default {
 
     // 查看图片
     viewImage(row) {
-      row = this.list;
+      //row = this.list;
       if (!row.picUrl) {
         this.$message.warning("无抓拍图片");
         return;
