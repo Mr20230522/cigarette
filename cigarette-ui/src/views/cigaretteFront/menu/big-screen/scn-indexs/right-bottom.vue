@@ -206,6 +206,7 @@ export default {
             : this.getDefaultImage()
         }))
         console.log('【fetchTableData】表格数据已更新，条数：', this.filteredVehicles.length)
+        console.log('【fetchTableData】：', this.filteredVehicles)
       } else {
         this.filteredVehicles = []
         this.total = 0
