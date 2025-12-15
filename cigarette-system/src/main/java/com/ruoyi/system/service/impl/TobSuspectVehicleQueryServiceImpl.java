@@ -1,7 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import com.ruoyi.system.domain.ToVehicleRealTimMonitoring;
-import com.ruoyi.system.domain.vo.SuspectVehicleQueryVO;
+import com.ruoyi.system.domain.vo.TobSuspectVehicleQueryVO;
 import com.ruoyi.system.mapper.SuspectVehicleQueryMapper;
 import com.ruoyi.system.service.ITobSuspectVehicleQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ public class TobSuspectVehicleQueryServiceImpl implements ITobSuspectVehicleQuer
     private SuspectVehicleQueryMapper suspectVehicleQueryMapper;
 
     @Override
-    public List<ToVehicleRealTimMonitoring> selectSuspectVehicleList(SuspectVehicleQueryVO query) {
+    public List<ToVehicleRealTimMonitoring> selectSuspectVehicleList(TobSuspectVehicleQueryVO query) {
         return suspectVehicleQueryMapper.selectSuspectVehicleList(query);
     }
 }

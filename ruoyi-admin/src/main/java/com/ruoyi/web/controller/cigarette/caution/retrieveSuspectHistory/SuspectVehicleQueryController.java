@@ -7,8 +7,8 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.bean.BeanUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.ToVehicleRealTimMonitoring;
-import com.ruoyi.system.domain.vo.SuspectVehicleExportVO;
-import com.ruoyi.system.domain.vo.SuspectVehicleQueryVO;
+import com.ruoyi.system.domain.vo.TobSuspectVehicleExportVO;
+import com.ruoyi.system.domain.vo.TobSuspectVehicleQueryVO;
 import com.ruoyi.system.service.ITobSuspectVehicleQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +29,7 @@ public class SuspectVehicleQueryController extends BaseController {
 
     @Log(title = "嫌疑车辆查询", businessType = BusinessType.OTHER)
     @GetMapping("/list")
-    public TableDataInfo list(SuspectVehicleQueryVO vo) {
+    public TableDataInfo list(TobSuspectVehicleQueryVO vo) {
         // System.out.println("startTime: " + vo.getStartTime());
         // System.out.println("endTime: " + vo.getEndTime());
         // 启动分页（自动读取 pageNum / pageSize）
@@ -47,13 +47,13 @@ public class SuspectVehicleQueryController extends BaseController {
      */
     @Log(title = "嫌疑车辆导出", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
-    public void exportData(HttpServletResponse response, SuspectVehicleQueryVO queryVO) throws IOException {
+    public void exportData(HttpServletResponse response, TobSuspectVehicleQueryVO queryVO) throws IOException {
         // 1. 查询数据（不分页）
         List<ToVehicleRealTimMonitoring> list = suspectVehicleQueryService.selectSuspectVehicleList(queryVO);
 
         // 2. 转换为导出对象
-        List<SuspectVehicleExportVO> exportList = list.stream().map(entity -> {
-            SuspectVehicleExportVO vo = new SuspectVehicleExportVO();
+        List<TobSuspectVehicleExportVO> exportList = list.stream().map(entity -> {
+            TobSuspectVehicleExportVO vo = new TobSuspectVehicleExportVO();
             BeanUtils.copyProperties(entity, vo); // 自动复制同名属性
             return vo;
         }).collect(Collectors.toList());
@@ -65,7 +65,7 @@ public class SuspectVehicleQueryController extends BaseController {
         response.setHeader("Content-disposition", "attachment;filename=" + fileName);
 
         // 4. 导出Excel
-        ExcelUtil<SuspectVehicleExportVO> excelUtil = new ExcelUtil<>(SuspectVehicleExportVO.class);
+        ExcelUtil<TobSuspectVehicleExportVO> excelUtil = new ExcelUtil<>(TobSuspectVehicleExportVO.class);
         excelUtil.exportExcel(response, exportList, "嫌疑车辆数据", "数据");
     }
 }

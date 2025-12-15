@@ -5,7 +5,7 @@ import lombok.Data;
 
 import java.util.Date;
 @Data
-public class SuspectVehicleExportVO {
+public class TobSuspectVehicleExportVO {
     /** 相机名称 */
     @Excel(name = "相机名称")
     private String cameraName;
