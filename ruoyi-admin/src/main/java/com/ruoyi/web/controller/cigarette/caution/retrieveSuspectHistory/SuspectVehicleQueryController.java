@@ -9,7 +9,7 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.ToVehicleRealTimMonitoring;
 import com.ruoyi.system.domain.vo.SuspectVehicleExportVO;
 import com.ruoyi.system.domain.vo.SuspectVehicleQueryVO;
-import com.ruoyi.system.service.ISuspectVehicleQueryService;
+import com.ruoyi.system.service.ITobSuspectVehicleQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class SuspectVehicleQueryController extends BaseController {
 
     @Autowired
-    private ISuspectVehicleQueryService suspectVehicleQueryService;
+    private ITobSuspectVehicleQueryService suspectVehicleQueryService;
 
     @Log(title = "嫌疑车辆查询", businessType = BusinessType.OTHER)
     @GetMapping("/list")
