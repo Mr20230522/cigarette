@@ -17,7 +17,7 @@ public class ToRiskScoreRunner implements CommandLineRunner {
             while (true) {
                 try {
                     riskScoreService.processNextBatch();
-                    Thread.sleep(2000); // 每批间隔2秒
+                    Thread.sleep(10); // 每批间隔2秒
                 } catch (Exception e) {
                     e.printStackTrace();
                     try {

@@ -4,7 +4,7 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.domain.ToFactorTrigger;
-import com.ruoyi.system.service.IToFactorTriggerService;
+import com.ruoyi.system.service.ITobFactorTriggerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +15,7 @@ import java.util.List;
 public class ToFactorTriggerController extends BaseController {
 
     @Autowired
-    private IToFactorTriggerService factorTriggerService;
+    private ITobFactorTriggerService factorTriggerService;
 
     @GetMapping("/list")
     public TableDataInfo list(ToFactorTrigger filter) {

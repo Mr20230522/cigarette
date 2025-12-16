@@ -3,14 +3,14 @@ package com.ruoyi.system.service.impl;
 
 import com.ruoyi.system.domain.ToFactorConfig;
 import com.ruoyi.system.mapper.ToFactorConfigMapper;
-import com.ruoyi.system.service.IToFactorConfigService;
+import com.ruoyi.system.service.ITobFactorConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class ToFactorConfigServiceImpl implements IToFactorConfigService {
+public class TobFactorConfigServiceImpl implements ITobFactorConfigService {
 
     @Autowired
     private ToFactorConfigMapper factorConfigMapper;

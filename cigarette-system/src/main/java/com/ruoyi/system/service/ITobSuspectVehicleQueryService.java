@@ -5,6 +5,6 @@ import com.ruoyi.system.domain.vo.SuspectVehicleQueryVO;
 
 import java.util.List;
 
-public interface ISuspectVehicleQueryService {
+public interface ITobSuspectVehicleQueryService {
     List<ToVehicleRealTimMonitoring> selectSuspectVehicleList(SuspectVehicleQueryVO query);
 }

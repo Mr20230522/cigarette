@@ -4,7 +4,7 @@ package com.ruoyi.web.controller.cigarette.vehicle;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.domain.vo.ToVehicleBehaviorMediaVo;
-import com.ruoyi.system.service.IToVehicleBehaviorMediaService;
+import com.ruoyi.system.service.ITobVehicleBehaviorMediaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ToVehicleBehaviorMediaController extends BaseController {
 
     @Autowired
-    private IToVehicleBehaviorMediaService vehicleBehaviorService;
+    private ITobVehicleBehaviorMediaService vehicleBehaviorService;
 
     /**
      * 获取车辆行为媒体文件信息

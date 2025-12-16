@@ -4,7 +4,7 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.domain.ToFactorConfig;
-import com.ruoyi.system.service.IToFactorConfigService;
+import com.ruoyi.system.service.ITobFactorConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +15,7 @@ import java.util.List;
 public class ToFactorConfigController extends BaseController {
 
     @Autowired
-    private IToFactorConfigService factorConfigService;
+    private ITobFactorConfigService factorConfigService;
 
     @GetMapping("/list")
     public TableDataInfo list(ToFactorConfig filter) {
