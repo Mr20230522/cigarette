@@ -1,4 +1,4 @@
-<template>
+ <template>
   <div v-if="pageflag" class="right_center_wrap beautify-scroll-def" @wheel="handleWheel">
     <transition-group name="list" tag="ul" class="right_center">
       <li

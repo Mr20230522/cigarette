@@ -202,7 +202,8 @@ export default {
           licensePlate: it.plate || '无车牌',
           suspicionLevel: it.level ?? 0,
           imageUrl: it.picUrl
-            ? 'http://127.0.0.1:8000/' + it.picUrl.replace(/^\/+/, '')
+          ? 'http://127.0.0.1:8000/' + it.picUrl.replace(/^\/+/, '')
+          // ? 'http://10.145.16.196:8000/' + it.picUrl.replace(/^\/+/, '')
             : this.getDefaultImage()
         }))
         console.log('【fetchTableData】表格数据已更新，条数：', this.filteredVehicles.length)
