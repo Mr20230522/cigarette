@@ -6,7 +6,7 @@
       <div class="image-container" style="padding: 0">
 
         <!-- 头像图片 -->
-        <img :src="'http://10.145.16.196:8000/Images/'+this.imgd[0].picUrl" style="max-width: 100%;height: 210px">
+        <img :src="'http://10.145.16.196:8000/'+this.imgd[0].picUrl" style="max-width: 100%;height: 210px">
         <!-- 分割线 -->
 
       </div>
