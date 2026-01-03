@@ -127,6 +127,7 @@ export function filterDynamicRoutes(routes) {
 
 export const loadView = (view) => {
   if (process.env.NODE_ENV === 'development') {
+    //加上.vue,只扫描.vue组件
     return (resolve) => require([`@/views/${view}.vue`], resolve)
   } else {
     // 使用 import 实现生产环境的路由懒加载
