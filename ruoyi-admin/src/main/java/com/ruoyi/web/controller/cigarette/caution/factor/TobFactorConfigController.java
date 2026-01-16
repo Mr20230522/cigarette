@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/factor/config")
-public class ToFactorConfigController extends BaseController {
+public class TobFactorConfigController extends BaseController {
 
     @Autowired
     private ITobFactorConfigService factorConfigService;
