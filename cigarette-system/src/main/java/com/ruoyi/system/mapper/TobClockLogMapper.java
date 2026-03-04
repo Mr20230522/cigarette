@@ -1,7 +1,9 @@
 package com.ruoyi.system.mapper;
 
+import java.util.Date;
 import java.util.List;
 import com.ruoyi.system.domain.TobClockLog;
+import io.lettuce.core.dynamic.annotation.Param;
 
 /**
  * 出勤记录Mapper接口
@@ -58,4 +60,10 @@ public interface TobClockLogMapper
      * @return 结果
      */
     public int deleteTobClockLogByCommutingIds(Long[] commutingIds);
+
+    /**
+     * 根据检测点和当前时间查询值班人员
+     */
+    TobClockLog selectCurrentDuty(@Param("detectionId") Long detectionId,
+                                  @Param("currentTime") Date currentTime);
 }

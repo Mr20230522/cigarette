@@ -106,4 +106,25 @@
             #{staffId}
         </foreach>
     </delete>
+    <!-- 根据staff_id查询，关联sys_user获取手机号 -->
+    <select id="selectByIdWithPhone" resultType="com.ruoyi.system.domain.vo.TobStaffVo">
+        select
+            s.staff_id,
+            s.user_id,
+            s.face_feature,
+            s.status,
+            s.del_flag,
+            s.remark,
+            s.create_time,
+            s.update_time,
+            s.detection_id,
+            s.district_id,
+            s.picture,
+            u.phonenumber
+        from tob_staff s
+                 left join sys_user u on s.user_id = u.user_id
+        where s.staff_id = #{staffId}
+          and s.del_flag = '0'
+    </select>
+
 </mapper>

@@ -104,4 +104,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{commutingId}
         </foreach>
     </delete>
+
+
+    <!-- 根据检测点和当前时间查询值班人员 -->
+    <select id="selectCurrentDuty" resultMap="TobClockLogResult">
+        select commuting_id, staff_id, duty_date, start_time, end_time, duty_type,
+        del_flag, remark, create_time, update_time, flag, detection_id, district_id
+        from tob_clock_log
+        where detection_id = #{detectionId}
+        and del_flag = '0'
+        and flag = '0'
+        and #{currentTime} &gt;= start_time
+        and #{currentTime} &lt;= end_time
+        limit 1
+    </select>
 </mapper>

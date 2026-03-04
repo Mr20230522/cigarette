@@ -2,6 +2,7 @@ package com.ruoyi.system.mapper;
 
 import java.util.List;
 import com.ruoyi.system.domain.TobStaff;
+import com.ruoyi.system.domain.vo.TobStaffVo;
 
 /**
  * 工作人员Mapper接口
@@ -58,4 +59,11 @@ public interface TobStaffMapper
      * @return 结果
      */
     public int deleteTobStaffByStaffIds(Long[] staffIds);
+
+
+    /**
+     * 根据staff_id查询工作人员，并关联sys_user获取手机号
+     * @param staffId 需要查询的数据主键
+     */
+    TobStaffVo selectByIdWithPhone(Long staffId);
 }
