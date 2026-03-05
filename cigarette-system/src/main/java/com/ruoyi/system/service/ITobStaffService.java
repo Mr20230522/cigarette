@@ -58,4 +58,9 @@ public interface ITobStaffService
      * @return 结果
      */
     public int deleteTobStaffByStaffId(Long staffId);
+
+    /**
+     * 根据 userId 查询工作人员
+     */
+    public TobStaff selectStaffByUserId(Long userId);
 }

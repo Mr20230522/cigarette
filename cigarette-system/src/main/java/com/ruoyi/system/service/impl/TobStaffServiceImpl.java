@@ -93,4 +93,16 @@ public class TobStaffServiceImpl implements ITobStaffService
     {
         return tobStaffMapper.deleteTobStaffByStaffId(staffId);
     }
+
+
+    @Override
+    public TobStaff selectStaffByUserId(Long userId) {
+        TobStaff staff = new TobStaff();
+        staff.setUserId(userId);
+        List<TobStaff> list = tobStaffMapper.selectTobStaffList(staff);
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
+    }
 }

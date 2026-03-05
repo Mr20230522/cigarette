@@ -3,37 +3,33 @@
     <el-row :gutter="20">
       <!-- 地区数据 -->
       <el-col :span="4" :xs="24">
-        <!-- <div>
-                    <el-input v-model="districtName" placeholder="请输入地区名称" clearable size="small"
-                        prefix-icon="el-icon-search" style="margin-bottom: 20px" />
-                </div> -->
         <div>
           <el-tree :data="treeData" node-key="nodeKey" default-expand-all :props="defaultProps"
-            @node-click="handleNodeClick">
+                   @node-click="handleNodeClick">
           </el-tree>
         </div>
       </el-col>
       <!-- 摄像头数据 -->
       <el-col :span="20" :xs="24">
         <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch"
-          label-width="68px">
+                 label-width="68px">
           <el-form-item label="检测人员id" prop="staffId">
             <el-input v-model="queryParams.staffId" placeholder="请输入检测人员id" clearable
-              @keyup.enter.native="handleQuery" />
+                      @keyup.enter.native="handleQuery" />
           </el-form-item>
           <el-form-item label="值班日期" prop="dutyDate">
             <el-date-picker clearable v-model="queryParams.dutyDate" type="date" value-format="yyyy-MM-dd"
-              placeholder="请选择值班日期">
+                            placeholder="请选择值班日期">
             </el-date-picker>
           </el-form-item>
           <el-form-item label="开始时间" prop="startTime">
             <el-date-picker clearable v-model="queryParams.startTime" type="date" value-format="yyyy-MM-dd"
-              placeholder="请选择开始时间">
+                            placeholder="请选择开始时间">
             </el-date-picker>
           </el-form-item>
           <el-form-item label="结束时间" prop="endTime">
             <el-date-picker clearable v-model="queryParams.endTime" type="date" value-format="yyyy-MM-dd"
-              placeholder="请选择结束时间">
+                            placeholder="请选择结束时间">
             </el-date-picker>
           </el-form-item>
           <el-form-item label="出勤有误" prop="flag">
@@ -48,19 +44,19 @@
         <el-row :gutter="10" class="mb8">
           <el-col :span="1.5">
             <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
-              v-hasPermi="['personnel:clockLog:add']">新增</el-button>
+                       v-hasPermi="['personnel:clockLog:add']">新增</el-button>
           </el-col>
           <el-col :span="1.5">
             <el-button type="success" plain icon="el-icon-edit" size="mini" :disabled="single" @click="handleUpdate"
-              v-hasPermi="['personnel:clockLog:edit']">修改</el-button>
+                       v-hasPermi="['personnel:clockLog:edit']">修改</el-button>
           </el-col>
           <el-col :span="1.5">
             <el-button type="danger" plain icon="el-icon-delete" size="mini" :disabled="multiple" @click="handleDelete"
-              v-hasPermi="['personnel:clockLog:remove']">删除</el-button>
+                       v-hasPermi="['personnel:clockLog:remove']">删除</el-button>
           </el-col>
           <el-col :span="1.5">
             <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport"
-              v-hasPermi="['personnel:clockLog:export']">导出</el-button>
+                       v-hasPermi="['personnel:clockLog:export']">导出</el-button>
           </el-col>
           <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
@@ -99,27 +95,28 @@
           <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="100">
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
-                v-hasPermi="['personnel:clockLog:edit']">修改</el-button>
+                         v-hasPermi="['personnel:clockLog:edit']">修改</el-button>
               <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
-                v-hasPermi="['personnel:clockLog:remove']">删除</el-button>
+                         v-hasPermi="['personnel:clockLog:remove']">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
 
         <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum"
-          :limit.sync="queryParams.pageSize" @pagination="getList" />
+                    :limit.sync="queryParams.pageSize" @pagination="getList" />
       </el-col>
     </el-row>
+
     <!-- 添加或修改出勤记录对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="50%" append-to-body style="margin-top: 100px;">
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="搜索用户">
           <el-input v-model="searchInput" @input="filterUsers" placeholder="请输入用户名称、邮箱或电话号码" clearable
-            suffix-icon="el-icon-search"></el-input>
+                    suffix-icon="el-icon-search"></el-input>
           <el-scrollbar wrap-class="scrollbar-wrapper" style="max-height: auto;">
             <el-card class="user-list">
               <el-row v-for="(user, index) in filteredUsers" :key="index" class="user-info"
-                :class="{ 'bg-color': index % 2 === 1, 'selected': user === selectedUser }">
+                      :class="{ 'bg-color': index % 2 === 1, 'selected': user === selectedUser }">
                 <el-col :span="24">
                   <span @click="selectUser(user)" class="label" style="cursor:pointer;">用户名称:{{ user.username
                     }}&nbsp;&nbsp;电话号码:{{ user.phonenumber }}&nbsp;&nbsp;邮箱:{{ user.email }}
@@ -142,25 +139,25 @@
           </el-col>
         </el-row>
         <el-form-item label="检测点" prop="detectionId">
-                    <el-select v-model="form.detectionId" placeholder="请选择所管理的监测点" filterable
-                        @change="handleDetectionChange">
-                        <el-option v-for="item in detectionOptions" :key="item.detectionId"
-                            :label="getDetectionName(item.detectionId)" :value="item.detectionId"></el-option>
-                    </el-select>
-                </el-form-item>
+          <el-select v-model="form.detectionId" placeholder="请选择所管理的监测点" filterable
+                     @change="handleDetectionChange">
+            <el-option v-for="item in detectionOptions" :key="item.detectionId"
+                       :label="getDetectionName(item.detectionId)" :value="item.detectionId"></el-option>
+          </el-select>
+        </el-form-item>
 
         <el-row>
           <el-col :span="12">
             <el-form-item label="开始时间" prop="startTime">
               <el-date-picker clearable v-model="form.startTime" type="date" value-format="yyyy-MM-dd"
-                placeholder="请选择开始时间">
+                              placeholder="请选择开始时间">
               </el-date-picker>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="结束时间" prop="endTime">
               <el-date-picker clearable v-model="form.endTime" type="date" value-format="yyyy-MM-dd"
-                placeholder="请选择结束时间">
+                              placeholder="请选择结束时间">
               </el-date-picker>
             </el-form-item>
           </el-col>
@@ -170,7 +167,7 @@
           <el-col :span="12">
             <el-form-item label="值班日期" prop="dutyDate">
               <el-date-picker clearable v-model="form.dutyDate" type="date" value-format="yyyy-MM-dd"
-                placeholder="请选择值班日期">
+                              placeholder="请选择值班日期">
               </el-date-picker>
             </el-form-item>
           </el-col>
@@ -178,7 +175,7 @@
             <el-form-item label="出勤有误" prop="flag">
               <el-select v-model="form.flag" placeholder="请输入出勤有误">
                 <el-option v-for="dict in dict.type.tob_clock_correct" :key="dict.value" :label="dict.label"
-                  :value="dict.value"></el-option>
+                           :value="dict.value"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -187,7 +184,6 @@
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
-
 
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -202,32 +198,22 @@
 import { listLog, getLog, delLog, addLog, updateLog } from "@/api/cigarette/personnel/clockLog";
 import { listDistrict } from "@/api/cigarette/detection/district";
 import { listDetection } from "@/api/cigarette/detection/detection";
-import { listUser, } from "@/api/system/user";
-import { listStaff } from "@/api/cigarette/personnel/staff"; // 导入工作人员列表接口
+import { listUser } from "@/api/system/user";
+import { listStaff, getStaffByUserId } from "@/api/cigarette/personnel/staff"; // 导入 getStaffByUserId
 
 export default {
   name: "ClockLog",
-
   dicts: ['tob_clock_correct'],
   data() {
     return {
-      // 遮罩层
       loading: true,
-      // 选中数组
       ids: [],
-      // 非单个禁用
       single: true,
-      // 非多个禁用
       multiple: true,
-      // 显示搜索条件
       showSearch: true,
-      // 总条数
       total: 0,
-      // 出勤记录表格数据
       logList: [],
-      // 弹出层标题
       title: "",
-      // 是否显示弹出层
       open: false,
       searchInput: '',
       userIdList: [],
@@ -238,22 +224,11 @@ export default {
       },
       treeData: [],
       selectedUser: null,
-      // 表单参数
-      form: {},
-      // 搜索人
-      // 存储搜索信息
-      searchInput: '',
-      // 存储用户信息
-      userIdList: [],
-      // 存储根据搜索条件过滤后的用户列表数据
-      filteredUsers: [],
-      // 存储所选用户信息
-      selectedUser: null,
       districts: [],
       detections: [],
-      detectionOptions: [],    //json数组，用于存储检测点选项
+      detectionOptions: [],
+      staffList: [], // 添加 staffList
 
-      // 查询参数
       queryParams: {
         pageNum: 1,
         pageSize: 10,
@@ -264,9 +239,9 @@ export default {
         dutyType: null,
         flag: null
       },
-      // 表单参数
+
       form: {},
-      // 表单校验
+
       rules: {
         staffId: [
           { required: true, message: "检测人员id不能为空", trigger: "blur" }
@@ -280,18 +255,6 @@ export default {
         endTime: [
           { required: true, message: "结束时间不能为空", trigger: "blur" }
         ],
-        dutyType: [
-          { required: true, message: "值班类型不能为空", trigger: "change" }
-        ],
-        delFlag: [
-          { required: true, message: "删除标记不能为空", trigger: "blur" }
-        ],
-        createTime: [
-          { required: true, message: "创建时间不能为空", trigger: "blur" }
-        ],
-        updateTime: [
-          { required: true, message: "更新时间不能为空", trigger: "blur" }
-        ],
         flag: [
           { required: true, message: "出勤有误不能为空", trigger: "blur" }
         ]
@@ -300,23 +263,25 @@ export default {
   },
   created() {
     this.getList();
-    this.loadDetectionOptions(); // 加载检测点选项
-    this.loadDistrictOptions(); // 加载地区选项
+    this.loadDetectionOptions();
+    this.loadDistrictOptions();
     this.getUserList();
   },
   mounted() {
     this.filteredUsers = [];
   },
   methods: {
+    // ==================== 修改：保存 userId ====================
     getUserList() {
       this.loading = true;
       listUser({
         pageNum: null,
         pageSize: 100000
       }).then(response => {
-        // 获取到用户信息后，保存原始用户列表数据
+        // 关键：保存 userId，用于后面查 staffId
         this.userIdList = response.rows.map(user => {
           return {
+            userId: user.userId,        // 新增：保存 userId
             username: user.nickName,
             phonenumber: user.phonenumber,
             email: user.email,
@@ -324,10 +289,9 @@ export default {
         });
       }).catch(error => {
         console.error('Failed to fetch user list:', error);
-      })
-        .finally(() => {
-          this.loading = false;
-        });
+      }).finally(() => {
+        this.loading = false;
+      });
 
       listStaff(this.queryParams).then(response => {
         this.staffList = response.rows;
@@ -335,7 +299,7 @@ export default {
         this.loading = false;
       });
     },
-    //加载地区选项
+
     loadDistrictOptions() {
       listDistrict().then(response => {
         this.districtOptions = response.data.map(item => ({
@@ -346,7 +310,7 @@ export default {
         console.error("Failed to load district options:", error);
       });
     },
-    // 加载检测点选项
+
     loadDetectionOptions() {
       listDetection().then(response => {
         this.detectionOptions = response.rows.map(item => ({
@@ -358,23 +322,24 @@ export default {
         console.error("Failed to load detection options:", error);
       });
     },
-        // 当检测点变更时触发，自动填充地区ID
-        handleDetectionChange(newValue) {
-      // 通过检测点ID找到对应的地区ID
+
+    handleDetectionChange(newValue) {
       const selectedDetection = this.detectionOptions.find(item => item.detectionId === newValue);
       if (selectedDetection) {
-        // 将地区ID填充到表单的districtId字段
         this.form.districtId = selectedDetection.districtId;
       }
-    },    getDistrictName(districtId) {
-        const district = this.districtOptions.find(item => item.districtId === districtId);
-        return district ? district.districtName : '未知地区';
     },
-      // 根据 detectionId 获取监测点名字
-      getDetectionName(detectionId) {
-        const detection = this.detectionOptions.find(item => item.detectionId === detectionId)
-        return detection ? detection.detectionName : '未知监测点';
+
+    getDistrictName(districtId) {
+      const district = this.districtOptions.find(item => item.districtId === districtId);
+      return district ? district.districtName : '未知地区';
     },
+
+    getDetectionName(detectionId) {
+      const detection = this.detectionOptions.find(item => item.detectionId === detectionId)
+      return detection ? detection.detectionName : '未知监测点';
+    },
+
     async getList() {
       try {
         const districtsResponse = await listDistrict();
@@ -395,6 +360,7 @@ export default {
         this.loading = false;
       }
     },
+
     buildTreeData() {
       const districtMap = new Map();
 
@@ -431,6 +397,7 @@ export default {
         }
       });
     },
+
     handleNodeClick(data, node) {
       const detectionIds = [];
 
@@ -445,7 +412,6 @@ export default {
 
       collectDetectionIds(data);
 
-      // 如果有多个 detectionId，循环发送请求并合并结果
       if (detectionIds.length > 1) {
         this.logList = [];
         detectionIds.forEach(async (id) => {
@@ -454,32 +420,22 @@ export default {
           this.logList.push(...response.rows);
         });
       } else {
-        // 只有一个 detectionId，直接发送请求
         this.queryParams.detectionId = detectionIds[0];
         this.getList();
       }
     },
 
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.cameraId);
+      this.ids = selection.map(item => item.commutingId);
       this.single = selection.length !== 1;
       this.multiple = !selection.length;
     },
-    /** 查询出勤记录列表 */
-    // getList() {
-    //   this.loading = true;
-    //   listLog(this.queryParams).then(response => {
-    //     this.logList = response.rows;
-    //     this.total = response.total;
-    //     this.loading = false;
-    //   });
-    // },
-    // 取消按钮
+
     cancel() {
       this.open = false;
       this.reset();
     },
-    // 表单重置
+
     reset() {
       this.form = {
         commutingId: null,
@@ -487,7 +443,7 @@ export default {
         dutyDate: null,
         startTime: null,
         endTime: null,
-        dutyType: null,
+        dutyType: '1',
         delFlag: null,
         remark: null,
         createTime: null,
@@ -496,29 +452,23 @@ export default {
       };
       this.resetForm("form");
     },
-    /** 搜索按钮操作 */
+
     handleQuery() {
       this.queryParams.pageNum = 1;
       this.getList();
     },
-    /** 重置按钮操作 */
+
     resetQuery() {
       this.resetForm("queryForm");
       this.handleQuery();
     },
-    // 多选框选中数据
-    handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.commutingId)
-      this.single = selection.length !== 1
-      this.multiple = !selection.length
-    },
-    /** 新增按钮操作 */
+
     handleAdd() {
       this.reset();
       this.open = true;
       this.title = "添加出勤记录";
     },
-    /** 修改按钮操作 */
+
     handleUpdate(row) {
       this.reset();
       const commutingId = row.commutingId || this.ids
@@ -528,7 +478,7 @@ export default {
         this.title = "修改出勤记录";
       });
     },
-    /** 提交按钮 */
+
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
@@ -548,7 +498,7 @@ export default {
         }
       });
     },
-    /** 删除按钮操作 */
+
     handleDelete(row) {
       const commutingIds = row.commutingId || this.ids;
       this.$modal.confirm('是否确认删除出勤记录编号为"' + commutingIds + '"的数据项？').then(function () {
@@ -558,22 +508,20 @@ export default {
         this.$modal.msgSuccess("删除成功");
       }).catch(() => { });
     },
-    /** 导出按钮操作 */
+
     handleExport() {
       this.download('cigarette/personnel/clockLog/export', {
         ...this.queryParams
       }, `log_${new Date().getTime()}.xlsx`)
     },
-    // 选择数据化进行数据填充
+
     filterUsers() {
       const searchInput = this.searchInput.toLowerCase().trim();
       if (!searchInput) {
-        // 如果搜索条件为空，不显示任何用户
         this.filteredUsers = [];
         return;
       }
       this.filteredUsers = this.userIdList.filter(user => {
-        // 在用户名 邮箱和电话号码中进行搜索匹配
         return (
           user.username.toLowerCase().includes(searchInput) ||
           user.email.toString().includes(searchInput) ||
@@ -581,14 +529,32 @@ export default {
         );
       }).slice(0, 10);
     },
-    // 搜索用户并筛选数据
-    selectUser(user) {
-      // 将所选用户信息存储到 selectedUser 变量中
+
+    // ==================== 修改：异步查询 staffId ====================
+    async selectUser(user) {
       this.selectedUser = user;
-      // 更新表单数据
-      this.$set(this.form, "email", user.email);
-      this.$set(this.form, "leader", user.username);
-      this.$set(this.form, "phone", user.phonenumber);
+
+      try {
+        // 关键：根据 userId 查询 staff 信息
+        const res = await getStaffByUserId(user.userId);
+
+        if (res.data) {
+          // 成功获取 staff 信息，设置 staffId
+          this.$set(this.form, "staffId", res.data.staffId);
+          this.$set(this.form, "email", user.email);
+          this.$set(this.form, "leader", user.username);
+          this.$set(this.form, "phone", user.phonenumber);
+        } else {
+          // 未找到 staff 信息
+          this.$modal.msgError("该用户未绑定工作人员信息，无法选择");
+          return;
+        }
+      } catch (error) {
+        this.$modal.msgError("查询工作人员信息失败");
+        console.error(error);
+        return;
+      }
+
       // 清空搜索输入框和搜索结果
       this.searchInput = '';
       this.filteredUsers = [];

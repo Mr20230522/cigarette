@@ -41,4 +41,13 @@ export function delStaff(staffId) {
     url: '/cigarette/personnel/staff/' + staffId,
     method: 'delete'
   })
+
+
+}
+// 根据 userId 查询工作人员信息
+export function getStaffByUserId(userId) {
+  return request({
+    url: '/cigarette/personnel/staff/getByUserId/' + userId,
+    method: 'get'
+  })
 }

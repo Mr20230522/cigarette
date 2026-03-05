@@ -101,4 +101,19 @@ public class TobStaffController extends BaseController
     {
         return toAjax(tobStaffService.deleteTobStaffByStaffIds(staffIds));
     }
+
+    /**
+     * 根据 userId 查询工作人员信息
+     */
+    @PreAuthorize("@ss.hasPermi('personnel:staff:list')")
+    @GetMapping("/getByUserId/{userId}")
+    public AjaxResult getByUserId(@PathVariable Long userId) {
+        TobStaff staff = new TobStaff();
+        staff.setUserId(userId);
+        List<TobStaff> list = tobStaffService.selectTobStaffList(staff);
+        if (list == null || list.isEmpty()) {
+            return AjaxResult.success(null);
+        }
+        return AjaxResult.success(list.get(0));
+    }
 }
