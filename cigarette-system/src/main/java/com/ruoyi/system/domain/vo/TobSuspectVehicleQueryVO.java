@@ -8,7 +8,7 @@ import java.util.Date;
  * 嫌疑车辆查询条件
  */
 @Data
-public class SuspectVehicleQueryVO {
+public class TobSuspectVehicleQueryVO {
     private String plate;           // 车牌号码（模糊）
     private String plateType;       // 车牌类型
     private String plateColor;      // 车牌颜色
