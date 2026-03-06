@@ -178,7 +178,6 @@ public class TobVehicleBehaviorController extends BaseController
     public List<List<Object>> byDateGetSuspicionVehicleBehavior(Duration duration)
     {
         List<List<Object>> list = tobVehicleBehaviorService.byDateGetSuspicionVehicleBehavior(duration);
-        System.out.println("!@#$%^&*()"+list);
         return list;
 
     }

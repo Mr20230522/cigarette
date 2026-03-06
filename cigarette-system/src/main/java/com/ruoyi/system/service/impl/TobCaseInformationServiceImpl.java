@@ -77,18 +77,15 @@ public class TobCaseInformationServiceImpl implements ITobCaseInformationService
     @Override
     public int insertTobCaseInformation(TobCaseInformation tobCaseInformation)
     {
-        System.out.println("16666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666");
         TobVehicleBehavior vehiclebehavior =tobVehicleBehaviorMapper.selectTobVehicleBehaviorByBehaviorId(tobCaseInformation.getBehaviorId());
 
         TobVehicle vehicle =tobVehicleMapper.selectTobVehicleByCarId(vehiclebehavior.getCarId());
         vehicle.setCasesInvolved(vehicle.getCasesInvolved()+1);
-        System.out.println("2666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666");
 
         tobVehicleMapper.updateTobVehicle(vehicle);
         TobPerson person =tobPersonMapper.selectTobPersonBySuspectId(vehiclebehavior.getDriverId());
         person.setCasesInvolved(person.getCasesInvolved()+1);
         tobPersonMapper.updateTobPerson(person);
-        System.out.println("6666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666");
         return tobCaseInformationMapper.insertTobCaseInformation(tobCaseInformation);
     }
 

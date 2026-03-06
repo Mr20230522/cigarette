@@ -113,9 +113,7 @@ public class TobDistrictController extends BaseController
     @PreAuthorize("@ss.hasPermi('cigarette:district:list')")
     @GetMapping("/getDistrictId") //小地址
     public AjaxResult getDistrictId(String districtName){
-        System.out.println("@@@districtName@@@"+districtName);
         Long districtId=tobDistrictService.getDistrictId(districtName);
-        System.out.println("###districtId###"+districtId);
         if(districtId==null){
             return error();
         }
