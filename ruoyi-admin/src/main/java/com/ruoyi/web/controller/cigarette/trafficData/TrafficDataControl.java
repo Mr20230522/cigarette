@@ -5,6 +5,7 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.domain.TrafficData;
 import com.ruoyi.system.domain.undefine.SearchOfTheSuspectedVehicle;
+import com.ruoyi.system.domain.vo.CameraIdNameVO;
 import com.ruoyi.system.service.ITrafficDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,5 +69,13 @@ public class TrafficDataControl extends BaseController {
 
         List<TrafficData> list = TrafficDataService.searchVehicle(search);
         return getDataTable(list);   // RuoYi 自带，返回 {total, rows}
+    }
+
+    /**
+     * 获取所有摄像头ID和名称的配对数据
+     */
+    @GetMapping("/allCameraIdNamePairs")
+    public List<CameraIdNameVO> getAllCameraIdNamePairs() {
+        return TrafficDataService.getAllCameraIdNamePairs();
     }
 }

@@ -123,4 +123,35 @@
             LIMIT #{limit}
     </select>
 
+    <!-- 获取所有摄像头ID和名称的配对数据（取出现次数最多的名称） -->
+    <select id="getAllCameraIdNamePairs" resultType="com.ruoyi.system.domain.vo.CameraIdNameVO">
+        SELECT
+            t1.CameraId as cameraId,
+            t1.CameraName as cameraName
+        FROM (
+                 SELECT
+                     CameraName,
+                     CameraId,
+                     COUNT(*) as freq
+                 FROM trafficdata
+                 WHERE CameraId IS NOT NULL
+                   AND CameraName IS NOT NULL
+                   AND CameraName != ''
+                 GROUP BY CameraName, CameraId
+             ) t1
+                 LEFT JOIN (
+            SELECT
+                CameraName,
+                CameraId,
+                COUNT(*) as freq
+            FROM trafficdata
+            WHERE CameraId IS NOT NULL
+              AND CameraName IS NOT NULL
+              AND CameraName != ''
+            GROUP BY CameraName, CameraId
+        ) t2 ON t1.CameraName = t2.CameraName AND t1.freq &lt; t2.freq
+                                                            WHERE t2.CameraId IS NULL
+                                                            ORDER BY t1.CameraName
+    </select>
+
 </mapper>

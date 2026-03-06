@@ -111,4 +111,54 @@ public class TobCameraController extends BaseController
     {
         return toAjax(tobCameraService.deleteTobCameraByCameraIds(cameraIds));
     }
+    /**
+     * 简单新增摄像头（不用原来的复杂逻辑）
+     */
+    @PreAuthorize("@ss.hasPermi('detection:camera:add')")
+    @Log(title = "摄像头", businessType = BusinessType.INSERT)
+    @PostMapping("/simpleAdd")
+    public AjaxResult simpleAdd(@RequestBody TobCamera tobCamera)
+    {
+        System.out.println("========== 简单新增摄像头 ==========");
+        System.out.println("1. 接收到的数据：");
+        System.out.println("   cameraName: " + tobCamera.getCameraName());
+        System.out.println("   cameraIp: " + tobCamera.getCameraIp());
+        System.out.println("   cameraModel: " + tobCamera.getCameraModel());
+        System.out.println("   cameraManufacturer: " + tobCamera.getCameraManufacturer());
+        System.out.println("   detectionId: " + tobCamera.getDetectionId());
+        System.out.println("   resolutionRatio: " + tobCamera.getResolutionRatio());
+        System.out.println("   frameRate: " + tobCamera.getFrameRate());
+        System.out.println("   nightVision: " + tobCamera.getNightVision());
+        System.out.println("   connectionType: " + tobCamera.getConnectionType());
+        System.out.println("   installationDate: " + tobCamera.getInstallationDate());
+        System.out.println("   guaranteePeriod: " + tobCamera.getGuaranteePeriod());
+        System.out.println("   longitude: " + tobCamera.getLongitude());
+        System.out.println("   latitude: " + tobCamera.getLatitude());
+        System.out.println("   cameraType: " + tobCamera.getCameraType());
+        System.out.println("   cameraGroupIndication: " + tobCamera.getCameraGroupIndication());
+        System.out.println("   cameraApplicationType: " + tobCamera.getCameraApplicationType());
+        System.out.println("   status: " + tobCamera.getStatus());
+        System.out.println("   districtId: " + tobCamera.getDistrictId());
+        System.out.println("   remark: " + tobCamera.getRemark());
+
+        try {
+            System.out.println("2. 开始调用 service 方法...");
+            int result = tobCameraService.simpleInsertTobCamera(tobCamera);
+            System.out.println("3. service 返回结果: " + result);
+
+            if (result > 0) {
+                System.out.println("4. 新增成功，返回的ID: " + tobCamera.getCameraId());
+            } else {
+                System.out.println("4. 新增失败，影响行数为0");
+            }
+
+            return toAjax(result);
+        } catch (Exception e) {
+            System.out.println("===== 发生异常 =====");
+            System.out.println("异常类型: " + e.getClass().getName());
+            System.out.println("异常信息: " + e.getMessage());
+            e.printStackTrace();
+            return AjaxResult.error("操作失败：" + e.getMessage());
+        }
+    }
 }

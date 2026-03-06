@@ -19,9 +19,21 @@ public class TobCamera extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 摄像头id
+     * 摄像头id (自增主键)
      */
     private Long cameraId;
+
+    /**
+     * trafficdata表中的摄像头ID (Camerald)
+     */
+    @Excel(name = "traffic摄像头ID")
+    private Long trafficCameraId;
+
+    /**
+     * 摄像头名称
+     */
+    @Excel(name = "摄像头WebSocket的摄像头名称")
+    private String cameraName;
 
     /**
      * 摄像头ip
@@ -126,8 +138,6 @@ public class TobCamera extends BaseEntity {
      */
     private String delFlag;
 
-
-
     /**
      * 地区id
      */
@@ -137,13 +147,28 @@ public class TobCamera extends BaseEntity {
     @Excel(name = "摄像头地址")
     private String cameraUrl;
 
-
     public void setCameraId(Long cameraId) {
         this.cameraId = cameraId;
     }
 
     public Long getCameraId() {
         return cameraId;
+    }
+
+    public void setTrafficCameraId(Long trafficCameraId) {
+        this.trafficCameraId = trafficCameraId;
+    }
+
+    public Long getTrafficCameraId() {
+        return trafficCameraId;
+    }
+
+    public void setCameraName(String cameraName) {
+        this.cameraName = cameraName;
+    }
+
+    public String getCameraName() {
+        return cameraName;
     }
 
     public void setCameraIp(String cameraIp) {
@@ -302,6 +327,8 @@ public class TobCamera extends BaseEntity {
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
                 .append("cameraId", getCameraId())
+                .append("trafficCameraId", getTrafficCameraId())
+                .append("cameraName", getCameraName())
                 .append("cameraIp", getCameraIp())
                 .append("cameraModel", getCameraModel())
                 .append("cameraManufacturer", getCameraManufacturer())

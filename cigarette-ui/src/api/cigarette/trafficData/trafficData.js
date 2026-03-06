@@ -47,4 +47,11 @@ export function searchVehicle(query) {
   })
 }
 
+// 获取所有摄像头ID和名称的配对数据
+export function getAllCameraIdNamePairs() {
+  return request({
+    url: '/cigarette/trafficData/allCameraIdNamePairs',
+    method: 'get'
+  })
+}
 

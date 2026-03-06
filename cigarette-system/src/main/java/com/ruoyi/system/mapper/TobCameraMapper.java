@@ -65,4 +65,6 @@ public interface TobCameraMapper
      * @return
      */
     List<TobCamera> selectTobCameraListByDistrictId(TobCamera tobCamera);
+
+
 }

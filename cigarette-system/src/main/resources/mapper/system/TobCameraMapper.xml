@@ -6,6 +6,8 @@
 
     <resultMap type="TobCamera" id="TobCameraResult">
         <result property="cameraId" column="camera_id"/>
+        <result property="trafficCameraId" column="traffic_camera_id"/>
+        <result property="cameraName" column="camera_name"/>
         <result property="cameraIp" column="camera_ip"/>
         <result property="cameraModel" column="camera_model"/>
         <result property="cameraManufacturer" column="camera_manufacturer"/>
@@ -28,11 +30,12 @@
         <result property="updateTime" column="update_time"/>
         <result property="districtId" column="district_id"/>
         <result property="cameraUrl" column="camera_url"/>
-
     </resultMap>
 
     <sql id="selectTobCameraVo">
         select camera_id,
+               traffic_camera_id,
+               camera_name,
                camera_ip,
                camera_model,
                camera_manufacturer,
@@ -61,11 +64,11 @@
     <select id="selectTobCameraList" parameterType="TobCamera" resultMap="TobCameraResult">
         <include refid="selectTobCameraVo"/>
         <where>
+            <if test="trafficCameraId != null">and traffic_camera_id = #{trafficCameraId}</if>
+            <if test="cameraName != null  and cameraName != ''">and camera_Name = #{cameraName}</if>
             <if test="cameraIp != null  and cameraIp != ''">and camera_ip = #{cameraIp}</if>
             <if test="cameraModel != null  and cameraModel != ''">and camera_model = #{cameraModel}</if>
-            <if test="cameraManufacturer != null  and cameraManufacturer != ''">and camera_manufacturer =
-                #{cameraManufacturer}
-            </if>
+            <if test="cameraManufacturer != null  and cameraManufacturer != ''">and camera_manufacturer = #{cameraManufacturer}</if>
             <if test="detectionId != null ">and detection_id = #{detectionId}</if>
             <if test="resolutionRatio != null  and resolutionRatio != ''">and resolution_ratio = #{resolutionRatio}</if>
             <if test="frameRate != null ">and frame_rate = #{frameRate}</if>
@@ -77,9 +80,7 @@
             <if test="latitude != null ">and latitude = #{latitude}</if>
             <if test="cameraType != null  and cameraType != ''">and camera_type = #{cameraType}</if>
             <if test="cameraGroupIndication != null ">and camera_group_indication = #{cameraGroupIndication}</if>
-            <if test="cameraApplicationType != null  and cameraApplicationType != ''">and camera_application_type =
-                #{cameraApplicationType}
-            </if>
+            <if test="cameraApplicationType != null  and cameraApplicationType != ''">and camera_application_type = #{cameraApplicationType}</if>
             and del_flag = '0'
             <if test="status != null  and status != ''">and status = #{status}</if>
             <if test="districtId != null ">and district_id = #{districtId}</if>
@@ -95,33 +96,21 @@
                     SELECT DISTINCT district_id
                     FROM tob_district
                     WHERE CONCAT(ancestors, ',', district_id) LIKE CONCAT('%,', #{districtId}, ',%')
-                    OR district_id = #{districtId}  -- 包括自身地区ID
+                    OR district_id = #{districtId}
                     )
                 </when>
                 <otherwise>
-                    <!-- 如果没有地区ID传入，则不添加任何地区限制条件 -->
                 </otherwise>
             </choose>
-            <!-- 其他条件 -->
-            <if test="cameraIp != null and cameraIp != ''">
-                AND camera_ip = #{cameraIp}
-            </if>
-            <if test="cameraModel != null and cameraModel != ''">
-                AND camera_model LIKE CONCAT('%', #{cameraModel}, '%')
-            </if>
-            <if test="cameraManufacturer != null and cameraManufacturer != ''">
-                AND camera_manufacturer LIKE CONCAT('%', #{cameraManufacturer}, '%')
-            </if>
-            <if test="detectionId != null">
-                AND detection_id = #{detectionId}
-            </if>
-            <if test="cameraType != null and cameraType != ''">
-                AND camera_type = #{cameraType}
-            </if>
-            <if test="status != null and status != ''">
-                AND status = #{status}
-            </if>
-                AND del_flag = '0'
+            <if test="trafficCameraId != null">and traffic_camera_id = #{trafficCameraId}</if>
+            <if test="cameraName != null  and cameraName != ''">and camera_Name = #{cameraName}</if>
+            <if test="cameraIp != null and cameraIp != ''">and camera_ip = #{cameraIp}</if>
+            <if test="cameraModel != null and cameraModel != ''">and camera_model LIKE CONCAT('%', #{cameraModel}, '%')</if>
+            <if test="cameraManufacturer != null and cameraManufacturer != ''">and camera_manufacturer LIKE CONCAT('%', #{cameraManufacturer}, '%')</if>
+            <if test="detectionId != null">and detection_id = #{detectionId}</if>
+            <if test="cameraType != null and cameraType != ''">and camera_type = #{cameraType}</if>
+            <if test="status != null and status != ''">and status = #{status}</if>
+            and del_flag = '0'
         </where>
     </select>
 
@@ -130,11 +119,11 @@
         where camera_id = #{cameraId} and del_flag = '0'
     </select>
 
-
-
     <insert id="insertTobCamera" parameterType="TobCamera" useGeneratedKeys="true" keyProperty="cameraId">
         insert into tob_camera
         <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="trafficCameraId != null">traffic_camera_id,</if>
+            <if test="cameraName != null and cameraName != ''">camera_name,</if>
             <if test="cameraIp != null and cameraIp != ''">camera_ip,</if>
             <if test="cameraModel != null and cameraModel != ''">camera_model,</if>
             <if test="cameraManufacturer != null and cameraManufacturer != ''">camera_manufacturer,</if>
@@ -156,8 +145,11 @@
             <if test="createTime != null">create_time,</if>
             update_time,
             <if test="districtId != null">district_id,</if>
+            <if test="cameraUrl != null">camera_url,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="trafficCameraId != null">#{trafficCameraId},</if>
+            <if test="cameraName != null and cameraName != ''">#{cameraName},</if>
             <if test="cameraIp != null and cameraIp != ''">#{cameraIp},</if>
             <if test="cameraModel != null and cameraModel != ''">#{cameraModel},</if>
             <if test="cameraManufacturer != null and cameraManufacturer != ''">#{cameraManufacturer},</if>
@@ -179,17 +171,18 @@
             <if test="createTime != null">#{createTime},</if>
             sysdate(),
             <if test="districtId != null">#{districtId},</if>
+            <if test="cameraUrl != null">#{cameraUrl},</if>
         </trim>
     </insert>
 
     <update id="updateTobCamera" parameterType="TobCamera">
         update tob_camera
         <trim prefix="SET" suffixOverrides=",">
+            <if test="trafficCameraId != null">traffic_camera_id = #{trafficCameraId},</if>
+            <if test="cameraName != null and cameraName != ''">camera_name = #{cameraName},</if>
             <if test="cameraIp != null and cameraIp != ''">camera_ip = #{cameraIp},</if>
             <if test="cameraModel != null and cameraModel != ''">camera_model = #{cameraModel},</if>
-            <if test="cameraManufacturer != null and cameraManufacturer != ''">camera_manufacturer =
-                #{cameraManufacturer},
-            </if>
+            <if test="cameraManufacturer != null and cameraManufacturer != ''">camera_manufacturer = #{cameraManufacturer},</if>
             <if test="detectionId != null">detection_id = #{detectionId},</if>
             <if test="resolutionRatio != null and resolutionRatio != ''">resolution_ratio = #{resolutionRatio},</if>
             <if test="frameRate != null">frame_rate = #{frameRate},</if>
@@ -201,15 +194,14 @@
             <if test="latitude != null">latitude = #{latitude},</if>
             <if test="cameraType != null and cameraType != ''">camera_type = #{cameraType},</if>
             <if test="cameraGroupIndication != null">camera_group_indication = #{cameraGroupIndication},</if>
-            <if test="cameraApplicationType != null and cameraApplicationType != ''">camera_application_type =
-                #{cameraApplicationType},
-            </if>
+            <if test="cameraApplicationType != null and cameraApplicationType != ''">camera_application_type = #{cameraApplicationType},</if>
             <if test="status != null and status != ''">status = #{status},</if>
             <if test="delFlag != null and delFlag != ''">del_flag = #{delFlag},</if>
             <if test="remark != null">remark = #{remark},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
             <if test="districtId != null">district_id = #{districtId},</if>
+            <if test="cameraUrl != null">camera_url = #{cameraUrl},</if>
         </trim>
         where camera_id = #{cameraId}
     </update>

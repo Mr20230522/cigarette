@@ -49,3 +49,12 @@ export function delCamera(cameraId) {
     method: 'delete'
   })
 }
+
+// 简单新增摄像头
+export function simpleAddCamera(data) {
+  return request({
+    url: '/cigarette/detection/camera/simpleAdd',
+    method: 'post',
+    data: data
+  })
+}

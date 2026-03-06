@@ -65,4 +65,11 @@ public interface ITobCameraService
      * @return
      */
     List<TobCamera> selectTobCameraListByDistrictId(TobCamera tobCamera);
+
+    /**
+     * 简单新增摄像头
+     * @param tobCamera 摄像头
+     * @return 结果
+     */
+    public int simpleInsertTobCamera(TobCamera tobCamera);
 }
