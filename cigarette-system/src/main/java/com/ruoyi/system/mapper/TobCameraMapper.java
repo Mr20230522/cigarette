@@ -2,6 +2,7 @@ package com.ruoyi.system.mapper;
 
 import java.util.List;
 import com.ruoyi.system.domain.TobCamera;
+import io.lettuce.core.dynamic.annotation.Param;
 
 /**
  * 摄像头Mapper接口
@@ -66,5 +67,13 @@ public interface TobCameraMapper
      */
     List<TobCamera> selectTobCameraListByDistrictId(TobCamera tobCamera);
 
+
+    // TobCameraMapper.java
+    /**
+     * 通过traffic_camera_id查询摄像头信息
+     * @param trafficCameraId trafficdata表中的摄像头ID
+     * @return 摄像头信息
+     */
+    TobCamera selectByTrafficCameraId(@Param("trafficCameraId") Long trafficCameraId);
 
 }

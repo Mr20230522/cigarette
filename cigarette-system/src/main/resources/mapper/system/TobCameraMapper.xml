@@ -216,4 +216,13 @@
             #{cameraId}
         </foreach>
     </delete>
+
+
+    <!-- TobCameraMapper.xml -->
+    <select id="selectByTrafficCameraId" resultMap="TobCameraResult">
+        <include refid="selectTobCameraVo"/>
+        where traffic_camera_id = #{trafficCameraId}
+        and del_flag = '0'
+        limit 1
+    </select>
 </mapper>
