@@ -179,7 +179,6 @@ public class TobVehicleBehaviorController extends BaseController
     {
         List<List<Object>> list = tobVehicleBehaviorService.byDateGetSuspicionVehicleBehavior(duration);
         return list;
-
     }
 
 }
