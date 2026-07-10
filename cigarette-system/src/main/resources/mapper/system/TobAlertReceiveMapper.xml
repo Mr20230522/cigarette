@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobAlertReceiveMapper">
+
+    <resultMap type="TobAlertReceive" id="TobAlertReceiveResult">
+        <result property="id"            column="id"             />
+        <result property="receiveNo"     column="receive_no"     />
+        <result property="originalId"    column="original_id"    />
+        <result property="reason"        column="reason"         />
+        <result property="trafficId"     column="traffic_id"     />
+        <result property="plate"         column="plate"          />
+        <result property="cameraId"      column="camera_id"      />
+        <result property="cameraName"    column="camera_name"    />
+        <result property="captureTime"   column="capture_time"   />
+        <result property="processStatus" column="process_status" />
+        <result property="remark"        column="remark"         />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectTobAlertReceiveVo">
+        select id, receive_no, original_id, reason, traffic_id, plate,
+               camera_id, camera_name, capture_time, process_status, remark, create_time
+        from tob_alert_receive
+    </sql>
+
+    <select id="selectTobAlertReceiveList" parameterType="TobAlertReceive" resultMap="TobAlertReceiveResult">
+        <include refid="selectTobAlertReceiveVo"/>
+        <where>
+            <if test="originalId != null "> and original_id = #{originalId}</if>
+            <if test="plate != null  and plate != ''"> and plate like concat('%', #{plate}, '%')</if>
+            <if test="cameraId != null "> and camera_id = #{cameraId}</if>
+            <if test="cameraName != null  and cameraName != ''"> and camera_name like concat('%', #{cameraName}, '%')</if>
+            <if test="reason != null  and reason != ''"> and reason like concat('%', #{reason}, '%')</if>
+            <if test="processStatus != null  and processStatus != ''"> and process_status = #{processStatus}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectTobAlertReceiveById" parameterType="Long" resultMap="TobAlertReceiveResult">
+        <include refid="selectTobAlertReceiveVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectTobAlertReceiveByOriginalId" parameterType="Long" resultMap="TobAlertReceiveResult">
+        <include refid="selectTobAlertReceiveVo"/>
+        where original_id = #{originalId}
+    </select>
+
+    <insert id="insertTobAlertReceive" parameterType="TobAlertReceive" useGeneratedKeys="true" keyProperty="id">
+        insert into tob_alert_receive
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            receive_no,
+            original_id,
+            reason,
+            <if test="trafficId != null">traffic_id,</if>
+            <if test="plate != null and plate != ''">plate,</if>
+            <if test="cameraId != null">camera_id,</if>
+            <if test="cameraName != null and cameraName != ''">camera_name,</if>
+            <if test="captureTime != null">capture_time,</if>
+            <if test="processStatus != null">process_status,</if>
+            <if test="remark != null">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{receiveNo},
+            #{originalId},
+            #{reason},
+            <if test="trafficId != null">#{trafficId},</if>
+            <if test="plate != null and plate != ''">#{plate},</if>
+            <if test="cameraId != null">#{cameraId},</if>
+            <if test="cameraName != null and cameraName != ''">#{cameraName},</if>
+            <if test="captureTime != null">#{captureTime},</if>
+            <if test="processStatus != null">#{processStatus},</if>
+            <if test="remark != null">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateTobAlertReceive" parameterType="TobAlertReceive">
+        update tob_alert_receive
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="processStatus != null and processStatus != ''">process_status = #{processStatus},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+</mapper>

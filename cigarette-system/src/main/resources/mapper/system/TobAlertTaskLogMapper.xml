@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobAlertTaskLogMapper">
+
+    <resultMap type="TobAlertTaskLog" id="TobAlertTaskLogResult">
+        <result property="id"             column="id"              />
+        <result property="taskId"         column="task_id"         />
+        <result property="operateUser"    column="operate_user"    />
+        <result property="operateType"    column="operate_type"    />
+        <result property="operateContent" column="operate_content" />
+        <result property="createTime"     column="create_time"     />
+    </resultMap>
+
+    <sql id="selectTobAlertTaskLogVo">
+        select id, task_id, operate_user, operate_type, operate_content, create_time
+        from tob_alert_task_log
+    </sql>
+
+    <select id="selectTobAlertTaskLogList" parameterType="TobAlertTaskLog" resultMap="TobAlertTaskLogResult">
+        <include refid="selectTobAlertTaskLogVo"/>
+        <where>
+            <if test="taskId != null "> and task_id = #{taskId}</if>
+            <if test="operateUser != null  and operateUser != ''"> and operate_user = #{operateUser}</if>
+            <if test="operateType != null "> and operate_type = #{operateType}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectTobAlertTaskLogById" parameterType="Long" resultMap="TobAlertTaskLogResult">
+        <include refid="selectTobAlertTaskLogVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectTobAlertTaskLogByTaskId" parameterType="Long" resultMap="TobAlertTaskLogResult">
+        <include refid="selectTobAlertTaskLogVo"/>
+        where task_id = #{taskId}
+        order by create_time asc
+    </select>
+
+    <insert id="insertTobAlertTaskLog" parameterType="TobAlertTaskLog" useGeneratedKeys="true" keyProperty="id">
+        insert into tob_alert_task_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            task_id,
+            operate_user,
+            operate_type,
+            <if test="operateContent != null and operateContent != ''">operate_content,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{taskId},
+            #{operateUser},
+            #{operateType},
+            <if test="operateContent != null and operateContent != ''">#{operateContent},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+</mapper>

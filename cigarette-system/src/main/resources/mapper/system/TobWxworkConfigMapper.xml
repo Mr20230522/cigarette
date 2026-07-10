@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobWxworkConfigMapper">
+
+    <resultMap type="TobWxworkConfig" id="TobWxworkConfigResult">
+        <result property="id"          column="id"           />
+        <result property="configKey"   column="config_key"   />
+        <result property="configValue" column="config_value" />
+        <result property="configName"  column="config_name"  />
+        <result property="configType"  column="config_type"  />
+        <result property="isActive"    column="is_active"    />
+        <result property="remark"      column="remark"       />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"  column="create_time"  />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"  column="update_time"  />
+    </resultMap>
+
+    <sql id="selectTobWxworkConfigVo">
+        select id, config_key, config_value, config_name, config_type, is_active,
+               remark, create_by, create_time, update_by, update_time
+        from tob_wxwork_config
+    </sql>
+
+    <select id="selectTobWxworkConfigList" parameterType="TobWxworkConfig" resultMap="TobWxworkConfigResult">
+        <include refid="selectTobWxworkConfigVo"/>
+        <where>
+            <if test="configKey != null  and configKey != ''"> and config_key like concat('%', #{configKey}, '%')</if>
+            <if test="configName != null  and configName != ''"> and config_name like concat('%', #{configName}, '%')</if>
+            <if test="configType != null  and configType != ''"> and config_type = #{configType}</if>
+            <if test="isActive != null "> and is_active = #{isActive}</if>
+        </where>
+    </select>
+
+    <select id="selectTobWxworkConfigById" parameterType="Long" resultMap="TobWxworkConfigResult">
+        <include refid="selectTobWxworkConfigVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectTobWxworkConfigByConfigKey" parameterType="String" resultMap="TobWxworkConfigResult">
+        <include refid="selectTobWxworkConfigVo"/>
+        where config_key = #{configKey} and is_active = 1
+    </select>
+
+    <insert id="insertTobWxworkConfig" parameterType="TobWxworkConfig" useGeneratedKeys="true" keyProperty="id">
+        insert into tob_wxwork_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            config_key,
+            config_value,
+            config_name,
+            <if test="configType != null and configType != ''">config_type,</if>
+            <if test="isActive != null">is_active,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            create_time,
+            update_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{configKey},
+            #{configValue},
+            #{configName},
+            <if test="configType != null and configType != ''">#{configType},</if>
+            <if test="isActive != null">#{isActive},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            sysdate(),
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateTobWxworkConfig" parameterType="TobWxworkConfig">
+        update tob_wxwork_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="configKey != null and configKey != ''">config_key = #{configKey},</if>
+            <if test="configValue != null and configValue != ''">config_value = #{configValue},</if>
+            <if test="configName != null and configName != ''">config_name = #{configName},</if>
+            <if test="configType != null and configType != ''">config_type = #{configType},</if>
+            <if test="isActive != null">is_active = #{isActive},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTobWxworkConfigById" parameterType="Long">
+        delete from tob_wxwork_config where id = #{id}
+    </delete>
+
+    <delete id="deleteTobWxworkConfigByIds" parameterType="Long">
+        delete from tob_wxwork_config where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

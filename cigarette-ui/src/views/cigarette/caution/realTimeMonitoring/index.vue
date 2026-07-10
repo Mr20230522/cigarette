@@ -321,7 +321,7 @@ export default {
     this.timer = setInterval(this.fetchNewData, 3000);// 每3秒请求一次
     window.addEventListener('beforeunload', this.handleBeforeUnload);
   },
-  beforeUnmount() {
+  beforeDestroy() {
     if (this.timer) {
       clearInterval(this.timer);
       this.timer = null;

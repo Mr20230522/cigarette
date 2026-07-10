@@ -35,6 +35,12 @@
             <artifactId>ruoyi-common</artifactId>
         </dependency>
 
+        <!-- 烟草业务模块 -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>cigarette-system</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

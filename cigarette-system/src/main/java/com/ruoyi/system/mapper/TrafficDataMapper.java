@@ -31,4 +31,9 @@ public interface TrafficDataMapper {
 
     /* 新增：增量同步专用 */
     List<TrafficData> fetchNewById(@Param("lastId") Long lastId, @Param("limit") int limit);
+
+    /**
+     * 根据主键Id查询交通数据
+     */
+    TrafficData selectById(@Param("id") Long id);
 }

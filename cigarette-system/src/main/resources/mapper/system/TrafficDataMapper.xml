@@ -123,4 +123,9 @@
             LIMIT #{limit}
     </select>
 
+    <!-- 根据主键ID查询交通数据 -->
+    <select id="selectById" resultMap="TrafficDataResult">
+        SELECT * FROM trafficdata WHERE Id = #{id}
+    </select>
+
 </mapper>
