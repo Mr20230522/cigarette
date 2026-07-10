@@ -94,4 +94,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
     </delete>
 
+    <select id="selectDistinctByUserId" parameterType="String" resultMap="TobRegionPersonResult">
+        <include refid="selectTobRegionPersonVo"/>
+        where user_id = #{userId} and is_active = 1
+        limit 1
+    </select>
+
 </mapper>

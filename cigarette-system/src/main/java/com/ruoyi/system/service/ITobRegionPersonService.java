@@ -37,4 +37,9 @@ public interface ITobRegionPersonService {
      * 删除地域人员绑定
      */
     int deleteTobRegionPersonByIds(Long[] ids);
+
+    /**
+     * 根据企微userId查询人员信息（用于OAuth自动注册获取昵称）
+     */
+    TobRegionPerson selectDistinctByUserId(String userId);
 }

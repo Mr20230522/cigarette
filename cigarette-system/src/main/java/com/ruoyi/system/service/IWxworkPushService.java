@@ -34,4 +34,11 @@ public interface IWxworkPushService {
      * @return 是否推送成功
      */
     boolean pushText(TobAlertTask task, String toUser);
+
+    /**
+     * 通过OAuth code获取企微用户信息
+     * @param code OAuth回调返回的code
+     * @return 企微用户ID(UserId)，失败返回null
+     */
+    String getUserInfoByCode(String code);
 }

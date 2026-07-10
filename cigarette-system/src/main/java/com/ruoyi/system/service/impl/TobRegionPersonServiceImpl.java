@@ -46,4 +46,9 @@ public class TobRegionPersonServiceImpl implements ITobRegionPersonService {
     public int deleteTobRegionPersonByIds(Long[] ids) {
         return tobRegionPersonMapper.deleteTobRegionPersonByIds(ids);
     }
+
+    @Override
+    public TobRegionPerson selectDistinctByUserId(String userId) {
+        return tobRegionPersonMapper.selectDistinctByUserId(userId);
+    }
 }

@@ -1,6 +1,7 @@
 package com.ruoyi.system.mapper;
 
 import com.ruoyi.system.domain.TobRegionPerson;
+import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
@@ -42,4 +43,9 @@ public interface TobRegionPersonMapper {
      * 批量删除地域人员绑定
      */
     int deleteTobRegionPersonByIds(Long[] ids);
+
+    /**
+     * 根据企微userId查询人员信息（用于OAuth自动注册时获取昵称）
+     */
+    TobRegionPerson selectDistinctByUserId(@Param("userId") String userId);
 }

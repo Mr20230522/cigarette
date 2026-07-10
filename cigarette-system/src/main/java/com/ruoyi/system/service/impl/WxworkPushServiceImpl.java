@@ -103,8 +103,48 @@ public class WxworkPushServiceImpl implements IWxworkPushService {
 
     @Override
     public boolean pushTextCard(TobAlertTask task, String toUser) {
-        // 改为 pushText 纯文本消息，不再需要域名
-        return pushText(task, toUser);
+        String accessToken = getAccessToken();
+        if (accessToken == null || accessToken.isEmpty()) {
+            log.error("推送TextCard失败：无法获取access_token，taskId={}", task.getId());
+            return false;
+        }
+
+        String agentId = tobWxworkConfigService.getConfigValue("wxwork.agentid", "1000001");
+        String signedUrl = generateSignedUrl(task.getId());
+
+        String title = "【预警通知】" + (task.getPlate() != null ? task.getPlate() : "新任务");
+        String description = "原因：" + task.getReason() + "\n"
+                + "卡口：" + (task.getCameraName() != null ? task.getCameraName() : "-") + "\n"
+                + "时间：" + (task.getCaptureTime() != null ? DateUtil.format(task.getCaptureTime(), "yyyy-MM-dd HH:mm") : "-");
+
+        JSONObject body = new JSONObject();
+        body.set("touser", toUser);
+        body.set("msgtype", "textcard");
+        JSONObject textcard = new JSONObject();
+        textcard.set("title", title);
+        textcard.set("description", description);
+        textcard.set("url", signedUrl);
+        textcard.set("btntxt", "立即处理");
+        body.set("textcard", textcard);
+        body.set("agentid", Integer.parseInt(agentId));
+
+        String url = "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=" + accessToken;
+        try {
+            HttpResponse response = HttpRequest.post(url).body(body.toString()).execute();
+            if (response.isOk()) {
+                JSONObject result = JSONUtil.parseObj(response.body());
+                if (result.getInt("errcode") == 0) {
+                    log.info("TextCard推送成功，taskId={}, toUser={}", task.getId(), toUser);
+                    return true;
+                } else {
+                    log.error("TextCard推送失败，taskId={}, toUser={}, errcode={}, errmsg={}",
+                            task.getId(), toUser, result.getInt("errcode"), result.getStr("errmsg"));
+                }
+            }
+        } catch (Exception e) {
+            log.error("TextCard推送异常，taskId={}, toUser={}", task.getId(), toUser, e);
+        }
+        return false;
     }
 
     @Override
@@ -116,7 +156,7 @@ public class WxworkPushServiceImpl implements IWxworkPushService {
         HMac hmac = new HMac(HmacAlgorithm.HmacSHA256, SIGN_SALT.getBytes());
         String sign = Base64.encodeUrlSafe(hmac.digestHex(raw));
 
-        return wxworkDomain + "/wxwork/handle?task_id=" + taskId + "&timestamp=" + timestamp + "&sign=" + sign;
+        return wxworkDomain + "/wxwork/handle.html?taskId=" + taskId + "&timestamp=" + timestamp + "&sign=" + sign;
     }
 
     /**
@@ -193,5 +233,33 @@ public class WxworkPushServiceImpl implements IWxworkPushService {
             log.error("Text推送异常，taskId={}, toUser={}", task.getId(), toUser, e);
         }
         return false;
+    }
+
+    @Override
+    public String getUserInfoByCode(String code) {
+        String accessToken = getAccessToken();
+        if (accessToken == null || accessToken.isEmpty()) {
+            log.error("getUserInfoByCode失败：无法获取access_token");
+            return null;
+        }
+        String url = "https://qyapi.weixin.qq.com/cgi-bin/auth/getuserinfo?access_token="
+                + accessToken + "&code=" + code;
+        try {
+            HttpResponse response = HttpRequest.get(url).execute();
+            if (response.isOk()) {
+                JSONObject result = JSONUtil.parseObj(response.body());
+                if (result.getInt("errcode") == 0) {
+                    String userId = result.getStr("userid");
+                    log.info("OAuth获取用户信息成功，userId={}", userId);
+                    return userId;
+                } else {
+                    log.error("OAuth获取用户信息失败，errcode={}, errmsg={}",
+                            result.getInt("errcode"), result.getStr("errmsg"));
+                }
+            }
+        } catch (Exception e) {
+            log.error("OAuth获取用户信息异常", e);
+        }
+        return null;
     }
 }

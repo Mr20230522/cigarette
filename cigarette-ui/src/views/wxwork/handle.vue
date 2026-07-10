@@ -89,10 +89,14 @@
   <script>
     var token = '';
     var baseUrl = '';
+    var wxworkUserId = '';
     var currentTab = 0;
     var feedbackTaskId = null;
     var isMeetAlert = null;
     var isIllegal = null;
+    var directTaskId = null;   // URL参数taskId，直达任务详情
+
+    // ========== 页面初始化 ==========
 
     function initBaseUrl() {
       var path = window.location.pathname;
@@ -101,15 +105,95 @@
       } else {
         baseUrl = '/dev-api';
       }
-      if (window.location.port === '80' || window.location.port === '') {
-        baseUrl = '/dev-api';
-      }
     }
 
-    function checkLogin() {
+    function getUrlParam(name) {
+      var m = window.location.search.match(new RegExp('[?&]' + name + '=([^&#]*)'));
+      return m ? decodeURIComponent(m[1]) : null;
+    }
+
+    function initApp() {
+      initBaseUrl();
+
+      var code = getUrlParam('code');
+      var taskId = getUrlParam('taskId');
+      if (taskId) {
+        directTaskId = taskId;
+      }
+
+      // 1. 已有token → 直接进入
       token = localStorage.getItem('alert_token');
+      wxworkUserId = localStorage.getItem('wxwork_user_id') || '';
       if (token) {
-        showList();
+        enterApp();
+        return;
+      }
+
+      // 2. URL有code → OAuth回调
+      if (code) {
+        handleOAuthCallback(code);
+        return;
+      }
+
+      // 3. 既没token也没code → 发起OAuth
+      startOAuth();
+    }
+
+    // ========== OAuth 流程 ==========
+
+    function startOAuth() {
+      var redirect = window.location.origin + window.location.pathname;
+      if (directTaskId) {
+        redirect += '?taskId=' + directTaskId;
+      }
+      window.location.href = baseUrl + '/wxwork/authorize?redirect_url=' + encodeURIComponent(redirect);
+    }
+
+    function handleOAuthCallback(code) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', baseUrl + '/wxwork/auth/login?code=' + encodeURIComponent(code), true);
+      xhr.onload = function() {
+        try {
+          var res = JSON.parse(xhr.responseText);
+          if (res.code === 200 && res.data && res.data.token) {
+            token = res.data.token;
+            wxworkUserId = res.data.wxworkUserId || '';
+            localStorage.setItem('alert_token', token);
+            localStorage.setItem('wxwork_user_id', wxworkUserId);
+            // 清理URL中的code参数
+            var cleanUrl = window.location.origin + window.location.pathname;
+            if (directTaskId) {
+              cleanUrl += '?taskId=' + directTaskId;
+            }
+            window.history.replaceState({}, '', cleanUrl);
+            enterApp();
+          } else {
+            // OAuth成功拿到userId但登录失败 → 显示登录表单
+            showToast((res.msg || '免密登录失败') + '，请手动登录');
+            showPwdLogin();
+          }
+        } catch(e) {
+          showToast('认证失败，请手动登录');
+          showPwdLogin();
+        }
+      };
+      xhr.onerror = function() {
+        showToast('网络错误，请手动登录');
+        showPwdLogin();
+      };
+      xhr.send();
+    }
+
+    // ========== 登录（手动密码登录，兜底） ==========
+
+    function showPwdLogin() {
+      document.getElementById('loginPanel').style.display = 'block';
+      document.getElementById('listPanel').style.display = 'none';
+      document.getElementById('detailPanel').style.display = 'none';
+      document.getElementById('feedbackPanel').style.display = 'none';
+      document.getElementById('btnLogout').style.display = 'none';
+      if (wxworkUserId) {
+        document.getElementById('username').value = wxworkUserId;
       }
     }
 
@@ -123,7 +207,6 @@
       xhr.onload = function() {
         var res = JSON.parse(xhr.responseText);
         if (res.code === 200) {
-          var uuid = res.uuid;
           var xhr2 = new XMLHttpRequest();
           xhr2.open('POST', baseUrl + '/login', true);
           xhr2.setRequestHeader('Content-Type', 'application/json');
@@ -131,30 +214,48 @@
             var loginRes = JSON.parse(xhr2.responseText);
             if (loginRes.code === 200 && loginRes.token) {
               token = loginRes.token;
+              wxworkUserId = username;
               localStorage.setItem('alert_token', token);
+              localStorage.setItem('wxwork_user_id', wxworkUserId);
               showToast('登录成功');
-              showList();
+              enterApp();
             } else {
               showToast(loginRes.msg || '登录失败');
             }
           };
-          xhr2.send(JSON.stringify({ username: username, password: password, code: '0', uuid: uuid }));
+          xhr2.send(JSON.stringify({ username: username, password: password, code: '0', uuid: res.uuid }));
         }
       };
       xhr.send();
     }
 
+    // ========== 进入应用 ==========
+
+    function enterApp() {
+      // 如果有直达taskId，直接打开详情
+      if (directTaskId) {
+        document.getElementById('loginPanel').style.display = 'none';
+        document.getElementById('listPanel').style.display = 'none';
+        document.getElementById('detailPanel').style.display = 'none';
+        document.getElementById('feedbackPanel').style.display = 'none';
+        document.getElementById('btnLogout').style.display = 'block';
+        showDetail(directTaskId);
+        // 打开详情后清空，避免返回列表后再跳到详情
+        directTaskId = null;
+      } else {
+        showList();
+      }
+    }
+
     function doLogout() {
       localStorage.removeItem('alert_token');
+      localStorage.removeItem('wxwork_user_id');
       token = '';
-      document.getElementById('loginPanel').style.display = 'block';
-      document.getElementById('listPanel').style.display = 'none';
-      document.getElementById('detailPanel').style.display = 'none';
-      document.getElementById('feedbackPanel').style.display = 'none';
-      document.getElementById('btnLogout').style.display = 'none';
-      document.getElementById('username').value = '';
-      document.getElementById('password').value = '';
+      wxworkUserId = '';
+      showPwdLogin();
     }
+
+    // ========== 任务列表 ==========
 
     function showList() {
       document.getElementById('loginPanel').style.display = 'none';
@@ -174,13 +275,13 @@
     }
 
     function loadTaskList(tab) {
-      var statusParam = '';
-      if (tab === 0) statusParam = '&status=0';
-      else if (tab === 1) statusParam = '&status=1';
-      else statusParam = '&status=2';
+      var qs = '?pageNum=1&pageSize=50';
+      if (tab === 0) qs += '&status=0';
+      else if (tab === 1) qs += '&status=1';
+      else qs += '&status=2';
 
       var xhr = new XMLHttpRequest();
-      xhr.open('GET', baseUrl + '/cigarette/alert/task/list?pageNum=1&pageSize=50' + statusParam, true);
+      xhr.open('GET', baseUrl + '/cigarette/alert/task/list' + qs, true);
       xhr.setRequestHeader('Authorization', 'Bearer ' + token);
       xhr.onload = function() {
         var res = JSON.parse(xhr.responseText);
@@ -212,17 +313,21 @@
       return '未知';
     }
 
+    // ========== 任务详情（支持从URL直达） ==========
+
     function showDetail(taskId) {
       var xhr = new XMLHttpRequest();
       xhr.open('GET', baseUrl + '/cigarette/alert/task/' + taskId, true);
       xhr.setRequestHeader('Authorization', 'Bearer ' + token);
       xhr.onload = function() {
         var res = JSON.parse(xhr.responseText);
+        if (res.code === 401 || res.code === 402) { doLogout(); return; }
         if (res.code !== 200) { showToast('加载失败'); return; }
         var task = res.data;
         document.getElementById('listPanel').style.display = 'none';
         document.getElementById('detailPanel').style.display = 'block';
         document.getElementById('feedbackPanel').style.display = 'none';
+        document.getElementById('btnLogout').style.display = 'block';
 
         var html = '';
         html += '<div class="card detail-card">';
@@ -257,12 +362,15 @@
       xhr.send();
     }
 
+    // ========== 任务操作 ==========
+
     function doAccept(taskId) {
       var xhr = new XMLHttpRequest();
       xhr.open('PUT', baseUrl + '/cigarette/alert/task/accept/' + taskId, true);
       xhr.setRequestHeader('Authorization', 'Bearer ' + token);
       xhr.onload = function() {
         var res = JSON.parse(xhr.responseText);
+        if (res.code === 401 || res.code === 402) { doLogout(); return; }
         if (res.code === 200) {
           showToast('已接受，请提交反馈');
           showFeedback(taskId);
@@ -280,6 +388,7 @@
       xhr.setRequestHeader('Authorization', 'Bearer ' + token);
       xhr.onload = function() {
         var res = JSON.parse(xhr.responseText);
+        if (res.code === 401 || res.code === 402) { doLogout(); return; }
         if (res.code === 200) {
           showToast('已拒绝');
           showList();
@@ -336,6 +445,7 @@
       xhr.setRequestHeader('Content-Type', 'application/json');
       xhr.onload = function() {
         var res = JSON.parse(xhr.responseText);
+        if (res.code === 401 || res.code === 402) { doLogout(); return; }
         if (res.code === 200) {
           showToast('反馈已提交');
           showList();
@@ -353,8 +463,8 @@
       setTimeout(function() { t.className = 'toast'; }, 2000);
     }
 
-    initBaseUrl();
-    checkLogin();
+    // ========== 启动 ==========
+    initApp();
   </script>
 </body>
 </html>
