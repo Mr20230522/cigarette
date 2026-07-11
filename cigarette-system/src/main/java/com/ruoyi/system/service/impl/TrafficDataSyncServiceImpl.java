@@ -71,6 +71,8 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
         List<TrafficData> news = trafficDataMapper.nextTenList(param);
         if (news == null || news.isEmpty()) return;
 
+        System.out.println("[SYNC] 发现 " + news.size() + " 条新数据, waterMark=" + waterMark + ", 第一条Id=" + news.get(0).getId());
+
         // ★★★ 新增：短信告警逻辑（完全独立，不影响原有代码）★★★
         for (TrafficData item : news) {
             try {
@@ -116,68 +118,75 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
      */
     private void sendAlert(TrafficData item) {
         try {
-//            System.out.println("========== 开始处理告警 ==========");
-//            System.out.println("车辆ID: " + item.getId());
-//            System.out.println("摄像头ID(traffic_camera_id): " + item.getCameraId());
-//            System.out.println("捕获时间: " + item.getCaptureTime());
-//            System.out.println("嫌疑值: " + item.getLevel());
+            System.out.println("========== [SMS] 开始处理 车辆ID=" + item.getId() + " CameraId=" + item.getCameraId() + " Level=" + item.getLevel() + " Time=" + item.getCaptureTime() + " ==========");
 
             if (item.getCameraId() == null) {
-//                System.out.println("摄像头ID为空，无法处理");
+                System.out.println("[SMS] ❌ 摄像头ID为空，跳过");
                 return;
             }
 
             TobCamera camera = tobCameraMapper.selectByTrafficCameraId(item.getCameraId().longValue());
             if (camera == null) {
-//                System.out.println("未找到摄像头信息，traffic_camera_id: " + item.getCameraId());
+                System.out.println("[SMS] ❌ 未找到摄像头 traffic_camera_id=" + item.getCameraId());
                 return;
             }
-//            System.out.println("找到摄像头，detection_id: " + camera.getDetectionId());
+            System.out.println("[SMS] ✅ 找到摄像头 detection_id=" + camera.getDetectionId());
 
             if (item.getCaptureTime() == null || item.getCaptureTime().isEmpty()) {
-//                System.out.println("捕获时间为空，无法处理");
+                System.out.println("[SMS] ❌ 捕获时间为空，跳过");
                 return;
             }
 
+            // 兼容datetime(6)：JDBC可能返回6位小数、3位小数、或无小数
+            String captureTimeStr = item.getCaptureTime();
+            System.out.println("[SMS] 原始CaptureTime=[" + captureTimeStr + "] 长度=" + (captureTimeStr != null ? captureTimeStr.length() : 0));
+            if (captureTimeStr != null) {
+                if (!captureTimeStr.contains(".")) {
+                    captureTimeStr = captureTimeStr + ".000";
+                } else if (captureTimeStr.length() > 23) {
+                    captureTimeStr = captureTimeStr.substring(0, 23);
+                }
+                System.out.println("[SMS] 规范化后=[" + captureTimeStr + "]");
+            }
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-            Date captureDate = sdf.parse(item.getCaptureTime());
+            Date captureDate = sdf.parse(captureTimeStr);
+            System.out.println("[SMS] ✅ 时间解析成功: " + captureDate);
 
             TobClockLog duty = tobClockLogMapper.selectCurrentDuty(
                     camera.getDetectionId(), captureDate
             );
 
             if (duty == null) {
-//                System.out.println("未找到值班记录，detection_id: " + camera.getDetectionId() +
-//                        ", 时间: " + item.getCaptureTime());
+                System.out.println("[SMS] ❌ 未找到值班记录 detection_id=" + camera.getDetectionId() + " time=" + captureTimeStr);
                 return;
             }
-//            System.out.println("找到值班记录，staff_id: " + duty.getStaffId());
+            System.out.println("[SMS] ✅ 找到值班记录 staff_id=" + duty.getStaffId() + " start=" + duty.getStartTime() + " end=" + duty.getEndTime());
 
             TobStaffVo staff = tobStaffMapper.selectByIdWithPhone(duty.getStaffId());
             if (staff == null) {
-//                System.out.println("未找到工作人员信息，staff_id: " + duty.getStaffId());
+                System.out.println("[SMS] ❌ 未找到工作人员 staff_id=" + duty.getStaffId());
                 return;
             }
+            System.out.println("[SMS] ✅ 找到工作人员 user_id=" + staff.getUserId() + " phone=" + staff.getPhonenumber());
 
             String phone = staff.getPhonenumber();
             if (phone == null || phone.isEmpty()) {
-//                System.out.println("工作人员手机号为空，staff_id: " + duty.getStaffId());
+                System.out.println("[SMS] ❌ 手机号为空 staff_id=" + duty.getStaffId());
                 return;
             }
-//            System.out.println("找到工作人员，手机号: " + phone);
 
             String message = buildAlertMessage(item);
-//            System.out.println("准备发送短信: " + message);
+            System.out.println("[SMS] 短信内容: " + message);
 
             boolean success = smsService.sendSms(phone, message);
             if (success) {
-//                System.out.println("短信发送成功，车辆ID: " + item.getId() + ", 手机号: " + phone);
+                System.out.println("[SMS] ✅✅✅ 短信发送成功! 车辆ID=" + item.getId() + " 手机号=" + phone);
             } else {
-//                System.out.println("短信发送失败，车辆ID: " + item.getId());
+                System.out.println("[SMS] ❌ 短信接口返回失败 车辆ID=" + item.getId());
             }
 
         } catch (Exception e) {
-            System.err.println("处理告警异常，车辆ID: " + item.getId() + ", 错误: " + e.getMessage());
+            System.err.println("[SMS] ❌❌❌ 异常 车辆ID=" + item.getId() + " 错误: " + e.getMessage());
             e.printStackTrace();
         }
     }
