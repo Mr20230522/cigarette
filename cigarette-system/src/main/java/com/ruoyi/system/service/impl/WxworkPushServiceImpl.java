@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -113,9 +114,12 @@ public class WxworkPushServiceImpl implements IWxworkPushService {
         String signedUrl = generateSignedUrl(task.getId());
 
         String title = "【预警通知】" + (task.getPlate() != null ? task.getPlate() : "新任务");
-        String description = "原因：" + task.getReason() + "\n"
+        String description = "车牌号：" + (task.getPlate() != null ? task.getPlate() : "-") + "\n"
+                + "预警原因：" + (task.getReason() != null ? task.getReason() : "-") + "\n"
+                + "预警等级：" + getLevelFromReason(task.getReason()) + "\n"
                 + "卡口：" + (task.getCameraName() != null ? task.getCameraName() : "-") + "\n"
-                + "时间：" + (task.getCaptureTime() != null ? DateUtil.format(task.getCaptureTime(), "yyyy-MM-dd HH:mm") : "-");
+                + "时间：" + (task.getCaptureTime() != null ? DateUtil.format(task.getCaptureTime(), "yyyy-MM-dd HH:mm") : "-") + "\n"
+                + "任务处理状态：" + getStatusText(task.getStatus());
 
         JSONObject body = new JSONObject();
         body.set("touser", toUser);
@@ -149,14 +153,27 @@ public class WxworkPushServiceImpl implements IWxworkPushService {
 
     @Override
     public String generateSignedUrl(Long taskId) {
-        long timestamp = System.currentTimeMillis() / 1000;
-        String raw = taskId + "|" + timestamp + "|" + SIGN_SALT;
+        String corpId = tobWxworkConfigService.getConfigValue("wxwork.corpid", "");
+        if (corpId == null || corpId.isEmpty()) {
+            log.error("generateSignedUrl失败：wxwork.corpid 未配置");
+            return appHomeUrl + "?taskId=" + taskId;
+        }
 
-        // HMAC-SHA256签名
-        HMac hmac = new HMac(HmacAlgorithm.HmacSHA256, SIGN_SALT.getBytes());
-        String sign = Base64.encodeUrlSafe(hmac.digestHex(raw));
+        String encodedRedirect;
+        try {
+            encodedRedirect = URLEncoder.encode(appHomeUrl, "UTF-8");
+        } catch (Exception e) {
+            log.error("URL编码失败: {}", e.getMessage());
+            return appHomeUrl + "?taskId=" + taskId;
+        }
 
-        return wxworkDomain + "/wxwork/handle.html?taskId=" + taskId + "&timestamp=" + timestamp + "&sign=" + sign;
+        return "https://open.weixin.qq.com/connect/oauth2/authorize"
+                + "?appid=" + corpId
+                + "&redirect_uri=" + encodedRedirect
+                + "&response_type=code"
+                + "&scope=snsapi_base"
+                + "&state=taskId:" + taskId
+                + "#wechat_redirect";
     }
 
     /**
@@ -201,12 +218,12 @@ public class WxworkPushServiceImpl implements IWxworkPushService {
 
         String agentId = tobWxworkConfigService.getConfigValue("wxwork.agentid", "1000001");
 
-        String content = "【预警通知】\n"
-                + "车牌：" + (task.getPlate() != null ? task.getPlate() : "-") + "\n"
-                + "原因：" + task.getReason() + "\n"
+        String content = "车牌号：" + (task.getPlate() != null ? task.getPlate() : "-") + "\n"
+                + "预警原因：" + (task.getReason() != null ? task.getReason() : "-") + "\n"
+                + "预警等级：" + getLevelFromReason(task.getReason()) + "\n"
                 + "卡口：" + (task.getCameraName() != null ? task.getCameraName() : "-") + "\n"
-                + "时间：" + (task.getCaptureTime() != null ? DateUtil.format(task.getCaptureTime(), "yyyy-MM-dd HH:mm") : "-") + "\n\n"
-                + "请打开企业微信工作台 → 推送测试 进行处理";
+                + "时间：" + (task.getCaptureTime() != null ? DateUtil.format(task.getCaptureTime(), "yyyy-MM-dd HH:mm") : "-") + "\n"
+                + "任务处理状态：" + getStatusText(task.getStatus());
 
         JSONObject body = new JSONObject();
         body.set("touser", toUser);
@@ -261,5 +278,25 @@ public class WxworkPushServiceImpl implements IWxworkPushService {
             log.error("OAuth获取用户信息异常", e);
         }
         return null;
+    }
+
+    private String getStatusText(Integer status) {
+        if (status == null) return "未知";
+        switch (status) {
+            case 0: return "待处理";
+            case 1: return "处理中";
+            case 2: return "已完成";
+            case 3: return "已关闭";
+            default: return "未知";
+        }
+    }
+
+    private String getLevelFromReason(String reason) {
+        if (reason == null) return "-";
+        if (reason.contains("严重")) return "严重";
+        if (reason.contains("高")) return "高";
+        if (reason.contains("中")) return "中";
+        if (reason.contains("低")) return "低";
+        return "-";
     }
 }
