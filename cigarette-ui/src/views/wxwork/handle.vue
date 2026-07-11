@@ -117,8 +117,13 @@
 
       var code = getUrlParam('code');
       var taskId = getUrlParam('taskId');
+      var state = getUrlParam('state');
+
+      // taskId 来源优先级：URL参数 > state参数（OAuth回调时企微透传）
       if (taskId) {
         directTaskId = taskId;
+      } else if (state && state.indexOf('taskId:') === 0) {
+        directTaskId = state.substring(7);
       }
 
       // 1. 已有token → 直接进入
