@@ -227,4 +227,76 @@ public class TobAlertReceiveServiceImpl implements ITobAlertReceiveService {
     public int updateTobAlertReceive(TobAlertReceive tobAlertReceive) {
         return tobAlertReceiveMapper.updateTobAlertReceive(tobAlertReceive);
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Long receiveAlertFromMonitoring(ToVehicleRealTimMonitoring data, double level) {
+        // 1. 防重校验
+        TobAlertReceive existReceive = tobAlertReceiveMapper.selectTobAlertReceiveByOriginalId(data.getId());
+        if (existReceive != null) {
+            log.info("监控数据已创建过预警，skip monitoringId={}", data.getId());
+            return existReceive.getId();
+        }
+
+        // 2. 卡口→地域映射
+        TobCameraRegion cameraRegion = null;
+        if (data.getCameraId() != null) {
+            cameraRegion = tobCameraRegionMapper.selectTobCameraRegionByCameraId(data.getCameraId());
+        }
+        if (cameraRegion == null) {
+            log.warn("卡口未绑定地域，跳过预警，monitoringId={}, cameraId={}", data.getId(), data.getCameraId());
+            return null;
+        }
+
+        // 3. 写入接收表
+        TobAlertReceive receive = new TobAlertReceive();
+        receive.setReceiveNo("R" + DateUtil.format(new Date(), "yyyyMMdd") + IdUtil.fastSimpleUUID().substring(0, 6).toUpperCase());
+        receive.setOriginalId(data.getId());
+        receive.setReason("风险计算系统触发，Level=" + level);
+        receive.setTrafficId(data.getId());
+        receive.setPlate(data.getPlate());
+        receive.setCameraId(data.getCameraId());
+        receive.setCameraName(data.getCameraName());
+        if (data.getCaptureTime() != null) {
+            receive.setCaptureTime(data.getCaptureTime());
+        }
+        receive.setProcessStatus("0");
+        tobAlertReceiveMapper.insertTobAlertReceive(receive);
+        log.info("风险计算预警接收成功，receiveId={}, monitoringId={}, plate={}, level={}",
+                 receive.getId(), data.getId(), data.getPlate(), level);
+
+        // 4. 创建任务
+        TobAlertTask task = new TobAlertTask();
+        task.setTaskNo("T" + DateUtil.format(new Date(), "yyyyMMdd") + IdUtil.fastSimpleUUID().substring(0, 6).toUpperCase());
+        task.setOriginalId(data.getId());
+        task.setReceiveId(receive.getId());
+        task.setLocationId(cameraRegion.getLocationId());
+        task.setPlate(data.getPlate());
+        task.setCameraName(data.getCameraName());
+        if (data.getCaptureTime() != null) {
+            task.setCaptureTime(data.getCaptureTime());
+        }
+        task.setReason("风险计算系统触发，Level=" + level);
+        task.setStatus(0);
+        task.setAssignIndex(0);
+        task.setPushedToAdmin(0);
+        task.setExpireTime(DateUtil.offsetHour(new Date(), 2));
+        task.setCreateBy("system");
+        tobAlertTaskService.insertTobAlertTask(task);
+        log.info("风险计算预警任务创建成功，taskId={}, taskNo={}", task.getId(), task.getTaskNo());
+
+        // 5. 查询绑定人员并推送
+        List<TobRegionPerson> personList = tobRegionPersonService.selectTobRegionPersonByLocationId(cameraRegion.getLocationId());
+        if (personList == null || personList.isEmpty()) {
+            pushToAdmin(task, "地域无绑定人员");
+        } else {
+            pushToFirstPerson(task, personList);
+        }
+
+        // 6. 更新接收表状态
+        receive.setProcessStatus("1");
+        tobAlertReceiveMapper.updateTobAlertReceive(receive);
+
+        return receive.getId();
+    }
 }

@@ -98,7 +98,7 @@ public class TobWxworkAuthController extends BaseController {
             return error("获取用户信息失败，请重试");
         }
         log.info("OAuth认证成功，企微userId={}", userId);
-        return success("认证成功", userId);
+        return AjaxResult.success("认证成功", userId);
     }
 
     /**
@@ -134,7 +134,7 @@ public class TobWxworkAuthController extends BaseController {
         result.set("token", token);
         result.set("wxworkUserId", wxworkUserId);
         log.info("企微OAuth登录成功，wxworkUserId={}", wxworkUserId);
-        return success("登录成功", result);
+        return AjaxResult.success("登录成功", result);
     }
 
     /**
@@ -154,7 +154,6 @@ public class TobWxworkAuthController extends BaseController {
         user.setNickName(nickName);
         user.setPassword(passwordEncoder.encode(wxworkUserId + "_wxwork_default"));
         user.setStatus("0");
-        user.setUserType("00");
         user.setCreateBy("system");
 
         int rows = sysUserService.insertUser(user);

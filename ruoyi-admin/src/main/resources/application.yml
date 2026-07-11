@@ -34,6 +34,11 @@ server:
       # Tomcat启动初始化的线程数，默认值10
       min-spare: 100
 
+# 企业微信配置（数据库 tob_wxwork_config 优先，此处为默认值兜底）
+wxwork:
+  domain: https://你的域名.com
+  app-home-url: https://你的域名.com/wxwork/handle.html
+
 # 日志配置
 logging:
   level:

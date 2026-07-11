@@ -1,6 +1,7 @@
 package com.ruoyi.system.service;
 
 import com.ruoyi.system.domain.TobAlertReceive;
+import com.ruoyi.system.domain.ToVehicleRealTimMonitoring;
 import java.util.List;
 
 /**
@@ -35,4 +36,12 @@ public interface ITobAlertReceiveService {
      * 修改预警接收记录
      */
     int updateTobAlertReceive(TobAlertReceive tobAlertReceive);
+
+    /**
+     * 从风险计算系统接收预警（直接用ToVehicleRealTimMonitoring数据，不查trafficdata）
+     * @param data  实时监控数据
+     * @param level 计算出的风险等级
+     * @return 接收记录ID，null表示跳过（如卡口未绑定地域）
+     */
+    Long receiveAlertFromMonitoring(ToVehicleRealTimMonitoring data, double level);
 }

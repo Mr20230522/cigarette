@@ -838,6 +838,10 @@ import com.ruoyi.system.mapper.ToVehicleRealTimMonitoringMapper;
 import com.ruoyi.system.service.IToRiskScoreService;
 import com.ruoyi.system.service.IToVehicleFieldScoreService;
 import com.ruoyi.system.service.ITobCaseHistoryService;
+import com.ruoyi.system.service.ITobAlertReceiveService;
+import com.ruoyi.system.service.ITobWxworkConfigService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -860,6 +864,7 @@ import java.util.stream.Collectors;
 @Service
 public class ToRiskScoreServiceImpl implements IToRiskScoreService {
 
+    private static final Logger log = LoggerFactory.getLogger(ToRiskScoreServiceImpl.class);
     private static final int BATCH_SIZE = 50;
     private static final String POSITION_FILE = "risk_position.txt";
     private static final ZoneId DEFAULT_ZONE = ZoneId.systemDefault();
@@ -878,6 +883,12 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
     //各个字段得分
     @Autowired
     private IToVehicleFieldScoreService fieldScoreService;
+    // 新增：预警接收服务
+    @Autowired
+    private ITobAlertReceiveService alertReceiveService;
+    // 新增：企微配置服务
+    @Autowired
+    private ITobWxworkConfigService wxworkConfigService;
     // 预加载历史车牌集合（避免重复查询）
     private Set<String> historicalPlates = new HashSet<>();
 
@@ -1080,6 +1091,16 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
                 if (!triggeredFactors.isEmpty()) {
                     System.out.println("ID=" + data.getId() + " 车牌=" + data.getPlate() + " 触发: " + String.join(", ", triggeredFactors) + "，总分=" + totalScore);
                 }
+                // 【新增】检查风险阈值，触发预警
+                try {
+                    if (isRiskAlertEnabled() && totalScore > getRiskThreshold()) {
+                        log.info("风险计算超阈值，monitoringId={}, plate={}, level={}, threshold={}",
+                                 data.getId(), data.getPlate(), totalScore, getRiskThreshold());
+                        alertReceiveService.receiveAlertFromMonitoring(data, totalScore);
+                    }
+                } catch (Exception ex) {
+                    log.error("风险计算联动预警异常，monitoringId={}, plate={}", data.getId(), data.getPlate(), ex);
+                }
             } catch (Exception ex) {
                 System.err.println("更新风险分失败，ID=" + data.getId() + "：" + ex.getMessage());
             }
@@ -1088,6 +1109,27 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
         }
 
         writeLastProcessedId(maxId);
+    }
+
+    /**
+     * 检查是否启用风险计算预警（开关）
+     */
+    private boolean isRiskAlertEnabled() {
+        String sourceType = wxworkConfigService.getConfigValue("alert.source.type", "");
+        return "risk".equals(sourceType);
+    }
+
+    /**
+     * 获取风险阈值
+     */
+    private double getRiskThreshold() {
+        String thresholdStr = wxworkConfigService.getConfigValue("alert.risk.threshold", "60");
+        try {
+            return Double.parseDouble(thresholdStr);
+        } catch (NumberFormatException e) {
+            log.warn("风险阈值配置非法：{}，使用默认值60", thresholdStr);
+            return 60.0;
+        }
     }
 
     /**

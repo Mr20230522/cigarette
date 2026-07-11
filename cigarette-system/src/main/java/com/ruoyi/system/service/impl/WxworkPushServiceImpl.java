@@ -206,7 +206,7 @@ public class WxworkPushServiceImpl implements IWxworkPushService {
                 + "原因：" + task.getReason() + "\n"
                 + "卡口：" + (task.getCameraName() != null ? task.getCameraName() : "-") + "\n"
                 + "时间：" + (task.getCaptureTime() != null ? DateUtil.format(task.getCaptureTime(), "yyyy-MM-dd HH:mm") : "-") + "\n\n"
-                + "请打开企业微信工作台 → 预警处理系统 进行处理";
+                + "请打开企业微信工作台 → 推送测试 进行处理";
 
         JSONObject body = new JSONObject();
         body.set("touser", toUser);
