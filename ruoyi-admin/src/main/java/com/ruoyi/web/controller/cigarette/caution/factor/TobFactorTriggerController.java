@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/factor/trigger")
-public class ToFactorTriggerController extends BaseController {
+public class TobFactorTriggerController extends BaseController {
 
     @Autowired
     private ITobFactorTriggerService factorTriggerService;
