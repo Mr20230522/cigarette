@@ -44,3 +44,11 @@ export function delRegionPerson(ids) {
     method: 'delete'
   })
 }
+
+/* 获取地域下拉选项 */
+export function listLocations() {
+  return request({
+    url: '/cigarette/alert/cameraRegion/locations',
+    method: 'get'
+  })
+}

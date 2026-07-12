@@ -10,7 +10,8 @@
       <el-form-item label="处理状态" prop="processStatus">
         <el-select v-model="queryParams.processStatus" placeholder="请选择" clearable>
           <el-option label="未处理" value="0" />
-          <el-option label="已处理" value="1" />
+          <el-option label="处理中" value="1" />
+          <el-option label="已处理" value="2" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -31,9 +32,9 @@
       <el-table-column label="预警原因" align="center" prop="reason" min-width="120px" show-overflow-tooltip />
       <el-table-column label="处理状态" align="center" prop="processStatus" width="100px">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.processStatus === '1' ? 'success' : 'warning'">
-            {{ scope.row.processStatus === '1' ? '已处理' : '未处理' }}
-          </el-tag>
+          <el-tag v-if="scope.row.processStatus === '0'" type="warning">未处理</el-tag>
+          <el-tag v-else-if="scope.row.processStatus === '1'" type="primary">处理中</el-tag>
+          <el-tag v-else-if="scope.row.processStatus === '2'" type="success">已处理</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" min-width="160px" />

@@ -3,6 +3,7 @@ package com.ruoyi.system.service.impl;
 import cn.hutool.core.date.DateUtil;
 import com.ruoyi.system.domain.*;
 import com.ruoyi.system.mapper.TobAlertTaskMapper;
+import com.ruoyi.system.mapper.TobAlertReceiveMapper;
 import com.ruoyi.system.mapper.TobCameraRegionMapper;
 import com.ruoyi.system.service.*;
 import org.slf4j.Logger;
@@ -34,6 +35,9 @@ public class TobAlertTaskServiceImpl implements ITobAlertTaskService {
 
     @Autowired
     private ITobRegionPersonService tobRegionPersonService;
+
+    @Autowired
+    private TobAlertReceiveMapper tobAlertReceiveMapper;
 
     @Autowired
     private WxworkPushServiceImpl wxworkPushService;
@@ -86,6 +90,17 @@ public class TobAlertTaskServiceImpl implements ITobAlertTaskService {
 
         log.info("任务接受成功，taskId={}, userId={}", taskId, userId);
         notifyGroupStatus(taskId, userId, "接受任务", "处理中");
+
+        // 同步更新接收表 processStatus
+        TobAlertTask task = tobAlertTaskMapper.selectTobAlertTaskById(taskId);
+        if (task != null && task.getOriginalId() != null) {
+            TobAlertReceive receive = tobAlertReceiveMapper.selectTobAlertReceiveByOriginalId(task.getOriginalId());
+            if (receive != null) {
+                receive.setProcessStatus("1");
+                tobAlertReceiveMapper.updateTobAlertReceive(receive);
+            }
+        }
+
         return 1;
     }
 
@@ -155,6 +170,15 @@ public class TobAlertTaskServiceImpl implements ITobAlertTaskService {
         task.setStatus(3);
         tobAlertTaskMapper.updateTobAlertTask(task);
 
+        // 同步更新接收表 processStatus
+        if (task.getOriginalId() != null) {
+            TobAlertReceive receive = tobAlertReceiveMapper.selectTobAlertReceiveByOriginalId(task.getOriginalId());
+            if (receive != null) {
+                receive.setProcessStatus("2");
+                tobAlertReceiveMapper.updateTobAlertReceive(receive);
+            }
+        }
+
         // 记录日志
         TobAlertTaskLog taskLog = new TobAlertTaskLog();
         taskLog.setTaskId(taskId);
@@ -189,6 +213,15 @@ public class TobAlertTaskServiceImpl implements ITobAlertTaskService {
         // 更新任务状态：1(已接受) → 2(处理中/已反馈)
         task.setStatus(2);
         tobAlertTaskMapper.updateTobAlertTask(task);
+
+        // 同步更新接收表 processStatus
+        if (task.getOriginalId() != null) {
+            TobAlertReceive receive = tobAlertReceiveMapper.selectTobAlertReceiveByOriginalId(task.getOriginalId());
+            if (receive != null) {
+                receive.setProcessStatus("2");
+                tobAlertReceiveMapper.updateTobAlertReceive(receive);
+            }
+        }
 
         // 记录反馈日志
         TobAlertTaskLog taskLog = new TobAlertTaskLog();
@@ -226,9 +259,14 @@ public class TobAlertTaskServiceImpl implements ITobAlertTaskService {
         }
 
         for (TobAlertTask task : timeoutTasks) {
+            // 已被接受或已处理，跳过
+            if (task.getStatus() == null || task.getStatus() != 0) {
+                continue;
+            }
+
             long minutesAgo = (System.currentTimeMillis() - task.getCreateTime().getTime()) / 60000;
 
-            if (minutesAgo >= 120 && task.getPushedToAdmin() == 0) {
+            if (minutesAgo >= 120) {
                 // 超过2小时，硬超时关闭
                 task.setStatus(3);
                 tobAlertTaskMapper.updateTobAlertTask(task);
@@ -242,26 +280,84 @@ public class TobAlertTaskServiceImpl implements ITobAlertTaskService {
 
                 log.info("任务硬超时关闭，taskId={}", task.getId());
                 notifyGroupStatus(task.getId(), "system", "超时自动关闭", "已关闭");
-            } else if (minutesAgo >= 2 && task.getPushedToAdmin() == 0) {
-                // 超过2分钟未处理，推管理员
-                task.setPushedToAdmin(1);
-                tobAlertTaskMapper.updateTobAlertTask(task);
-
-                List<TobRegionPerson> adminList = tobRegionPersonService.selectTobRegionPersonByLocationId(0);
-                if (adminList != null && !adminList.isEmpty()) {
-                    wxworkPushService.pushTextCard(task, adminList.get(0).getUserId());
+            } else {
+                // 不仅推管理员——先尝试流转给下一个空闲的人
+                List<TobRegionPerson> personList = tobRegionPersonService.selectTobRegionPersonByLocationId(task.getLocationId());
+                if (personList == null || personList.isEmpty()) {
+                    pushToAdmin(task, "地域无绑定人员，超时流转");
+                    continue;
                 }
 
-                TobAlertTaskLog taskLog = new TobAlertTaskLog();
-                taskLog.setTaskId(task.getId());
-                taskLog.setOperateUser("system");
-                taskLog.setOperateType(5);
-                taskLog.setOperateContent("超时升级推送至管理员（创建超过2分钟未处理）");
-                tobAlertTaskLogService.insertTobAlertTaskLog(taskLog);
+                // 当前推送的人超时未响应 → assignIndex+1
+                int currentIndex = task.getAssignIndex() != null ? task.getAssignIndex() : 0;
+                if (currentIndex < personList.size() && task.getAcceptUser() == null) {
+                    TobAlertTaskLog timeoutLog = new TobAlertTaskLog();
+                    timeoutLog.setTaskId(task.getId());
+                    timeoutLog.setOperateUser("system");
+                    timeoutLog.setOperateType(6);
+                    timeoutLog.setOperateContent("推送超时未响应，自动流转至下一位");
+                    tobAlertTaskLogService.insertTobAlertTaskLog(timeoutLog);
 
-                log.info("任务超时升级推管理员，taskId={}", task.getId());
-                notifyGroupStatus(task.getId(), "system", "超时升级推送管理员", "待处理");
+                    task.setAssignIndex(currentIndex + 1);
+                    tobAlertTaskMapper.updateTobAlertTask(task);
+                }
+
+                int nextIndex = task.getAssignIndex() != null ? task.getAssignIndex() : 0;
+                if (nextIndex >= personList.size()) {
+                    pushToAdmin(task, "所有人员均已尝试");
+                    continue;
+                }
+
+                boolean found = false;
+                for (int i = nextIndex; i < personList.size(); i++) {
+                    TobRegionPerson person = personList.get(i);
+                    if (tobAlertTaskMapper.countActiveTasksByUserId(person.getUserId()) > 0) {
+                        continue;
+                    }
+                    boolean success = wxworkPushService.pushTextCard(task, person.getUserId());
+                    if (success) {
+                        task.setAssignIndex(i);
+                        tobAlertTaskMapper.updateTobAlertTask(task);
+                        found = true;
+
+                        TobAlertTaskLog pushLog = new TobAlertTaskLog();
+                        pushLog.setTaskId(task.getId());
+                        pushLog.setOperateUser("system");
+                        pushLog.setOperateType(3);
+                        pushLog.setOperateContent("超时流转推送成功，推送至用户[" + person.getUserId() + "]");
+                        tobAlertTaskLogService.insertTobAlertTaskLog(pushLog);
+                    } else {
+                        task.setAssignIndex(i + 1);
+                        tobAlertTaskMapper.updateTobAlertTask(task);
+                    }
+                    break;
+                }
+
+                if (!found) {
+                    task.setExpireTime(cn.hutool.core.date.DateUtil.offsetMinute(new java.util.Date(), 10));
+                    tobAlertTaskMapper.updateTobAlertTask(task);
+                    log.info("超时流转时全员忙碌，taskId={}，延长等待", task.getId());
+                }
             }
+        }
+    }
+
+    private void pushToAdmin(TobAlertTask task, String reason) {
+        if (task.getPushedToAdmin() != null && task.getPushedToAdmin() == 1) {
+            return;
+        }
+        task.setPushedToAdmin(1);
+        tobAlertTaskMapper.updateTobAlertTask(task);
+
+        List<TobRegionPerson> adminList = tobRegionPersonService.selectTobRegionPersonByLocationId(0);
+        if (adminList != null && !adminList.isEmpty()) {
+            wxworkPushService.pushTextCard(task, adminList.get(0).getUserId());
+            TobAlertTaskLog pushLog = new TobAlertTaskLog();
+            pushLog.setTaskId(task.getId());
+            pushLog.setOperateUser("system");
+            pushLog.setOperateType(5);
+            pushLog.setOperateContent("超时流转推送至管理员[" + adminList.get(0).getUserId() + "]，原因：" + reason);
+            tobAlertTaskLogService.insertTobAlertTaskLog(pushLog);
         }
     }
 
@@ -352,5 +448,10 @@ public class TobAlertTaskServiceImpl implements ITobAlertTaskService {
         } catch (Exception e) {
             log.warn("群通知发送异常, taskId={}: {}", taskId, e.getMessage());
         }
+    }
+
+    @Override
+    public boolean isPersonBusy(String userId) {
+        return tobAlertTaskMapper.countActiveTasksByUserId(userId) > 0;
     }
 }

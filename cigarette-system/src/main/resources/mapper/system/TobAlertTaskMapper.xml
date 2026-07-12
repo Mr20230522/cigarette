@@ -139,4 +139,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
     </delete>
 
+    <select id="countActiveTasksByUserId" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM tob_alert_task
+        WHERE accept_user = #{userId} AND status = 1
+    </select>
+
 </mapper>

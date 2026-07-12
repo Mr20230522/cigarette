@@ -46,4 +46,9 @@ public class TobCameraRegionServiceImpl implements ITobCameraRegionService {
     public int deleteTobCameraRegionByIds(Long[] ids) {
         return tobCameraRegionMapper.deleteTobCameraRegionByIds(ids);
     }
+
+    @Override
+    public List<TobCameraRegion> selectDistinctLocations() {
+        return tobCameraRegionMapper.selectDistinctLocations();
+    }
 }

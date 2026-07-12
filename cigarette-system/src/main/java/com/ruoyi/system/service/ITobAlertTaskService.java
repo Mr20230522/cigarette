@@ -72,4 +72,9 @@ public interface ITobAlertTaskService {
      * 手动推送任务（重置推送索引，重新推送给第一个绑定人员）
      */
     int pushTask(Long taskId);
+
+    /**
+     * 判断某人是否忙碌（有status=1的处理中任务）
+     */
+    boolean isPersonBusy(String userId);
 }

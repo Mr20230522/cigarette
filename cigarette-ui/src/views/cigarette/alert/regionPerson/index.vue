@@ -28,6 +28,7 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" prop="id" width="80px" />
       <el-table-column label="地域ID" align="center" prop="locationId" width="100px" />
+      <el-table-column label="地域名称" align="center" prop="locationName" width="120px" />
       <el-table-column label="用户ID" align="center" prop="userId" width="150px" />
       <el-table-column label="用户姓名" align="center" prop="userName" width="120px" />
       <el-table-column label="推送优先级" align="center" prop="sortOrder" width="100px" />
@@ -54,8 +55,10 @@
 
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-form-item label="地域ID" prop="locationId">
-          <el-input-number v-model="form.locationId" :min="0" placeholder="0代表管理员，>0代表普通地域" />
+        <el-form-item label="地域" prop="locationId">
+          <el-select v-model="form.locationId" placeholder="请选择地域" style="width:100%">
+            <el-option v-for="item in locationOptions" :key="item.locationId" :label="item.locationName" :value="item.locationId" />
+          </el-select>
         </el-form-item>
         <el-form-item label="用户ID" prop="userId">
           <el-input v-model="form.userId" placeholder="企业微信用户ID" />
@@ -82,7 +85,7 @@
 </template>
 
 <script>
-import { listRegionPerson, getRegionPerson, addRegionPerson, updateRegionPerson, delRegionPerson } from "@/api/cigarette/alert/regionPerson";
+import { listRegionPerson, getRegionPerson, addRegionPerson, updateRegionPerson, delRegionPerson, listLocations } from "@/api/cigarette/alert/regionPerson";
 
 export default {
   name: "RegionPerson",
@@ -95,6 +98,7 @@ export default {
       showSearch: true,
       total: 0,
       personList: [],
+      locationOptions: [],
       title: "",
       open: false,
       queryParams: {
@@ -118,7 +122,9 @@ export default {
   methods: {
     getList() {
       this.loading = true;
-      listRegionPerson(this.queryParams).then(response => {
+      const params = { ...this.queryParams };
+      if (params.locationId === 0) params.locationId = null;
+      listRegionPerson(params).then(response => {
         this.personList = response.rows;
         this.total = response.total;
         this.loading = false;
@@ -139,11 +145,13 @@ export default {
     },
     handleAdd() {
       this.reset();
+      this.loadLocations();
       this.open = true;
       this.title = "新增地域人员绑定";
     },
     handleUpdate(row) {
       this.reset();
+      this.loadLocations();
       const id = row.id || this.ids;
       getRegionPerson(id).then(response => {
         this.form = response.data;
@@ -177,6 +185,11 @@ export default {
             });
           }
         }
+      });
+    },
+    loadLocations() {
+      listLocations().then(res => {
+        this.locationOptions = res.data || [];
       });
     },
     cancel() {

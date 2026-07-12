@@ -9,6 +9,7 @@ import com.ruoyi.system.service.ITobAlertTaskService;
 import com.ruoyi.system.service.ITobAlertTaskLogService;
 import com.ruoyi.system.service.ITobCameraRegionService;
 import com.ruoyi.system.service.ITobRegionPersonService;
+import com.ruoyi.system.service.ITobWxworkConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,9 @@ public class TobAlertReceiveServiceImpl implements ITobAlertReceiveService {
 
     @Autowired
     private WxworkPushServiceImpl wxworkPushService;
+
+    @Autowired
+    private ITobWxworkConfigService wxworkConfigService;
 
     @Override
     public TobAlertReceive selectTobAlertReceiveById(Long id) {
@@ -133,69 +137,73 @@ public class TobAlertReceiveServiceImpl implements ITobAlertReceiveService {
             log.warn("地域{}无绑定人员，尝试推送管理员", cameraRegion.getLocationId());
             pushToAdmin(task, "地域无绑定人员");
         } else {
-            // 推送首个人员
-            pushToFirstPerson(task, personList);
+            boolean pushed = pushToNextAvailable(task, personList, 0);
+            if (!pushed) {
+                log.info("区域{}全员忙碌，taskId={}等待重试", cameraRegion.getLocationId(), task.getId());
+                TobAlertTaskLog busyLog = new TobAlertTaskLog();
+                busyLog.setTaskId(task.getId());
+                busyLog.setOperateUser("system");
+                busyLog.setOperateType(6);
+                busyLog.setOperateContent("全员忙碌，等待空闲");
+                tobAlertTaskLogService.insertTobAlertTaskLog(busyLog);
+            }
         }
 
         // 7. 更新接收表状态
-        receive.setProcessStatus("1");
+        receive.setProcessStatus("0");
         tobAlertReceiveMapper.updateTobAlertReceive(receive);
 
         return receive.getId();
     }
 
     /**
-     * 推送给首个绑定人员
+     * 从指定index开始，找第一个空闲的人推送
+     * @return true=找到并推送了，false=全员忙碌
      */
-    private void pushToFirstPerson(TobAlertTask task, List<TobRegionPerson> personList) {
-        TobRegionPerson firstPerson = personList.get(0);
-        boolean success = wxworkPushService.pushTextCard(task, firstPerson.getUserId());
+    private boolean pushToNextAvailable(TobAlertTask task, List<TobRegionPerson> personList, int startIndex) {
+        for (int i = startIndex; i < personList.size(); i++) {
+            TobRegionPerson person = personList.get(i);
+            if (tobAlertTaskService.isPersonBusy(person.getUserId())) {
+                log.info("用户{}忙碌，跳过，taskId={}", person.getUserId(), task.getId());
+                continue;
+            }
+            boolean success = wxworkPushService.pushTextCard(task, person.getUserId());
 
-        TobAlertTaskLog log = new TobAlertTaskLog();
-        log.setTaskId(task.getId());
-        log.setOperateUser("system");
-        if (success) {
-            log.setOperateType(3);
-            log.setOperateContent("推送成功，推送至用户[" + firstPerson.getUserId() + "]");
-        } else {
-            log.setOperateType(4);
-            log.setOperateContent("推送失败，推送至用户[" + firstPerson.getUserId() + "]");
-            // 失败则推下一人
-            task.setAssignIndex(task.getAssignIndex() + 1);
-            tobAlertTaskService.updateTobAlertTask(task);
-            pushNextPerson(task, personList);
+            TobAlertTaskLog pushLog = new TobAlertTaskLog();
+            pushLog.setTaskId(task.getId());
+            pushLog.setOperateUser("system");
+            pushLog.setOperateType(success ? 3 : 4);
+            pushLog.setOperateContent(success ?
+                    "推送成功，推送至用户[" + person.getUserId() + "]" :
+                    "推送失败，推送至用户[" + person.getUserId() + "]");
+            tobAlertTaskLogService.insertTobAlertTaskLog(pushLog);
+
+            if (success) {
+                task.setAssignIndex(i);
+                tobAlertTaskService.updateTobAlertTask(task);
+            } else {
+                task.setAssignIndex(i + 1);
+                tobAlertTaskService.updateTobAlertTask(task);
+                return pushToNextAvailable(task, personList, i + 1);
+            }
+            return true;
         }
-        tobAlertTaskLogService.insertTobAlertTaskLog(log);
+        return false;
     }
 
     /**
-     * 推送给下一个人员（拒绝链逻辑）
+     * 推送给下一个人员（拒绝/超时后流转，兼容旧调用）
      */
     private void pushNextPerson(TobAlertTask task, List<TobRegionPerson> personList) {
-        int index = task.getAssignIndex();
+        int index = task.getAssignIndex() != null ? task.getAssignIndex() : 0;
         if (index >= personList.size()) {
-            // 所有人员均推送失败/拒绝，推管理员
-            pushToAdmin(task, "所有绑定人员均推送失败");
+            pushToAdmin(task, "所有绑定人员均已尝试");
             return;
         }
-
-        TobRegionPerson person = personList.get(index);
-        boolean success = wxworkPushService.pushTextCard(task, person.getUserId());
-
-        TobAlertTaskLog log = new TobAlertTaskLog();
-        log.setTaskId(task.getId());
-        log.setOperateUser("system");
-        if (success) {
-            log.setOperateType(3);
-            log.setOperateContent("重新推送成功，推送至用户[" + person.getUserId() + "]");
-        } else {
-            log.setOperateType(4);
-            log.setOperateContent("重新推送失败，推送至用户[" + person.getUserId() + "]");
-            task.setAssignIndex(task.getAssignIndex() + 1);
-            tobAlertTaskService.updateTobAlertTask(task);
-            pushNextPerson(task, personList);
+        boolean pushed = pushToNextAvailable(task, personList, index);
+        if (!pushed) {
+            pushToAdmin(task, "所有绑定人员均已尝试");
         }
-        tobAlertTaskLogService.insertTobAlertTaskLog(log);
     }
 
     /**
@@ -252,7 +260,7 @@ public class TobAlertReceiveServiceImpl implements ITobAlertReceiveService {
         TobAlertReceive receive = new TobAlertReceive();
         receive.setReceiveNo("R" + DateUtil.format(new Date(), "yyyyMMdd") + IdUtil.fastSimpleUUID().substring(0, 6).toUpperCase());
         receive.setOriginalId(data.getId());
-        receive.setReason("风险计算系统触发，Level=" + level);
+        receive.setReason("等级：" + getLevelText(level) + "（Level=" + level + "）");
         receive.setTrafficId(data.getId());
         receive.setPlate(data.getPlate());
         receive.setCameraId(data.getCameraId());
@@ -276,7 +284,7 @@ public class TobAlertReceiveServiceImpl implements ITobAlertReceiveService {
         if (data.getCaptureTime() != null) {
             task.setCaptureTime(data.getCaptureTime());
         }
-        task.setReason("风险计算系统触发，Level=" + level);
+        task.setReason("等级：" + getLevelText(level) + "（Level=" + level + "）");
         task.setStatus(0);
         task.setAssignIndex(0);
         task.setPushedToAdmin(0);
@@ -290,13 +298,42 @@ public class TobAlertReceiveServiceImpl implements ITobAlertReceiveService {
         if (personList == null || personList.isEmpty()) {
             pushToAdmin(task, "地域无绑定人员");
         } else {
-            pushToFirstPerson(task, personList);
+            boolean pushed = pushToNextAvailable(task, personList, 0);
+            if (!pushed) {
+                log.info("区域{}全员忙碌，taskId={}等待重试", cameraRegion.getLocationId(), task.getId());
+                TobAlertTaskLog busyLog = new TobAlertTaskLog();
+                busyLog.setTaskId(task.getId());
+                busyLog.setOperateUser("system");
+                busyLog.setOperateType(6);
+                busyLog.setOperateContent("全员忙碌，等待空闲");
+                tobAlertTaskLogService.insertTobAlertTaskLog(busyLog);
+            }
         }
 
-        // 6. 更新接收表状态
-        receive.setProcessStatus("1");
+        // 6. 更新接收表状态（monitoring）("1");
         tobAlertReceiveMapper.updateTobAlertReceive(receive);
 
         return receive.getId();
+    }
+
+    private String getLevelText(double level) {
+        int low = getLevelConfigInt("alert.level.low", 30);
+        int medium = getLevelConfigInt("alert.level.medium", 60);
+        int high = getLevelConfigInt("alert.level.high", 100);
+        if (level > high)   return "严重";
+        if (level > medium) return "高";
+        if (level > low)    return "中";
+        return "低";
+    }
+
+    private int getLevelConfigInt(String key, int defaultValue) {
+        String val = wxworkConfigService.getConfigValue(key, "");
+        if (val == null || val.isEmpty()) return defaultValue;
+        try {
+            return Integer.parseInt(val);
+        } catch (NumberFormatException e) {
+            log.warn("等级配置{}非法：{}，使用默认值{}", key, val, defaultValue);
+            return defaultValue;
+        }
     }
 }

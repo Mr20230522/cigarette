@@ -15,6 +15,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createTime" column="create_time" />
         <result property="updateBy"   column="update_by"   />
         <result property="updateTime" column="update_time" />
+        <result property="locationName" column="location_name" />
     </resultMap>
 
     <sql id="selectTobRegionPersonVo">
@@ -24,14 +25,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </sql>
 
     <select id="selectTobRegionPersonList" parameterType="TobRegionPerson" resultMap="TobRegionPersonResult">
-        <include refid="selectTobRegionPersonVo"/>
+        SELECT p.id, p.location_id, p.user_id, p.user_name, p.sort_order, p.is_active,
+               p.create_by, p.create_time, p.update_by, p.update_time,
+               c.location_name
+        FROM tob_region_person p
+        LEFT JOIN (SELECT DISTINCT location_id, location_name FROM tob_camera_region) c
+          ON p.location_id = c.location_id
         <where>
-            <if test="locationId != null "> and location_id = #{locationId}</if>
-            <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
-            <if test="userName != null  and userName != ''"> and user_name like concat('%', #{userName}, '%')</if>
-            <if test="isActive != null "> and is_active = #{isActive}</if>
+            <if test="locationId != null"> and p.location_id = #{locationId}</if>
+            <if test="userId != null  and userId != ''"> and p.user_id = #{userId}</if>
+            <if test="userName != null  and userName != ''"> and p.user_name like concat('%', #{userName}, '%')</if>
+            <if test="isActive != null "> and p.is_active = #{isActive}</if>
         </where>
-        order by sort_order asc, id asc
+        ORDER BY p.sort_order ASC, p.id ASC
     </select>
 
     <select id="selectTobRegionPersonById" parameterType="Long" resultMap="TobRegionPersonResult">

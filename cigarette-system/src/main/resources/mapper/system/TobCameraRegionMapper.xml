@@ -98,4 +98,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
     </delete>
 
+    <select id="selectDistinctLocations" resultMap="TobCameraRegionResult">
+        SELECT DISTINCT location_id, location_name
+        FROM tob_camera_region
+        WHERE is_active = 1
+        ORDER BY location_id ASC
+    </select>
+
 </mapper>

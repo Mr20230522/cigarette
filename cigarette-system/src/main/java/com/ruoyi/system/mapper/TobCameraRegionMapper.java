@@ -48,4 +48,9 @@ public interface TobCameraRegionMapper {
      * 根据地域ID查询（用于获取群Webhook配置）
      */
     TobCameraRegion selectTobCameraRegionByLocationId(@Param("locationId") Integer locationId);
+
+    /**
+     * 查询所有已生效的地域（DISTINCT，用于下拉选项）
+     */
+    List<TobCameraRegion> selectDistinctLocations();
 }

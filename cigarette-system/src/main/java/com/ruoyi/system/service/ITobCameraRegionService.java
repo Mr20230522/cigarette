@@ -37,4 +37,9 @@ public interface ITobCameraRegionService {
      * 删除卡口地域映射
      */
     int deleteTobCameraRegionByIds(Long[] ids);
+
+    /**
+     * 查询所有已生效的地域（DISTINCT，用于下拉选项）
+     */
+    List<TobCameraRegion> selectDistinctLocations();
 }

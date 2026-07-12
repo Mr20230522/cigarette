@@ -30,4 +30,7 @@ public class TobRegionPerson extends BaseEntity {
 
     /** 是否生效（1:生效 0:失效） */
     private Integer isActive;
+
+    /** 地域名称（JOIN tob_camera_region，仅查询用，不持久化） */
+    private String locationName;
 }

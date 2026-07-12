@@ -41,6 +41,14 @@ public class TobCameraRegionController extends BaseController {
     }
 
     /**
+     * 获取所有地域下拉选项（DISTINCT location_id + location_name）
+     */
+    @GetMapping("/locations")
+    public AjaxResult locations() {
+        return success(tobCameraRegionService.selectDistinctLocations());
+    }
+
+    /**
      * 新增卡口地域映射
      */
     @PreAuthorize("@ss.hasPermi('cigarette:alert:cameraRegion:add')")

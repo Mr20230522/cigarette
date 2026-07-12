@@ -54,4 +54,9 @@ public interface TobAlertTaskMapper {
      * 查询超时未处理任务
      */
     List<TobAlertTask> selectTimeoutTasks();
+
+    /**
+     * 查询某人当前处理中的任务数（status=1 已接受未完成）
+     */
+    int countActiveTasksByUserId(@Param("userId") String userId);
 }
