@@ -198,12 +198,11 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
         StringBuilder sb = new StringBuilder();
         // 改成平台允许的签名之一
         sb.append("【云南省烟草公司曲靖市公司】");  // 或者 【曲靖烟草】等
-        sb.append("车辆告警-");
-        sb.append("检测点：").append(item.getCameraName()).append("，");
-        sb.append("时间：").append(item.getCaptureTime()).append("，");
-        sb.append("车牌：").append(item.getPlate()).append("，");
-        sb.append("嫌疑值：").append(item.getLevel()).append("。");
-        sb.append("请及时查看监控。");
+        sb.append("车牌：").append(item.getPlate());
+        sb.append("于").append(item.getCaptureTime().substring(item.getCaptureTime().length() - 8));
+        sb.append("经过").append("我家旁边").append("，");
+        sb.append("预警等级：中").append("。").append("风险因子：夜间行驶、历史涉烟").append("。");
+        sb.append("请拦截！");
         return sb.toString();
     }
 
