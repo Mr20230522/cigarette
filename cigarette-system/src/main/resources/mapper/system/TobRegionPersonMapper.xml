@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobRegionPersonMapper">
+
+    <resultMap type="TobRegionPerson" id="TobRegionPersonResult">
+        <result property="id"         column="id"          />
+        <result property="locationId" column="location_id" />
+        <result property="userId"     column="user_id"     />
+        <result property="userName"   column="user_name"   />
+        <result property="sortOrder"  column="sort_order"  />
+        <result property="isActive"   column="is_active"   />
+        <result property="createBy"   column="create_by"   />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy"   column="update_by"   />
+        <result property="updateTime" column="update_time" />
+        <result property="locationName" column="location_name" />
+    </resultMap>
+
+    <sql id="selectTobRegionPersonVo">
+        select id, location_id, user_id, user_name, sort_order, is_active,
+               create_by, create_time, update_by, update_time
+        from tob_region_person
+    </sql>
+
+    <select id="selectTobRegionPersonList" parameterType="TobRegionPerson" resultMap="TobRegionPersonResult">
+        SELECT p.id, p.location_id, p.user_id, p.user_name, p.sort_order, p.is_active,
+               p.create_by, p.create_time, p.update_by, p.update_time,
+               c.location_name
+        FROM tob_region_person p
+        LEFT JOIN (SELECT DISTINCT location_id, location_name FROM tob_camera_region) c
+          ON p.location_id = c.location_id
+        <where>
+            <if test="locationId != null"> and p.location_id = #{locationId}</if>
+            <if test="userId != null  and userId != ''"> and p.user_id = #{userId}</if>
+            <if test="userName != null  and userName != ''"> and p.user_name like concat('%', #{userName}, '%')</if>
+            <if test="isActive != null "> and p.is_active = #{isActive}</if>
+        </where>
+        ORDER BY p.sort_order ASC, p.id ASC
+    </select>
+
+    <select id="selectTobRegionPersonById" parameterType="Long" resultMap="TobRegionPersonResult">
+        <include refid="selectTobRegionPersonVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectTobRegionPersonByLocationId" parameterType="Integer" resultMap="TobRegionPersonResult">
+        <include refid="selectTobRegionPersonVo"/>
+        where location_id = #{locationId} and is_active = 1
+        order by sort_order asc, id asc
+    </select>
+
+    <insert id="insertTobRegionPerson" parameterType="TobRegionPerson" useGeneratedKeys="true" keyProperty="id">
+        insert into tob_region_person
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            location_id,
+            user_id,
+            <if test="userName != null and userName != ''">user_name,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="isActive != null">is_active,</if>
+            <if test="createBy != null">create_by,</if>
+            create_time,
+            update_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{locationId},
+            #{userId},
+            <if test="userName != null and userName != ''">#{userName},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="isActive != null">#{isActive},</if>
+            <if test="createBy != null">#{createBy},</if>
+            sysdate(),
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateTobRegionPerson" parameterType="TobRegionPerson">
+        update tob_region_person
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="locationId != null">location_id = #{locationId},</if>
+            <if test="userId != null and userId != ''">user_id = #{userId},</if>
+            <if test="userName != null and userName != ''">user_name = #{userName},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="isActive != null">is_active = #{isActive},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTobRegionPersonById" parameterType="Long">
+        delete from tob_region_person where id = #{id}
+    </delete>
+
+    <delete id="deleteTobRegionPersonByIds" parameterType="Long">
+        delete from tob_region_person where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectDistinctByUserId" parameterType="String" resultMap="TobRegionPersonResult">
+        <include refid="selectTobRegionPersonVo"/>
+        where user_id = #{userId} and is_active = 1
+        limit 1
+    </select>
+
+</mapper>

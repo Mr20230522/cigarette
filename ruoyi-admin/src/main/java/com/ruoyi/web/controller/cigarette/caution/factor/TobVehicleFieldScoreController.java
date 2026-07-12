@@ -16,7 +16,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/system/vehicleFieldScore")
-public class ToVehicleFieldScoreController extends BaseController {
+public class TobVehicleFieldScoreController extends BaseController {
 
     @Autowired
     private IToVehicleFieldScoreService toVehicleFieldScoreService;

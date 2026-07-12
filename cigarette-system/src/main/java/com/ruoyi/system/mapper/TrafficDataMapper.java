@@ -2,7 +2,6 @@ package com.ruoyi.system.mapper;
 
 import com.ruoyi.system.domain.TrafficData;
 import com.ruoyi.system.domain.undefine.SearchOfTheSuspectedVehicle;
-import com.ruoyi.system.domain.vo.CameraIdNameVO;
 import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
@@ -34,8 +33,7 @@ public interface TrafficDataMapper {
     List<TrafficData> fetchNewById(@Param("lastId") Long lastId, @Param("limit") int limit);
 
     /**
-     * 获取所有摄像头ID和名称的配对数据
-     * @return 摄像头ID和名称的配对列表
+     * 根据主键Id查询交通数据
      */
-    public List<CameraIdNameVO> getAllCameraIdNamePairs();
+    TrafficData selectById(@Param("id") Long id);
 }

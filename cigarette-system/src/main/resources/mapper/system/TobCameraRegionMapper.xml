@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobCameraRegionMapper">
+
+    <resultMap type="TobCameraRegion" id="TobCameraRegionResult">
+        <result property="id"              column="id"              />
+        <result property="cameraId"        column="camera_id"       />
+        <result property="locationId"      column="location_id"     />
+        <result property="locationName"    column="location_name"   />
+        <result property="isActive"        column="is_active"       />
+        <result property="groupWebhookUrl" column="group_webhook_url"/>
+        <result property="createBy"        column="create_by"       />
+        <result property="createTime"      column="create_time"     />
+        <result property="updateBy"        column="update_by"       />
+        <result property="updateTime"      column="update_time"     />
+    </resultMap>
+
+    <sql id="selectTobCameraRegionVo">
+        select id, camera_id, location_id, location_name, is_active, group_webhook_url,
+               create_by, create_time, update_by, update_time
+        from tob_camera_region
+    </sql>
+
+    <select id="selectTobCameraRegionList" parameterType="TobCameraRegion" resultMap="TobCameraRegionResult">
+        <include refid="selectTobCameraRegionVo"/>
+        <where>
+            <if test="cameraId != null "> and camera_id = #{cameraId}</if>
+            <if test="locationId != null "> and location_id = #{locationId}</if>
+            <if test="locationName != null  and locationName != ''"> and location_name like concat('%', #{locationName}, '%')</if>
+            <if test="isActive != null "> and is_active = #{isActive}</if>
+        </where>
+    </select>
+
+    <select id="selectTobCameraRegionById" parameterType="Long" resultMap="TobCameraRegionResult">
+        <include refid="selectTobCameraRegionVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectTobCameraRegionByCameraId" parameterType="Integer" resultMap="TobCameraRegionResult">
+        <include refid="selectTobCameraRegionVo"/>
+        where camera_id = #{cameraId} and is_active = 1
+    </select>
+
+    <select id="selectTobCameraRegionByLocationId" parameterType="Integer" resultMap="TobCameraRegionResult">
+        <include refid="selectTobCameraRegionVo"/>
+        where location_id = #{locationId} and is_active = 1
+        limit 1
+    </select>
+
+    <insert id="insertTobCameraRegion" parameterType="TobCameraRegion" useGeneratedKeys="true" keyProperty="id">
+        insert into tob_camera_region
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            camera_id,
+            location_id,
+            location_name,
+            <if test="isActive != null">is_active,</if>
+            <if test="groupWebhookUrl != null and groupWebhookUrl != ''">group_webhook_url,</if>
+            <if test="createBy != null">create_by,</if>
+            create_time,
+            update_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{cameraId},
+            #{locationId},
+            #{locationName},
+            <if test="isActive != null">#{isActive},</if>
+            <if test="groupWebhookUrl != null and groupWebhookUrl != ''">#{groupWebhookUrl},</if>
+            <if test="createBy != null">#{createBy},</if>
+            sysdate(),
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateTobCameraRegion" parameterType="TobCameraRegion">
+        update tob_camera_region
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="cameraId != null">camera_id = #{cameraId},</if>
+            <if test="locationId != null">location_id = #{locationId},</if>
+            <if test="locationName != null and locationName != ''">location_name = #{locationName},</if>
+            <if test="isActive != null">is_active = #{isActive},</if>
+            <if test="groupWebhookUrl != null">group_webhook_url = #{groupWebhookUrl},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTobCameraRegionById" parameterType="Long">
+        delete from tob_camera_region where id = #{id}
+    </delete>
+
+    <delete id="deleteTobCameraRegionByIds" parameterType="Long">
+        delete from tob_camera_region where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectDistinctLocations" resultMap="TobCameraRegionResult">
+        SELECT DISTINCT location_id, location_name
+        FROM tob_camera_region
+        WHERE is_active = 1
+        ORDER BY location_id ASC
+    </select>
+
+</mapper>

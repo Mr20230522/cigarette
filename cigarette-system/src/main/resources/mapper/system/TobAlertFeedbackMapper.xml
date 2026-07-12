@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobAlertFeedbackMapper">
+
+    <resultMap type="TobAlertFeedback" id="TobAlertFeedbackResult">
+        <result property="id"          column="id"           />
+        <result property="taskId"      column="task_id"      />
+        <result property="userId"      column="user_id"      />
+        <result property="isMeetAlert" column="is_meet_alert"/>
+        <result property="isIllegal"   column="is_illegal"   />
+        <result property="remark"      column="remark"       />
+        <result property="createTime"  column="create_time"  />
+    </resultMap>
+
+    <sql id="selectTobAlertFeedbackVo">
+        select id, task_id, user_id, is_meet_alert, is_illegal, remark, create_time
+        from tob_alert_feedback
+    </sql>
+
+    <select id="selectTobAlertFeedbackList" parameterType="TobAlertFeedback" resultMap="TobAlertFeedbackResult">
+        <include refid="selectTobAlertFeedbackVo"/>
+        <where>
+            <if test="taskId != null "> and task_id = #{taskId}</if>
+            <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectTobAlertFeedbackById" parameterType="Long" resultMap="TobAlertFeedbackResult">
+        <include refid="selectTobAlertFeedbackVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectTobAlertFeedbackByTaskId" parameterType="Long" resultMap="TobAlertFeedbackResult">
+        <include refid="selectTobAlertFeedbackVo"/>
+        where task_id = #{taskId}
+    </select>
+
+    <insert id="insertTobAlertFeedback" parameterType="TobAlertFeedback" useGeneratedKeys="true" keyProperty="id">
+        insert into tob_alert_feedback
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            task_id,
+            user_id,
+            is_meet_alert,
+            is_illegal,
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{taskId},
+            #{userId},
+            #{isMeetAlert},
+            #{isIllegal},
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+</mapper>

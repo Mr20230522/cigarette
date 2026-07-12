@@ -21,4 +21,42 @@
         WHERE his_car_plate = #{plate}
     </select>
 
+    <select id="selectById" resultMap="TobCaseHistoryResult">
+        SELECT id, his_car_plate, his_car_type, his_car_brand
+        FROM tob_case_history
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.system.domain.TobCaseHistory" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tob_case_history (his_car_plate, his_car_type, his_car_brand)
+        VALUES (#{hisCarPlate}, #{hisCarType}, #{hisCarBrand})
+    </insert>
+
+    <update id="updateById" parameterType="com.ruoyi.system.domain.TobCaseHistory">
+        UPDATE tob_case_history
+        <set>
+            <if test="hisCarPlate != null">his_car_plate = #{hisCarPlate},</if>
+            <if test="hisCarType != null">his_car_type = #{hisCarType},</if>
+            <if test="hisCarBrand != null">his_car_brand = #{hisCarBrand},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectList" parameterType="com.ruoyi.system.domain.TobCaseHistory" resultMap="TobCaseHistoryResult">
+        SELECT id, his_car_plate, his_car_type, his_car_brand
+        FROM tob_case_history
+        <where>
+            <if test="hisCarPlate != null and hisCarPlate != ''">
+                AND his_car_plate LIKE CONCAT('%', #{hisCarPlate}, '%')
+            </if>
+            <if test="hisCarType != null and hisCarType != ''">
+                AND his_car_type LIKE CONCAT('%', #{hisCarType}, '%')
+            </if>
+            <if test="hisCarBrand != null and hisCarBrand != ''">
+                AND his_car_brand LIKE CONCAT('%', #{hisCarBrand}, '%')
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
 </mapper>

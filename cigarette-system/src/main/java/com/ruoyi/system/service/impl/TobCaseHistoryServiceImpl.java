@@ -26,4 +26,24 @@ public class TobCaseHistoryServiceImpl implements ITobCaseHistoryService {
     public TobCaseHistory getByPlate(String plate) {
         return caseHistoryMapper.selectByPlate(plate);
     }
+
+    @Override
+    public TobCaseHistory getById(Long id) {
+        return caseHistoryMapper.selectById(id);
+    }
+
+    @Override
+    public int insert(TobCaseHistory record) {
+        return caseHistoryMapper.insert(record);
+    }
+
+    @Override
+    public int update(TobCaseHistory record) {
+        return caseHistoryMapper.updateById(record);
+    }
+
+    @Override
+    public List<TobCaseHistory> selectList(TobCaseHistory query) {
+        return caseHistoryMapper.selectList(query);
+    }
 }

@@ -22,4 +22,24 @@ public interface ITobCaseHistoryService {
      * @return 历史案件车辆信息，不存在返回 null
      */
     TobCaseHistory getByPlate(String plate);
+
+    /**
+     * 根据ID查询历史案件
+     */
+    TobCaseHistory getById(Long id);
+
+    /**
+     * 新增历史案件
+     */
+    int insert(TobCaseHistory record);
+
+    /**
+     * 修改历史案件
+     */
+    int update(TobCaseHistory record);
+
+    /**
+     * 条件查询历史案件列表（支持车牌/车型/品牌模糊搜索）
+     */
+    List<TobCaseHistory> selectList(TobCaseHistory query);
 }

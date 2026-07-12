@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobAlertTaskMapper">
+
+    <resultMap type="TobAlertTask" id="TobAlertTaskResult">
+        <result property="id"             column="id"              />
+        <result property="taskNo"         column="task_no"         />
+        <result property="originalId"     column="original_id"     />
+        <result property="receiveId"      column="receive_id"      />
+        <result property="locationId"     column="location_id"     />
+        <result property="plate"          column="plate"           />
+        <result property="cameraName"     column="camera_name"     />
+        <result property="captureTime"    column="capture_time"    />
+        <result property="reason"         column="reason"          />
+        <result property="status"         column="status"          />
+        <result property="acceptUser"     column="accept_user"     />
+        <result property="assignIndex"    column="assign_index"    />
+        <result property="pushedToAdmin"  column="pushed_to_admin" />
+        <result property="expireTime"     column="expire_time"     />
+        <result property="createBy"       column="create_by"       />
+        <result property="createTime"     column="create_time"     />
+        <result property="updateBy"       column="update_by"       />
+        <result property="updateTime"     column="update_time"     />
+    </resultMap>
+
+    <sql id="selectTobAlertTaskVo">
+        select id, task_no, original_id, receive_id, location_id, plate,
+               camera_name, capture_time, reason, status, accept_user,
+               assign_index, pushed_to_admin, expire_time,
+               create_by, create_time, update_by, update_time
+        from tob_alert_task
+    </sql>
+
+    <select id="selectTobAlertTaskList" parameterType="TobAlertTask" resultMap="TobAlertTaskResult">
+        <include refid="selectTobAlertTaskVo"/>
+        <where>
+            <if test="taskNo != null  and taskNo != ''"> and task_no like concat('%', #{taskNo}, '%')</if>
+            <if test="originalId != null "> and original_id = #{originalId}</if>
+            <if test="locationId != null "> and location_id = #{locationId}</if>
+            <if test="plate != null  and plate != ''"> and plate like concat('%', #{plate}, '%')</if>
+            <if test="cameraName != null  and cameraName != ''"> and camera_name like concat('%', #{cameraName}, '%')</if>
+            <if test="reason != null  and reason != ''"> and reason like concat('%', #{reason}, '%')</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="acceptUser != null  and acceptUser != ''"> and accept_user = #{acceptUser}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectTobAlertTaskById" parameterType="Long" resultMap="TobAlertTaskResult">
+        <include refid="selectTobAlertTaskVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectTobAlertTaskByOriginalId" parameterType="Long" resultMap="TobAlertTaskResult">
+        <include refid="selectTobAlertTaskVo"/>
+        where original_id = #{originalId}
+    </select>
+
+    <!-- 查询超时未处理任务 -->
+    <select id="selectTimeoutTasks" resultMap="TobAlertTaskResult">
+        <include refid="selectTobAlertTaskVo"/>
+        where status = 0
+        and (
+            (create_time &lt;= DATE_SUB(NOW(), INTERVAL 2 MINUTE) and pushed_to_admin = 0)
+            or create_time &lt;= DATE_SUB(NOW(), INTERVAL 2 HOUR)
+        )
+    </select>
+
+    <insert id="insertTobAlertTask" parameterType="TobAlertTask" useGeneratedKeys="true" keyProperty="id">
+        insert into tob_alert_task
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            task_no,
+            original_id,
+            receive_id,
+            location_id,
+            reason,
+            <if test="plate != null and plate != ''">plate,</if>
+            <if test="cameraName != null and cameraName != ''">camera_name,</if>
+            <if test="captureTime != null">capture_time,</if>
+            <if test="status != null">status,</if>
+            <if test="assignIndex != null">assign_index,</if>
+            <if test="pushedToAdmin != null">pushed_to_admin,</if>
+            <if test="expireTime != null">expire_time,</if>
+            <if test="createBy != null">create_by,</if>
+            create_time,
+            update_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{taskNo},
+            #{originalId},
+            #{receiveId},
+            #{locationId},
+            #{reason},
+            <if test="plate != null and plate != ''">#{plate},</if>
+            <if test="cameraName != null and cameraName != ''">#{cameraName},</if>
+            <if test="captureTime != null">#{captureTime},</if>
+            <if test="status != null">#{status},</if>
+            <if test="assignIndex != null">#{assignIndex},</if>
+            <if test="pushedToAdmin != null">#{pushedToAdmin},</if>
+            <if test="expireTime != null">#{expireTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            sysdate(),
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateTobAlertTask" parameterType="TobAlertTask">
+        update tob_alert_task
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="status != null">status = #{status},</if>
+            <if test="acceptUser != null">accept_user = #{acceptUser},</if>
+            <if test="assignIndex != null">assign_index = #{assignIndex},</if>
+            <if test="pushedToAdmin != null">pushed_to_admin = #{pushedToAdmin},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </trim>
+        where id = #{id}
+    </update>
+
+    <!-- 原子更新任务状态（防并发） -->
+    <update id="updateTobAlertTaskStatus">
+        update tob_alert_task
+        set status = #{newStatus},
+            accept_user = #{acceptUser},
+            update_time = sysdate()
+        where id = #{taskId} and status = #{oldStatus}
+    </update>
+
+    <delete id="deleteTobAlertTaskById" parameterType="Long">
+        delete from tob_alert_task where id = #{id}
+    </delete>
+
+    <delete id="deleteTobAlertTaskByIds" parameterType="Long">
+        delete from tob_alert_task where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="countActiveTasksByUserId" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM tob_alert_task
+        WHERE accept_user = #{userId} AND status = 1
+    </select>
+
+</mapper>

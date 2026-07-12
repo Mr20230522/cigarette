@@ -114,7 +114,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/system/user/checkPhoneExist",
                         "/sms/send",
                         "/sms/verify",
-                        "/loginByPhone").permitAll()
+                        "/loginByPhone",
+                        "/wxwork/**").permitAll()
                 //映射的图片地址取消鉴权(test)
                 //.antMatchers("/images/**").permitAll()
                 // 静态资源，可匿名访问
