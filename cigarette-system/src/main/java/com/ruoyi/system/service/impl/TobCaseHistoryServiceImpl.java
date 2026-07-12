@@ -43,7 +43,7 @@ public class TobCaseHistoryServiceImpl implements ITobCaseHistoryService {
     }
 
     @Override
-    public List<TobCaseHistory> searchByPlate(String plate) {
-        return caseHistoryMapper.searchByPlate(plate);
+    public List<TobCaseHistory> selectList(TobCaseHistory query) {
+        return caseHistoryMapper.selectList(query);
     }
 }

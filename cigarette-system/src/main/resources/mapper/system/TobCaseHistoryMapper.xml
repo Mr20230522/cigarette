@@ -42,12 +42,18 @@
         WHERE id = #{id}
     </update>
 
-    <select id="searchByPlate" resultMap="TobCaseHistoryResult">
+    <select id="selectList" parameterType="com.ruoyi.system.domain.TobCaseHistory" resultMap="TobCaseHistoryResult">
         SELECT id, his_car_plate, his_car_type, his_car_brand
         FROM tob_case_history
         <where>
-            <if test="plate != null and plate != ''">
-                AND his_car_plate LIKE CONCAT('%', #{plate}, '%')
+            <if test="hisCarPlate != null and hisCarPlate != ''">
+                AND his_car_plate LIKE CONCAT('%', #{hisCarPlate}, '%')
+            </if>
+            <if test="hisCarType != null and hisCarType != ''">
+                AND his_car_type LIKE CONCAT('%', #{hisCarType}, '%')
+            </if>
+            <if test="hisCarBrand != null and hisCarBrand != ''">
+                AND his_car_brand LIKE CONCAT('%', #{hisCarBrand}, '%')
             </if>
         </where>
         ORDER BY id DESC

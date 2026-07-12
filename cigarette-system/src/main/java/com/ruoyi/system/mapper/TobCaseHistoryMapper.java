@@ -34,7 +34,7 @@ public interface TobCaseHistoryMapper {
     int updateById(TobCaseHistory record);
 
     /**
-     * 模糊查询：按车牌搜索
+     * 条件查询历史案件列表（支持车牌/车型/品牌模糊搜索）
      */
-    List<TobCaseHistory> searchByPlate(String plate);
+    List<TobCaseHistory> selectList(TobCaseHistory query);
 }

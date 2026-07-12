@@ -3,6 +3,7 @@ package com.ruoyi.web.controller.cigarette.alert;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.system.domain.TobCaseHistory;
 import com.ruoyi.system.service.ITobCaseHistoryService;
@@ -21,12 +22,13 @@ public class TobCaseHistoryController extends BaseController {
     private ITobCaseHistoryService tobCaseHistoryService;
 
     /**
-     * 查询历史案件列表（支持车牌模糊搜索）
+     * 查询历史案件列表（分页，支持车牌/车型/品牌模糊搜索）
      */
     @PreAuthorize("@ss.hasPermi('cigarette:alert:caseHistory:list')")
     @GetMapping("/list")
-    public AjaxResult list(@RequestParam(required = false) String plate) {
-        return success(tobCaseHistoryService.searchByPlate(plate));
+    public TableDataInfo list(TobCaseHistory query) {
+        startPage();
+        return getDataTable(tobCaseHistoryService.selectList(query));
     }
 
     /**

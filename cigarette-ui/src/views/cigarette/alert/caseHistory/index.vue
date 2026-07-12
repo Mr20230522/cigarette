@@ -29,6 +29,9 @@
       </el-table-column>
     </el-table>
 
+    <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize"
+      @pagination="getList" />
+
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="车牌号" prop="hisCarPlate">
@@ -58,10 +61,13 @@ export default {
     return {
       loading: true,
       showSearch: true,
+      total: 0,
       caseList: [],
       title: "",
       open: false,
       queryParams: {
+        pageNum: 1,
+        pageSize: 10,
         plate: null
       },
       form: {},
@@ -77,11 +83,13 @@ export default {
     getList() {
       this.loading = true;
       listCaseHistory(this.queryParams).then(response => {
-        this.caseList = response.data || [];
+        this.caseList = response.rows;
+        this.total = response.total;
         this.loading = false;
       });
     },
     handleQuery() {
+      this.queryParams.pageNum = 1;
       this.getList();
     },
     resetQuery() {
