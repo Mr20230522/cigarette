@@ -1,17 +1,9 @@
 package com.ruoyi.system.service.impl;
 
-import com.ruoyi.system.domain.TobCamera;
-import com.ruoyi.system.domain.TobClockLog;
-import com.ruoyi.system.domain.TobSuspicionLevel;
-import com.ruoyi.system.domain.TrafficData;
+import com.ruoyi.system.domain.*;
 import com.ruoyi.system.domain.cache.*;
 import com.ruoyi.system.domain.vo.TobStaffVo;
-import com.ruoyi.system.mapper.TobCameraMapper;
-import com.ruoyi.system.mapper.TobCacheMapper;
-import com.ruoyi.system.mapper.TobClockLogMapper;
-import com.ruoyi.system.mapper.TobStaffMapper;
-import com.ruoyi.system.mapper.TobSuspicionLevelMapper;
-import com.ruoyi.system.mapper.TrafficDataMapper;
+import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.service.TrafficDataSyncService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
@@ -46,15 +40,14 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
     private TobStaffMapper tobStaffMapper;
     @Autowired
     private SmsService smsService;
+    @Autowired
+    private TobDetectionMapper tobDetectionMapper;
 
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @PostConstruct
     public void init() {
         TobCacheDaySlice slice = cacheMapper.selectDaySliceOne();
-//        System.out.println("【init】slice = " + slice);
-//        System.out.println("【init】maxTrafficId = " +
-//                (slice == null ? "null" : slice.getMaxTrafficId()));
         waterMark = slice == null || slice.getMaxTrafficId() == null
                 ? 0L : slice.getMaxTrafficId();
         if (tobSuspicionLevelMapper.selectSuspicionLevel() == null) {
@@ -73,16 +66,7 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
 
         System.out.println("[SYNC] 发现 " + news.size() + " 条新数据, waterMark=" + waterMark + ", 第一条Id=" + news.get(0).getId());
 
-        // ★★★ 新增：短信告警逻辑（完全独立，不影响原有代码）★★★
-        for (TrafficData item : news) {
-            try {
-                sendAlert(item);
-            } catch (Exception e) {
-                System.err.println("短信发送失败，车辆ID: " + item.getId() + ", 错误: " + e.getMessage());
-            }
-        }
-
-        // ★★★ 以下是原有的缓存统计代码，一行不改 ★★★
+        // 以下是原有的缓存统计代码，一行不改
         long batchMaxId = waterMark;
         String nowYM = sdf.format(new Date()).substring(0, 7);
         double curLevel = 0.0;
@@ -111,6 +95,15 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
             cacheMapper.incVehicleType(type);
         }
         waterMark = batchMaxId;
+
+        //新增：短信告警逻辑
+        for (TrafficData item : news) {
+            try {
+                sendAlert(item);
+            } catch (Exception e) {
+//                System.err.println("短信发送失败，车辆ID: " + item.getId() + ", 错误: " + e.getMessage());
+            }
+        }
     }
 
     /**
@@ -118,71 +111,57 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
      */
     private void sendAlert(TrafficData item) {
         try {
-            System.out.println("========== [SMS] 开始处理 车辆ID=" + item.getId() + " CameraId=" + item.getCameraId() + " Level=" + item.getLevel() + " Time=" + item.getCaptureTime() + " ==========");
+//            System.out.println("========== [SMS] 开始处理 车辆ID=" + item.getId() + " CameraId=" + item.getCameraId() + " Level=" + item.getLevel() + " Time=" + item.getCaptureTime() + " ==========");
 
             if (item.getCameraId() == null) {
-                System.out.println("[SMS] ❌ 摄像头ID为空，跳过");
                 return;
             }
 
-            TobCamera camera = tobCameraMapper.selectByTrafficCameraId(item.getCameraId().longValue());
-            if (camera == null) {
-                System.out.println("[SMS] ❌ 未找到摄像头 traffic_camera_id=" + item.getCameraId());
+            // 查询当前车辆是否存在预警处理
+            if (item.getLevel() <= 40) {
                 return;
             }
-            System.out.println("[SMS] ✅ 找到摄像头 detection_id=" + camera.getDetectionId());
 
+            TobDetection detectionId = tobDetectionMapper.selectTobDetectionByDetectionId((long) item.getCameraId());
+
+            // 现在只关注卡口编号为 1
+//            if ((item.getCameraId() != 1)) {
+//                return;
+//            }
             if (item.getCaptureTime() == null || item.getCaptureTime().isEmpty()) {
                 System.out.println("[SMS] ❌ 捕获时间为空，跳过");
                 return;
             }
-
             // 兼容datetime(6)：JDBC可能返回6位小数、3位小数、或无小数
             String captureTimeStr = item.getCaptureTime();
-            System.out.println("[SMS] 原始CaptureTime=[" + captureTimeStr + "] 长度=" + (captureTimeStr != null ? captureTimeStr.length() : 0));
+//            System.out.println("[SMS] 原始CaptureTime=[" + captureTimeStr + "] 长度=" + (captureTimeStr != null ? captureTimeStr.length() : 0));
             if (captureTimeStr != null) {
                 if (!captureTimeStr.contains(".")) {
                     captureTimeStr = captureTimeStr + ".000";
                 } else if (captureTimeStr.length() > 23) {
                     captureTimeStr = captureTimeStr.substring(0, 23);
                 }
-                System.out.println("[SMS] 规范化后=[" + captureTimeStr + "]");
+//                System.out.println("[SMS] 规范化后=[" + captureTimeStr + "]");
             }
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
             Date captureDate = sdf.parse(captureTimeStr);
-            System.out.println("[SMS] ✅ 时间解析成功: " + captureDate);
+//            System.out.println("[SMS] ✅ 时间解析成功: " + captureDate);
 
-            TobClockLog duty = tobClockLogMapper.selectCurrentDuty(
-                    camera.getDetectionId(), captureDate
-            );
-
-            if (duty == null) {
-                System.out.println("[SMS] ❌ 未找到值班记录 detection_id=" + camera.getDetectionId() + " time=" + captureTimeStr);
-                return;
-            }
-            System.out.println("[SMS] ✅ 找到值班记录 staff_id=" + duty.getStaffId() + " start=" + duty.getStartTime() + " end=" + duty.getEndTime());
-
-            TobStaffVo staff = tobStaffMapper.selectByIdWithPhone(duty.getStaffId());
-            if (staff == null) {
-                System.out.println("[SMS] ❌ 未找到工作人员 staff_id=" + duty.getStaffId());
-                return;
-            }
-            System.out.println("[SMS] ✅ 找到工作人员 user_id=" + staff.getUserId() + " phone=" + staff.getPhonenumber());
-
-            String phone = staff.getPhonenumber();
-            if (phone == null || phone.isEmpty()) {
-                System.out.println("[SMS] ❌ 手机号为空 staff_id=" + duty.getStaffId());
-                return;
-            }
-
-            String message = buildAlertMessage(item);
+//            String phone = staff.getPhonenumber();
+//            String phone = "13150566150";
+//            String phone = "18313946676";
+//            String phone = "18124211847";
+            String message = buildAlertMessage(item, detectionId.getDetectionName());
             System.out.println("[SMS] 短信内容: " + message);
 
-            boolean success = smsService.sendSms(phone, message);
-            if (success) {
-                System.out.println("[SMS] ✅✅✅ 短信发送成功! 车辆ID=" + item.getId() + " 手机号=" + phone);
-            } else {
-                System.out.println("[SMS] ❌ 短信接口返回失败 车辆ID=" + item.getId());
+            String[] phones = {"18313946676", "18124211847", "13150566150"};
+            for (String phone : phones) {
+                boolean success = smsService.sendSms(phone, message);
+                if (success) {
+                    System.out.println("[SMS] ✅✅✅ 短信发送成功! 车辆ID=" + item.getId() + " 手机号=" + phone);
+                } else {
+                    System.out.println("[SMS] ❌ 短信发送失败 车辆ID=" + item.getId());
+                }
             }
 
         } catch (Exception e) {
@@ -190,18 +169,123 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
             e.printStackTrace();
         }
     }
+    //
+//    这是原来的短信模块备份
+//    private void sendAlert(TrafficData item) {
+//        try {
+//            System.out.println("========== [SMS] 开始处理 车辆ID=" + item.getId() + " CameraId=" + item.getCameraId() + " Level=" + item.getLevel() + " Time=" + item.getCaptureTime() + " ==========");
+//
+//            if (item.getCameraId() == null) {
+//                System.out.println("[SMS] ❌ 摄像头ID为空，跳过");
+//                return;
+//            }
+//
+//            TobCamera camera = tobCameraMapper.selectByTrafficCameraId(item.getCameraId().longValue());
+//            if (camera == null) {
+//                System.out.println("[SMS] ❌ 未找到摄像头 traffic_camera_id=" + item.getCameraId());
+//                return;
+//            }
+//            System.out.println("[SMS] ✅ 找到摄像头 detection_id=" + camera.getDetectionId());
+//
+//            if (item.getCaptureTime() == null || item.getCaptureTime().isEmpty()) {
+//                System.out.println("[SMS] ❌ 捕获时间为空，跳过");
+//                return;
+//            }
+//            // 兼容datetime(6)：JDBC可能返回6位小数、3位小数、或无小数
+//            String captureTimeStr = item.getCaptureTime();
+//            System.out.println("[SMS] 原始CaptureTime=[" + captureTimeStr + "] 长度=" + (captureTimeStr != null ? captureTimeStr.length() : 0));
+//            if (captureTimeStr != null) {
+//                if (!captureTimeStr.contains(".")) {
+//                    captureTimeStr = captureTimeStr + ".000";
+//                } else if (captureTimeStr.length() > 23) {
+//                    captureTimeStr = captureTimeStr.substring(0, 23);
+//                }
+//                System.out.println("[SMS] 规范化后=[" + captureTimeStr + "]");
+//            }
+//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+//            Date captureDate = sdf.parse(captureTimeStr);
+//            System.out.println("[SMS] ✅ 时间解析成功: " + captureDate);
+//
+//            TobClockLog duty = tobClockLogMapper.selectCurrentDuty(
+//                    camera.getDetectionId(), captureDate
+//            );
+//
+//            if (duty == null) {
+//                System.out.println("[SMS] ❌ 未找到值班记录 detection_id=" + camera.getDetectionId() + " time=" + captureTimeStr);
+//                return;
+//            }
+//            System.out.println("[SMS] ✅ 找到值班记录 staff_id=" + duty.getStaffId() + " start=" + duty.getStartTime() + " end=" + duty.getEndTime());
+//
+//            TobStaffVo staff = tobStaffMapper.selectByIdWithPhone(duty.getStaffId());
+//            if (staff == null) {
+//                System.out.println("[SMS] ❌ 未找到工作人员 staff_id=" + duty.getStaffId());
+//                return;
+//            }
+//            System.out.println("[SMS] ✅ 找到工作人员 user_id=" + staff.getUserId() + " phone=" + staff.getPhonenumber());
+//
+//            String phone = staff.getPhonenumber();
+////            String phone = "13150566150";
+//            if (phone == null || phone.isEmpty()) {
+//                System.out.println("[SMS] ❌ 手机号为空 staff_id=" + duty.getStaffId());
+//                return;
+//            }
+//
+//            String message = buildAlertMessage(item);
+//            System.out.println("[SMS] 短信内容: " + message);
+//
+//            boolean success = smsService.sendSms(phone, message);
+//            if (success) {
+//                System.out.println("[SMS] ✅✅✅ 短信发送成功! 车辆ID=" + item.getId() + " 手机号=" + phone);
+//            } else {
+//                System.out.println("[SMS] ❌ 短信接口返回失败 车辆ID=" + item.getId());
+//            }
+//
+//        } catch (Exception e) {
+//            System.err.println("[SMS] ❌❌❌ 异常 车辆ID=" + item.getId() + " 错误: " + e.getMessage());
+//            e.printStackTrace();
+//        }
+//    }
 
     /**
      * 新增：构建短信内容
      */
-    private String buildAlertMessage(TrafficData item) {
+    private String buildAlertMessage(TrafficData item, String detectionName) {
         StringBuilder sb = new StringBuilder();
         // 改成平台允许的签名之一
-        sb.append("【云南省烟草公司曲靖市公司】");  // 或者 【曲靖烟草】等
+        sb.append("【云南省烟草公司曲靖市公司】");
         sb.append("车牌：").append(item.getPlate());
-        sb.append("于").append(item.getCaptureTime().substring(item.getCaptureTime().length() - 8));
-        sb.append("经过").append("我家旁边").append("，");
-        sb.append("预警等级：中").append("。").append("风险因子：夜间行驶、历史涉烟").append("。");
+        sb.append("（").append(item.getVehicleType()).append("-").append(item.getVehicleLogo()).append("）");
+        String rawTime = item.getCaptureTime();
+        String timeOnly = "";
+        if (rawTime != null) {
+            // 按空格分割，取第二部分（时间部分）
+            String[] spaceParts = rawTime.split(" ");
+            if (spaceParts.length >= 2) {
+                String timeWithMillis = spaceParts[1];
+                // 按小数点分割，取第一部分
+                String[] dotParts = timeWithMillis.split("\\.");
+                timeOnly = dotParts[0]; // "14:58:07"
+            }
+        }
+        // 将时间减少4.35分钟用于采集平衡系统与真是数据的差值
+        LocalTime originalTime = LocalTime.parse(timeOnly, DateTimeFormatter.ofPattern("HH:mm:ss"));
+        LocalTime newTime = originalTime.minusSeconds(4 * 60 + 35);
+        String finalTime = newTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+
+        sb.append("于").append(finalTime);
+        sb.append("经过").append(detectionName.trim()).append("，");
+
+        String level;
+        if (item.getLevel() >= 60) {
+            level = "高";
+        } else if (item.getLevel() >= 40 && item.getLevel() < 60) {
+            level = "中";
+        } else {
+            level = "低";
+        }
+
+        sb.append("预警等级：").append(level).append("。");
+//        sb.append("风险因子：夜间行驶、历史涉烟").append("。");
         sb.append("请拦截！");
         return sb.toString();
     }
@@ -339,31 +423,80 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
         }
         int hour = hourOf(t.getCaptureTime());
         switch (hour) {
-            case 0: h.setH00(1L); break;
-            case 1: h.setH01(1L); break;
-            case 2: h.setH02(1L); break;
-            case 3: h.setH03(1L); break;
-            case 4: h.setH04(1L); break;
-            case 5: h.setH05(1L); break;
-            case 6: h.setH06(1L); break;
-            case 7: h.setH07(1L); break;
-            case 8: h.setH08(1L); break;
-            case 9: h.setH09(1L); break;
-            case 10: h.setH10(1L); break;
-            case 11: h.setH11(1L); break;
-            case 12: h.setH12(1L); break;
-            case 13: h.setH13(1L); break;
-            case 14: h.setH14(1L); break;
-            case 15: h.setH15(1L); break;
-            case 16: h.setH16(1L); break;
-            case 17: h.setH17(1L); break;
-            case 18: h.setH18(1L); break;
-            case 19: h.setH19(1L); break;
-            case 20: h.setH20(1L); break;
-            case 21: h.setH21(1L); break;
-            case 22: h.setH22(1L); break;
-            case 23: h.setH23(1L); break;
-            default: break;
+            case 0:
+                h.setH00(1L);
+                break;
+            case 1:
+                h.setH01(1L);
+                break;
+            case 2:
+                h.setH02(1L);
+                break;
+            case 3:
+                h.setH03(1L);
+                break;
+            case 4:
+                h.setH04(1L);
+                break;
+            case 5:
+                h.setH05(1L);
+                break;
+            case 6:
+                h.setH06(1L);
+                break;
+            case 7:
+                h.setH07(1L);
+                break;
+            case 8:
+                h.setH08(1L);
+                break;
+            case 9:
+                h.setH09(1L);
+                break;
+            case 10:
+                h.setH10(1L);
+                break;
+            case 11:
+                h.setH11(1L);
+                break;
+            case 12:
+                h.setH12(1L);
+                break;
+            case 13:
+                h.setH13(1L);
+                break;
+            case 14:
+                h.setH14(1L);
+                break;
+            case 15:
+                h.setH15(1L);
+                break;
+            case 16:
+                h.setH16(1L);
+                break;
+            case 17:
+                h.setH17(1L);
+                break;
+            case 18:
+                h.setH18(1L);
+                break;
+            case 19:
+                h.setH19(1L);
+                break;
+            case 20:
+                h.setH20(1L);
+                break;
+            case 21:
+                h.setH21(1L);
+                break;
+            case 22:
+                h.setH22(1L);
+                break;
+            case 23:
+                h.setH23(1L);
+                break;
+            default:
+                break;
         }
         return h;
     }
@@ -434,23 +567,57 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
         }
         type = type.trim();
         switch (type) {
-            case "轿车": v.setSedan(1L); break;
-            case "SUV/MPV": v.setSuvMpv(1L); break;
-            case "货车": v.setTruck(1L); break;
-            case "二轮车": v.setTwoWheeler(1L); break;
-            case "面包车": v.setVan(1L); break;
-            case "小货车": v.setLightTruck(1L); break;
-            case "三轮车": v.setThreeWheeler(1L); break;
-            case "小型车": v.setSmallCar(1L); break;
-            case "行人": v.setPedestrian(1L); break;
-            case "大型车": v.setLargeVehicle(1L); break;
-            case "皮卡车": v.setPickup(1L); break;
-            case "大型客车": v.setLargeBus(1L); break;
-            case "未知": v.setUnknown(1L); break;
-            case "非机动车": v.setNonMotor(1L); break;
-            case "中型客车": v.setMediumBus(1L); break;
-            case "suv": v.setSuvOnly(1L); break;
-            default: v.setOther(1L); break;
+            case "轿车":
+                v.setSedan(1L);
+                break;
+            case "SUV/MPV":
+                v.setSuvMpv(1L);
+                break;
+            case "货车":
+                v.setTruck(1L);
+                break;
+            case "二轮车":
+                v.setTwoWheeler(1L);
+                break;
+            case "面包车":
+                v.setVan(1L);
+                break;
+            case "小货车":
+                v.setLightTruck(1L);
+                break;
+            case "三轮车":
+                v.setThreeWheeler(1L);
+                break;
+            case "小型车":
+                v.setSmallCar(1L);
+                break;
+            case "行人":
+                v.setPedestrian(1L);
+                break;
+            case "大型车":
+                v.setLargeVehicle(1L);
+                break;
+            case "皮卡车":
+                v.setPickup(1L);
+                break;
+            case "大型客车":
+                v.setLargeBus(1L);
+                break;
+            case "未知":
+                v.setUnknown(1L);
+                break;
+            case "非机动车":
+                v.setNonMotor(1L);
+                break;
+            case "中型客车":
+                v.setMediumBus(1L);
+                break;
+            case "suv":
+                v.setSuvOnly(1L);
+                break;
+            default:
+                v.setOther(1L);
+                break;
         }
         return v;
     }
@@ -478,7 +645,6 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
             Date cap = sdf.parse(captureTime);
             Date today = new Date();
             today = sdf.parse(sdf.format(today));
-
             long diff = today.getTime() - cap.getTime();
             int days = (int) (diff / (24 * 60 * 60 * 1000));
             return days >= 0 && days <= 7 ? days : -1;

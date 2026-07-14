@@ -1016,7 +1016,6 @@ public class ToRiskScoreServiceImpl implements IToRiskScoreService {
 
 
     //将各个字段的得分保存到数据表
-
     @Override
     public void processNextBatch() {
         long lastId = readLastProcessedId();

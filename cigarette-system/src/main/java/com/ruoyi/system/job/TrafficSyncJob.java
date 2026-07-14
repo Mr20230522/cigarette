@@ -13,6 +13,8 @@ public class TrafficSyncJob {
 
     @Scheduled(fixedDelay = 1000)
     public void run() {
-        syncService.sync();
+        try{
+            syncService.sync();
+        }catch (Exception ignored){}
     }
 }
