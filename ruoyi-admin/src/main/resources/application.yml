@@ -37,7 +37,7 @@ server:
 # 企业微信配置（数据库 tob_wxwork_config 优先，此处为默认值兜底）
 wxwork:
   # 应用主页地址，必须与企微后台「应用主页」一致，且域名在「可信域名」列表中
-  app-home-url: https://你的域名/wxwork/handle.html
+  app-home-url: https://zwfw.qjyc.cn/kd_api/wxwork/handle.html
 
 # 日志配置
 logging:

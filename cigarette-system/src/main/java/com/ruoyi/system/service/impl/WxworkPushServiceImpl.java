@@ -51,7 +51,7 @@ public class WxworkPushServiceImpl implements IWxworkPushService {
     private String wxworkDomain;
 
     /** 应用主页地址（企微自建应用的应用主页URL，支持内网IP） */
-    @Value("${wxwork.app-home-url:http://192.168.1.100:8080/wxwork/handle.html}")
+    @Value("${wxwork.app-home-url:https://zwfw.qjyc.cn/kd_api/wxwork/handle.html}")
     private String appHomeUrl;
 
     @Override
