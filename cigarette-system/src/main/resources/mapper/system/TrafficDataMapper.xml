@@ -128,4 +128,12 @@
         SELECT * FROM trafficdata WHERE Id = #{id}
     </select>
 
+    <!-- 获取所有摄像头ID和名称（去重） -->
+    <select id="getAllCameraIdNamePairs" resultType="com.ruoyi.system.domain.vo.CameraIdNameVO">
+        SELECT DISTINCT CameraId AS cameraId, CameraName AS cameraName
+        FROM trafficdata
+        WHERE CameraName IS NOT NULL AND CameraName != ''
+        ORDER BY CameraId
+    </select>
+
 </mapper>
