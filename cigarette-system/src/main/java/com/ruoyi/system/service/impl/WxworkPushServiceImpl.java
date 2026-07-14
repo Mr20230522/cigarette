@@ -9,6 +9,8 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.ruoyi.system.domain.TobAlertTask;
+import com.ruoyi.system.domain.TrafficData;
+import com.ruoyi.system.mapper.TrafficDataMapper;
 import com.ruoyi.system.service.IWxworkPushService;
 import com.ruoyi.system.service.ITobWxworkConfigService;
 import org.slf4j.Logger;
@@ -31,26 +33,37 @@ public class WxworkPushServiceImpl implements IWxworkPushService {
 
     private static final Logger log = LoggerFactory.getLogger(WxworkPushServiceImpl.class);
 
-    /** Redis缓存Key前缀 */
+    /**
+     * Redis缓存Key前缀
+     */
     private static final String ACCESS_TOKEN_KEY = "wxwork:access_token";
 
-    /** 签名盐值 */
+    /**
+     * 签名盐值
+     */
     private static final String SIGN_SALT = "AlertTask2026";
 
-    /** AccessToken缓存时间（7000秒，官方7200秒） */
+    /**
+     * AccessToken缓存时间（7000秒，官方7200秒）
+     */
     private static final long TOKEN_EXPIRE_SECONDS = 7000;
 
     @Autowired
     private ITobWxworkConfigService tobWxworkConfigService;
-
+    @Autowired
+    private TrafficDataMapper trafficDataMapper;
     @Autowired(required = false)
     private StringRedisTemplate stringRedisTemplate;
 
-    /** 系统域名，用于生成处理链接 */
+    /**
+     * 系统域名，用于生成处理链接
+     */
     @Value("${wxwork.domain:http://localhost:端口}")
     private String wxworkDomain;
 
-    /** 应用主页地址（企微自建应用的应用主页URL，支持内网IP） */
+    /**
+     * 应用主页地址（企微自建应用的应用主页URL，支持内网IP）
+     */
     @Value("${wxwork.app-home-url:https://zwfw.qjyc.cn/kd_api/wxwork/handle.html}")
     private String appHomeUrl;
 
@@ -112,9 +125,12 @@ public class WxworkPushServiceImpl implements IWxworkPushService {
 
         String agentId = tobWxworkConfigService.getConfigValue("wxwork.agentid", "1000001");
         String signedUrl = generateSignedUrl(task.getId());
+        TrafficData trafficData = trafficDataMapper.selectById(task.getOriginalId());
 
         String title = "【预警通知】" + (task.getPlate() != null ? task.getPlate() : "新任务");
         String description = "车牌号：" + (task.getPlate() != null ? task.getPlate() : "-") + "\n"
+                + "车辆品牌：" + (trafficData.getVehicleLogo() != null ? trafficData.getVehicleLogo() : "-") + "\n"
+                + "车辆类型：" + (trafficData.getVehicleType() != null ? trafficData.getVehicleType() : "-") + "\n"
                 + "预警原因：" + (task.getReason() != null ? task.getReason() : "-") + "\n"
                 + "预警等级：" + getLevelFromReason(task.getReason()) + "\n"
                 + "卡口：" + (task.getCameraName() != null ? task.getCameraName() : "-") + "\n"
@@ -178,6 +194,7 @@ public class WxworkPushServiceImpl implements IWxworkPushService {
 
     /**
      * 群机器人Webhook通知（旁路，不影响主流程）
+     *
      * @param webhookUrl 群机器人Webhook地址
      * @param content    Markdown格式消息内容
      */
@@ -283,11 +300,16 @@ public class WxworkPushServiceImpl implements IWxworkPushService {
     private String getStatusText(Integer status) {
         if (status == null) return "未知";
         switch (status) {
-            case 0: return "待处理";
-            case 1: return "处理中";
-            case 2: return "已完成";
-            case 3: return "已关闭";
-            default: return "未知";
+            case 0:
+                return "待处理";
+            case 1:
+                return "处理中";
+            case 2:
+                return "已完成";
+            case 3:
+                return "已关闭";
+            default:
+                return "未知";
         }
     }
 
