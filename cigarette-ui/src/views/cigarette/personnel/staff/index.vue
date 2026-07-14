@@ -86,10 +86,10 @@
             </template>
           </el-table-column>
           <el-table-column label="工作人员图片" align="center" prop="picture" width="100">
-        <template slot-scope="scope">
-          <image-preview :src="scope.row.picture" :width="50" :height="50"/>
-        </template>
-      </el-table-column>
+            <template slot-scope="scope">
+              <image-preview :src="scope.row.picture" :width="50" :height="50" />
+            </template>
+          </el-table-column>
           <el-table-column label="备注" align="center" prop="remark" />
           <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="100">
             <template slot-scope="scope">
@@ -118,7 +118,7 @@
                 :class="{ 'bg-color': index % 2 === 1, 'selected': user === selectedUser }">
                 <el-col :span="24">
                   <span @click="selectUser(user)" class="label" style="cursor:pointer;">用户ID:{{ user.id
-                    }}&nbsp;&nbsp;用户名称:{{ user.username }}&nbsp;&nbsp;电话号码:{{ user.phonenumber }}
+                  }}&nbsp;&nbsp;用户名称:{{ user.username }}&nbsp;&nbsp;电话号码:{{ user.phonenumber }}
                   </span>
                 </el-col>
               </el-row>
@@ -142,42 +142,41 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="检测点" prop="detectionId">
-                    <el-select v-model="form.detectionId" placeholder="请选择所管理的监测点" filterable
-                        @change="handleDetectionChange">
-                        <el-option v-for="item in detectionOptions" :key="item.detectionId"
-                            :label="getDetectionName(item.detectionId)" :value="item.detectionId"></el-option>
-                    </el-select>
-                </el-form-item>
+              <el-select v-model="form.detectionId" placeholder="请选择所管理的监测点" filterable @change="handleDetectionChange">
+                <el-option v-for="item in detectionOptions" :key="item.detectionId"
+                  :label="getDetectionName(item.detectionId)" :value="item.detectionId"></el-option>
+              </el-select>
+            </el-form-item>
 
           </el-col>
           <el-col :span="12">
             <el-form-item label="值班表id" prop="dutyId">
-          <el-input v-model="form.dutyId" placeholder="请输入值班表id" />
-        </el-form-item>
+              <el-input v-model="form.dutyId" placeholder="请输入值班表id" />
+            </el-form-item>
 
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
             <el-form-item label="工作人员图片" prop="picture">
-          <image-upload v-model="form.picture"/>
-        </el-form-item>
+              <image-upload v-model="form.picture" />
+            </el-form-item>
 
           </el-col>
           <el-col :span="12">
             <el-row>
-            <el-form-item label="人脸特征编码" prop="faceFeature">
-          <el-input v-model="form.faceFeature" placeholder="请输入人脸特征编码" />
-        </el-form-item>
-      </el-row>
-      <el-row>
-        <el-form-item label="状态" prop="status">
-          <el-select v-model="form.status" placeholder="请选择状态" clearable>
-            <el-option v-for="dict in dict.type.sys_normal_disable" :key="dict.value" :label="dict.label"
-              :value="dict.value" />
-          </el-select>
-        </el-form-item>
-      </el-row>
+              <el-form-item label="人脸特征编码" prop="faceFeature">
+                <el-input v-model="form.faceFeature" placeholder="请输入人脸特征编码" />
+              </el-form-item>
+            </el-row>
+            <el-row>
+              <el-form-item label="状态" prop="status">
+                <el-select v-model="form.status" placeholder="请选择状态" clearable>
+                  <el-option v-for="dict in dict.type.sys_normal_disable" :key="dict.value" :label="dict.label"
+                    :value="dict.value" />
+                </el-select>
+              </el-form-item>
+            </el-row>
           </el-col>
         </el-row>
 
@@ -261,7 +260,7 @@ export default {
         children: 'children',
         label: 'label'
       },
-      treeData : [],
+      treeData: [],
       // 表单校验
       rules: {
         userId: [{
@@ -455,18 +454,18 @@ export default {
         console.error("Failed to load district options:", error);
       });
     },
-        // 当检测点变更时触发，自动填充地区ID
-        handleDetectionChange(newValue) {
-        // 通过检测点ID找到对应的地区ID
-        const selectedDetection = this.detectionOptions.find(item => item.detectionId === newValue);
-        if (selectedDetection) {
-            // 将地区ID填充到表单的districtId字段
-            this.form.districtId = selectedDetection.districtId;
-        }
+    // 当检测点变更时触发，自动填充地区ID
+    handleDetectionChange(newValue) {
+      // 通过检测点ID找到对应的地区ID
+      const selectedDetection = this.detectionOptions.find(item => item.detectionId === newValue);
+      if (selectedDetection) {
+        // 将地区ID填充到表单的districtId字段
+        this.form.districtId = selectedDetection.districtId;
+      }
     },
     getDistrictName(districtId) {
-        const district = this.districtOptions.find(item => item.districtId === districtId);
-        return district ? district.districtName : '未知地区';
+      const district = this.districtOptions.find(item => item.districtId === districtId);
+      return district ? district.districtName : '未知地区';
     },
     // 根据 detectionId 获取监测点名字
     getDetectionName(detectionId) {

@@ -66,4 +66,8 @@ public interface TobClockLogMapper
      */
     TobClockLog selectCurrentDuty(@Param("detectionId") Long detectionId,
                                   @Param("currentTime") Date currentTime);
+    /**
+     * 根据检测点查询值班人员手机号码
+     */
+    List<String> selectPhoneNumbersByDetectionId(@Param("detectionId") Long detectionId);
 }

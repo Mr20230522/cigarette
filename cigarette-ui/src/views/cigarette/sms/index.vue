@@ -36,8 +36,9 @@
 
         <el-table v-loading="loading" :data="detectionList" @selection-change="handleSelectionChange">
             <el-table-column label="卡口编号" align="center" prop="detectionId" />
-            <el-table-column label="卡口名称" align="center" prop="detectionName" min-width="120px" :show-overflow-tooltip="true" />
-            <el-table-column label="卡口位置" align="center" prop="phone" min-width="120px" :show-overflow-tooltip="true" />
+            <el-table-column label="卡口名称" align="center" prop="detectionName" min-width="120px"
+                :show-overflow-tooltip="true" />
+            <!-- <el-table-column label="卡口位置" align="center" prop="phone" min-width="120px" :show-overflow-tooltip="true" /> -->
 
             <el-table-column fixed="right" label="操作" align="center" class-name="small-padding fixed-width"
                 min-width="120px">

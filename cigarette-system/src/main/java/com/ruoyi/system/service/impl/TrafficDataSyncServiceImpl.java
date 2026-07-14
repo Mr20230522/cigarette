@@ -113,25 +113,17 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
         try {
 //            System.out.println("========== [SMS] 开始处理 车辆ID=" + item.getId() + " CameraId=" + item.getCameraId() + " Level=" + item.getLevel() + " Time=" + item.getCaptureTime() + " ==========");
 
-            if (item.getCameraId() == null) {
-                return;
-            }
-
-            // 查询当前车辆是否存在预警处理
-            if (item.getLevel() <= 40) {
-                return;
-            }
-
+            // 当没有这个监测点时返回
+            if (item.getCameraId() == null) return;
             TobDetection detectionId = tobDetectionMapper.selectTobDetectionByDetectionId((long) item.getCameraId());
 
-            // 现在只关注卡口编号为 1
-//            if ((item.getCameraId() != 1)) {
-//                return;
-//            }
-            if (item.getCaptureTime() == null || item.getCaptureTime().isEmpty()) {
-                System.out.println("[SMS] ❌ 捕获时间为空，跳过");
-                return;
-            }
+            // 当该监测点没有人员或设备时返回
+            List<String> list = tobClockLogMapper.selectPhoneNumbersByDetectionId(detectionId.getDetectionId());
+            if (list == null && list.isEmpty()) return;
+            // 查询当前车辆是否存在预警处理
+            if (item.getLevel() <= 40) return;
+            if (item.getCaptureTime() == null || item.getCaptureTime().isEmpty()) return;
+
             // 兼容datetime(6)：JDBC可能返回6位小数、3位小数、或无小数
             String captureTimeStr = item.getCaptureTime();
 //            System.out.println("[SMS] 原始CaptureTime=[" + captureTimeStr + "] 长度=" + (captureTimeStr != null ? captureTimeStr.length() : 0));
@@ -141,21 +133,14 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
                 } else if (captureTimeStr.length() > 23) {
                     captureTimeStr = captureTimeStr.substring(0, 23);
                 }
-//                System.out.println("[SMS] 规范化后=[" + captureTimeStr + "]");
             }
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
             Date captureDate = sdf.parse(captureTimeStr);
-//            System.out.println("[SMS] ✅ 时间解析成功: " + captureDate);
 
-//            String phone = staff.getPhonenumber();
-//            String phone = "13150566150";
-//            String phone = "18313946676";
-//            String phone = "18124211847";
             String message = buildAlertMessage(item, detectionId.getDetectionName());
             System.out.println("[SMS] 短信内容: " + message);
 
-            String[] phones = {"18313946676", "18124211847", "13150566150"};
-            for (String phone : phones) {
+            for (String phone : list) {
                 boolean success = smsService.sendSms(phone, message);
                 if (success) {
                     System.out.println("[SMS] ✅✅✅ 短信发送成功! 车辆ID=" + item.getId() + " 手机号=" + phone);
