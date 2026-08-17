@@ -252,10 +252,10 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
                 timeOnly = dotParts[0]; // "14:58:07"
             }
         }
-        // 将时间减少4.35分钟用于采集平衡系统与真是数据的差值
         LocalTime originalTime = LocalTime.parse(timeOnly, DateTimeFormatter.ofPattern("HH:mm:ss"));
-        LocalTime newTime = originalTime.minusSeconds(4 * 60 + 35);
-        String finalTime = newTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        // 将时间减少4.35分钟用于采集平衡系统与真是数据的差值（已修复）
+//        LocalTime newTime = originalTime.minusSeconds(4 * 60 + 35);
+        String finalTime = originalTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
 
         sb.append("于").append(finalTime);
         sb.append("经过").append(detectionName.trim()).append("，");

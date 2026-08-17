@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TobSmsMoRecordMapper">
+
+    <!-- 结果映射：字段名 -> 实体属性 -->
+    <resultMap id="BaseResultMap" type="com.ruoyi.system.domain.TobSmsMoRecord">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="task_id" property="taskId" jdbcType="VARCHAR"/>
+        <result column="mobile" property="mobile" jdbcType="VARCHAR"/>
+        <result column="servicenumber" property="servicenumber" jdbcType="VARCHAR"/>
+        <result column="msgid" property="msgid" jdbcType="VARCHAR"/>
+        <result column="msg" property="msg" jdbcType="VARCHAR"/>
+        <result column="uptime" property="uptime" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <!-- 基础字段列表 -->
+    <sql id="Base_Column_List">
+        id, task_id, mobile, servicenumber, msgid, msg, uptime, status
+    </sql>
+
+    <!-- 1. 选择性插入（非空字段） -->
+    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tob_sms_mo_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="taskId != null">task_id,</if>
+            <if test="mobile != null">mobile,</if>
+            <if test="servicenumber != null">servicenumber,</if>
+            <if test="msgid != null">msgid,</if>
+            <if test="msg != null">msg,</if>
+            <if test="uptime != null">uptime,</if>
+            <if test="status != null">status,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="taskId != null">#{taskId,jdbcType=VARCHAR},</if>
+            <if test="mobile != null">#{mobile,jdbcType=VARCHAR},</if>
+            <if test="servicenumber != null">#{servicenumber,jdbcType=VARCHAR},</if>
+            <if test="msgid != null">#{msgid,jdbcType=VARCHAR},</if>
+            <if test="msg != null">#{msg,jdbcType=VARCHAR},</if>
+            <if test="uptime != null">#{uptime,jdbcType=VARCHAR},</if>
+            <if test="status != null">#{status,jdbcType=TINYINT},</if>
+        </trim>
+    </insert>
+
+    <!-- 2. 批量插入（使用 foreach） -->
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO tob_sms_mo_record (task_id, mobile, servicenumber, msgid, msg, uptime, status)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.taskId,jdbcType=VARCHAR},
+            #{item.mobile,jdbcType=VARCHAR},
+            #{item.servicenumber,jdbcType=VARCHAR},
+            #{item.msgid,jdbcType=VARCHAR},
+            #{item.msg,jdbcType=VARCHAR},
+            #{item.uptime,jdbcType=VARCHAR},
+            #{item.status,jdbcType=TINYINT}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 3. 根据主键查询 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM tob_sms_mo_record
+        WHERE id = #{id}
+    </select>
+
+    <!-- 4. 根据msgid查询（唯一） -->
+    <select id="selectByMsgid" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM tob_sms_mo_record
+        WHERE msgid = #{msgid}
+    </select>
+
+    <!-- 5. 根据状态查询 -->
+    <select id="selectByStatus" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM tob_sms_mo_record
+        WHERE status = #{status}
+        ORDER BY uptime ASC
+    </select>
+
+    <!-- 6. 查询待处理记录（状态=0），按上行时间正序，限制条数 -->
+    <select id="selectPendingList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM tob_sms_mo_record
+        WHERE status = 0
+        ORDER BY uptime ASC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 7. 根据ID更新状态 -->
+    <update id="updateStatusById">
+        UPDATE tob_sms_mo_record
+        SET status = #{status,jdbcType=TINYINT}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 8. 根据msgid更新状态 -->
+    <update id="updateStatusByMsgid">
+        UPDATE tob_sms_mo_record
+        SET status = #{status,jdbcType=TINYINT}
+        WHERE msgid = #{msgid}
+    </update>
+
+    <!-- 9. 根据ID删除 -->
+    <delete id="deleteById">
+        DELETE FROM tob_sms_mo_record
+        WHERE id = #{id}
+    </delete>
+
+    <!-- 10. 按状态统计 -->
+    <select id="countByStatus" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM tob_sms_mo_record
+        WHERE status = #{status}
+    </select>
+
+</mapper>
