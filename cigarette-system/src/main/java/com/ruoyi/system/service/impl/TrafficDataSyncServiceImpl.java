@@ -107,7 +107,7 @@ public class TrafficDataSyncServiceImpl implements TrafficDataSyncService {
     }
 
     /**
-     * 新增：短信发送逻辑
+     * 短信发送逻辑
      */
     private void sendAlert(TrafficData item) {
         try {
