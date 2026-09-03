@@ -7,8 +7,8 @@ ruoyi:
   # 版权年份
   copyrightYear: 2024
   # 文件路径 示例（ Windows配置C:/ruoyi/uploadPath，Linux配置 /home/ruoyi/uploadPath mac配置 /Users/deng/Desktop/asset/）
-#  服务器的地址
-#  profile: C:\win-x64\File\Images
+  #  服务器的地址
+  #  profile: C:\win-x64\File\Images
   profile: /Users/deng/Desktop/asset
 
   # 获取ip地址开关
@@ -39,10 +39,17 @@ wxwork:
   # 应用主页地址，必须与企微后台「应用主页」一致，且域名在「可信域名」列表中
   app-home-url: https://zwfw.qjyc.cn/kd_api/wxwork/handle.html
 
+# 调用python编写的模型服务参数配置
+python:
+  service:
+    port: 5000
+    startup-timeout: 30   # 等待启动超时（秒）
+    command: "E:/minaconda/envs/ML/python.exe"
 # 日志配置
 logging:
   level:
-    com.ruoyi: debug
+    com.ruoyi: warn
+    #    com.ruoyi: debug
     org.springframework: warn
 
 # 用户配置
@@ -145,7 +152,7 @@ xss:
 backup:
   # 备份文件存储路径
   dir: /Users/deng/Desktop/mysql_backups
-#  dir: C:/mysql_backups
+  #  dir: C:/mysql_backups
   # 要备份的表名
   table: trafficdata
   # 数据库名
